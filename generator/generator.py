@@ -1,11 +1,13 @@
 import contextlib
 import logging
 import pathlib
+from collections import defaultdict
 from functools import reduce
 from typing import Any, Dict, List
 
 import jinja2
 
+from generator.normalizers import pythonize_name
 from generator.structures import Entity, Group
 
 templates_dir: pathlib.Path = pathlib.Path(__file__).parent / "templates"
@@ -52,9 +54,37 @@ class Generator:
         log.info("Visit type %r", entity.name)
         with self.open_entity_file(out_dir, entity) as f:
             code = self.render_template(
-                "type.py.jinja2", {"entity": entity}
+                "type.py.jinja2",
+                {"entity": entity, "imports": self.extract_imports_from_type(entity)},
             )
             f.write(code)
+
+    def extract_imports_from_type(self, entity: Entity):
+        imports = defaultdict(set)
+
+        for annotation in entity.annotations:
+            # typing
+            for from_typing in {"Any", "Union", "Optional", "List"}:
+                if from_typing in annotation.python_type:
+                    imports["typing"].add(from_typing)
+            # Telegram
+            for telegram_type in self.telegram_types:
+                if (
+                    telegram_type in annotation.python_type
+                    and telegram_type != entity.name
+                ):
+                    imports["telegram"].add(
+                        (pythonize_name(telegram_type), telegram_type)
+                    )
+                    imports["typing"].add("TYPE_CHECKING")
+            if "datetime" in annotation.python_type:
+                imports["extra"].add("import datetime")
+
+        if entity.extends:
+            imports["extra"].add(
+                f"from .{pythonize_name(entity.extends[0])} import {entity.extends[0]}"
+            )
+        return imports
 
     @contextlib.contextmanager
     def open_entity_file(self, out_dir: pathlib.Path, entity: Entity):
