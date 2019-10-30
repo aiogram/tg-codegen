@@ -1,0 +1,3 @@
+.idea/*
+aiogram/types
+!aiogram/types/base.py
