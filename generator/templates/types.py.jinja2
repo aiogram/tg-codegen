@@ -1,0 +1,29 @@
+from .base import TelegramObject
+
+{%- for group in groups %}
+    {%- if group.has_types %}
+        {%- for child in group.childs %}
+            {%- if child.is_type %}
+from .{{child.pythonic_name}} import {{ child.name }}
+            {%- endif %}
+        {%- endfor %}
+    {%- endif %}
+{%- endfor %}
+
+__all__ = (
+    "TelegramObject",
+{%- for group in groups %}
+    {%- if group.has_types %}
+        {%- for child in group.childs %}
+            {%- if child.is_type %}
+    "{{ child.name }}",
+            {%- endif %}
+        {%- endfor %}
+    {%- endif %}
+{%- endfor %}
+)
+
+# Load typing forward refs for every TelegramObject
+for entity in __all__[:1]:
+    globals()[entity].update_forward_refs(**globals())
+

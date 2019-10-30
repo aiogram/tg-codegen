@@ -1,0 +1,19 @@
+from __future__ import annotations
+
+from pydantic import Field
+
+from .base import TelegramObject
+
+
+class {{ entity.name }}({{ (entity.extends or ['TelegramObject'])|join(', ') }}):
+    """
+    {{ entity.description|indent(width=4) }}
+
+    Source: https://core.telegram.org/bots/api#{{ entity.anchor }}
+    """
+{% for annotation in entity.annotations %}
+    {{ annotation.python_field }}
+    """{{ annotation.description|indent(width=4) }}"""
+{% else %}
+    pass
+{% endfor %}
