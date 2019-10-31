@@ -16,6 +16,8 @@ jinja2 = "*"
 isort = "*"
 black = "*"
 lxml = "*"
+aiohttp = "==3.6.2"
+mypy = "*"
 
 [requires]
 python_version = "3.7"

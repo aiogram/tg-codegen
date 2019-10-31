@@ -1,32 +1,23 @@
-from aiogram.types import Update
+import asyncio
 
-data = {
-    "update_id": 128526,
-    "message": {
-        "message_id": 11223,
-        "from": {
-            "id": 12345678,
-            "is_bot": False,
-            "first_name": "FirstName",
-            "last_name": "LastName",
-            "username": "username",
-            "language_code": "ru",
-        },
-        "chat": {
-            "id": 12345678,
-            "first_name": "FirstName",
-            "last_name": "LastName",
-            "username": "username",
-            "type": "private",
-        },
-        "date": 1508709711,
-        "text": "Hi, world!",
-    },
-}
+import aiohttp
 
-update = Update(**data)
-print(update)
-print(update.message)
-print(update.message.from_user)
-print(update.message.from_user.id)
-print(update.json(indent=3))
+from aiogram.api.methods.get_updaets import GetUpdates
+
+u = GetUpdates(limit=1)
+d = u.build_request()
+print(u)
+print(d)
+
+
+async def main():
+    token = "TOKEN"
+    async with aiohttp.ClientSession() as sess:
+        async with sess.get(f"https://api.telegram.org/bot{token}/{d.method}") as resp:
+            response = await resp.json()
+            result = u.build_response(response)
+            print(result.result)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
