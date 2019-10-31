@@ -4,17 +4,16 @@ from pydantic import Field
 
 from .base import TelegramObject
 
-# {{ imports }}
 {% if imports %}
-{% if imports.extra %}{% for import in imports.extra %}{{ import }}
+{%- if imports.extra %}{% for import in imports.extra %}{{ import }}
 {% endfor %}{% endif %}
 {% if imports.typing %}from typing import {{ imports.typing|join(', ') }}{% endif %}
 {% if imports.telegram %}
 if TYPE_CHECKING:
-    {% for module, import in imports.telegram %}from .{{ module }} import {{ import }}
+    {% for import in imports.telegram %}from .{{ import|pythonize }} import {{ import }}
     {% endfor %}
-{% endif %}
-{% endif %}
+{%- endif %}
+{%- endif %}
 
 class {{ entity.name }}({{ (entity.extends or ['TelegramObject'])|join(', ') }}):
     """

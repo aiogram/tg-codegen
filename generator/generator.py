@@ -21,6 +21,8 @@ class Generator:
         self.env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(searchpath=[templates_dir])
         )
+        self.env.filters.update({"pythonize": pythonize_name})
+
         self.telegram_types = {
             entity.name for group in groups for entity in group.childs if entity.is_type
         }
@@ -73,9 +75,7 @@ class Generator:
                     telegram_type in annotation.python_type
                     and telegram_type != entity.name
                 ):
-                    imports["telegram"].add(
-                        (pythonize_name(telegram_type), telegram_type)
-                    )
+                    imports["telegram"].add(telegram_type)
                     imports["typing"].add("TYPE_CHECKING")
             if "datetime" in annotation.python_type:
                 imports["extra"].add("import datetime")
