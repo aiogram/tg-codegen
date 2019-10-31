@@ -24,6 +24,6 @@ class {{ entity.name }}({{ (entity.extends or ['TelegramObject'])|join(', ') }})
 {% for annotation in entity.annotations %}
     {{ annotation.python_field }}
     """{{ annotation.description|indent(width=4) }}"""
-{% else %}
+{%- else %}
     pass
 {% endfor %}

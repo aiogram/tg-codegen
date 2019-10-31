@@ -1,12 +1,14 @@
 import contextlib
 import logging
 import pathlib
+import re
 from collections import defaultdict
 from functools import reduce
 from typing import Any, Dict, List
 
 import jinja2
 
+from generator.consts import TELEGRAM_TYPE_PATTERN
 from generator.normalizers import pythonize_name
 from generator.structures import Entity, Group
 
@@ -71,9 +73,9 @@ class Generator:
                     imports["typing"].add(from_typing)
             # Telegram
             for telegram_type in self.telegram_types:
-                if (
-                    telegram_type in annotation.python_type
-                    and telegram_type != entity.name
+                if telegram_type != entity.name and re.findall(
+                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type),
+                    annotation.python_type,
                 ):
                     imports["telegram"].add(telegram_type)
                     imports["typing"].add("TYPE_CHECKING")
