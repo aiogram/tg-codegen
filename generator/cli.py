@@ -11,7 +11,6 @@ out_dir = script_path.parent / "aiogram"
 
 
 def main(argv: typing.List[str]) -> int:
-    logging.basicConfig(level=logging.ERROR, stream=sys.stdout)
     parser = Parser()
 
     groups = parser.parse()

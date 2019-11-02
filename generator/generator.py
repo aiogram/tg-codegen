@@ -6,6 +6,9 @@ from collections import defaultdict
 from functools import reduce
 from typing import Any, Dict, List
 
+import autoflake
+import black
+import isort
 import jinja2
 
 from generator.consts import TELEGRAM_TYPE_PATTERN
@@ -23,7 +26,12 @@ class Generator:
         self.env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(searchpath=[templates_dir])
         )
-        self.env.filters.update({"pythonize": pythonize_name})
+        self.env.filters.update(
+            {
+                "pythonize": pythonize_name,
+                "class_name": lambda name: name[0].upper() + name[1:],
+            }
+        )
 
         self.telegram_types = {
             entity.name for group in groups for entity in group.childs if entity.is_type
@@ -45,14 +53,46 @@ class Generator:
                 else:
                     self.generate_type(entity, out_dir)
             log.info("Leave group %r", group.title)
-        with self.open_file(out_dir, "types", "__init__.py") as f:
+        with self.open_file(out_dir, "api", "types", "__init__.py") as f:
             f.write(self.render_template("types.py.jinja2", {"groups": self.groups}))
+        with self.open_file(out_dir, "api", "methods", "__init__.py") as f:
+            f.write(self.render_template("methods.py.jinja2", {"groups": self.groups}))
 
     def render_template(self, template_name: str, context: Dict[str, Any]):
-        return self.env.get_template(template_name).render(context)
+        log.info("Render template %r with context %s", template_name, context)
+        code = self.env.get_template(template_name).render(context)
+
+        code = autoflake.fix_code(
+            code,
+            additional_imports=None,
+            expand_star_imports=True,
+            remove_all_unused_imports=True,
+            remove_duplicate_keys=True,
+            remove_unused_variables=False,
+            ignore_init_module_imports=False,
+        )
+        try:
+            code = black.format_file_contents(
+                code,
+                fast=True,
+                mode=black.FileMode(
+                    target_versions={black.TargetVersion.PY37}, line_length=99
+                ),
+            )
+        except black.NothingChanged:
+            pass
+
+        return code
 
     def generate_method(self, entity: Entity, out_dir: pathlib.Path):
         log.info("Visit method %r -> %r", entity.name, entity.pythonic_name)
+        imports = self.extract_imports_from_type(entity, with_returning=True)
+        imports["typing"].update({"Dict", "Any"})
+        with self.open_entity_file(out_dir, entity) as f:
+            code = self.render_template(
+                "method.py.jinja2", {"entity": entity, "imports": imports},
+            )
+            f.write(code)
 
     def generate_type(self, entity: Entity, out_dir: pathlib.Path):
         log.info("Visit type %r", entity.name)
@@ -63,7 +103,7 @@ class Generator:
             )
             f.write(code)
 
-    def extract_imports_from_type(self, entity: Entity):
+    def extract_imports_from_type(self, entity: Entity, with_returning: bool = False):
         imports = defaultdict(set)
 
         for annotation in entity.annotations:
@@ -86,12 +126,23 @@ class Generator:
             imports["extra"].add(
                 f"from .{pythonize_name(entity.extends[0])} import {entity.extends[0]}"
             )
+        if with_returning:
+            for from_typing in {"Any", "Union", "Optional", "List"}:
+                if from_typing in entity.python_returning_type:
+                    imports["typing"].add(from_typing)
+            for telegram_type in self.telegram_types:
+                if re.findall(
+                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type),
+                    entity.python_returning_type,
+                ):
+                    imports["telegram"].add(telegram_type)
         return imports
 
     @contextlib.contextmanager
     def open_entity_file(self, out_dir: pathlib.Path, entity: Entity):
         with self.open_file(
             out_dir,
+            "api",
             ["types", "methods"][entity.is_method],
             f"{entity.pythonic_name}.py",
         ) as f:

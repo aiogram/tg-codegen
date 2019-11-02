@@ -1,7 +1,7 @@
 from typing import Optional, List, Dict, Any
 
 from aiogram.api.methods.base import TelegramMethod, Request, Response
-from aiogram.types import Update
+from aiogram.api.types import Update
 
 
 class GetUpdates(TelegramMethod):

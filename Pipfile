@@ -18,6 +18,7 @@ black = "*"
 lxml = "*"
 aiohttp = "==3.6.2"
 mypy = "*"
+autoflake = "*"
 
 [requires]
 python_version = "3.7"

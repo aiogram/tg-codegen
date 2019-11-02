@@ -1,0 +1,21 @@
+from .base import TelegramMethod
+
+{%- for group in groups %}
+    {%- for child in group.childs %}
+        {%- if child.is_method %}
+from .{{child.pythonic_name}} import {{ child.name|class_name }}
+        {%- endif %}
+    {%- endfor %}
+{%- endfor %}
+
+__all__ = (
+    "TelegramMethod",
+{%- for group in groups %}
+    {%- for child in group.childs %}
+        {%- if child.is_method %}
+    "{{ child.name|class_name }}",
+        {%- endif %}
+    {%- endfor %}
+{%- endfor %}
+)
+

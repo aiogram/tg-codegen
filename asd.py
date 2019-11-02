@@ -2,7 +2,7 @@ import asyncio
 
 import aiohttp
 
-from aiogram.api.methods.get_updaets import GetUpdates
+from aiogram.api.methods import GetUpdates
 
 u = GetUpdates(limit=1)
 d = u.build_request()
@@ -16,7 +16,7 @@ async def main():
         async with sess.get(f"https://api.telegram.org/bot{token}/{d.method}") as resp:
             response = await resp.json()
             result = u.build_response(response)
-            print(result.result)
+            print(result)
 
 
 if __name__ == "__main__":

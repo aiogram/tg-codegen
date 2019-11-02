@@ -5,7 +5,7 @@ from typing import Dict, Union, Optional, TypeVar, Generic, Any
 from pydantic import BaseModel, BaseConfig, Extra
 from pydantic.generics import GenericModel
 
-from aiogram.types import InputFile, ResponseParameters
+from aiogram.api.types import InputFile, ResponseParameters
 
 T = TypeVar("T")
 
@@ -22,7 +22,9 @@ class Request(BaseModel):
 
 class Response(ResponseParameters, GenericModel, Generic[T]):
     ok: bool
-    result: Optional[T]
+    result: Optional[T] = None
+    description: Optional[str] = None
+    error_code: Optional[int] = None
 
 
 class TelegramMethod(abc.ABC, BaseModel):

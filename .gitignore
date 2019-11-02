@@ -1,6 +1,9 @@
 .idea/*
-aiogram/types
-!aiogram/types/base.py
 .mypy_cache
 __pycache__
 *.py[cod]
+
+aiogram/api/types
+!aiogram/api/types/base.py
+aiogram/api/methods
+!aiogram/api/methods/base.py

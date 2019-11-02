@@ -1,0 +1,31 @@
+from pydantic import Field
+
+from .base import TelegramMethod, Request, Response
+
+
+{% if imports %}
+{%- if imports.extra %}{% for import in imports.extra %}{{ import }}
+{% endfor %}{% endif %}
+{% if imports.typing %}from typing import {{ imports.typing|join(', ') }}{% endif %}
+{% if imports.telegram %}
+{% for import in imports.telegram %}from ..types import {{ import }}
+{% endfor %}
+{%- endif %}
+{%- endif %}
+
+
+class {{ entity.name|class_name }}({{ (entity.extends or ['TelegramMethod'])|join(', ') }}):
+    """
+    {{ entity.description|indent(width=4) }}
+
+    Source: https://core.telegram.org/bots/api#{{ entity.anchor }}
+    """
+{% for annotation in entity.annotations %}
+    {{ annotation.python_field }}
+    """{{ annotation.description|indent(width=4) }}"""
+{% endfor %}
+    def build_request(self) -> Request:
+        return Request(method="{{ entity.name }}", data=self.dict(exclude_unset=True))
+
+    def build_response(self, data: Dict[str, Any]) -> Response[{{ entity.python_returning_type }}]:
+        return Response[{{ entity.python_returning_type }}](**data)

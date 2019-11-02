@@ -34,4 +34,4 @@ SPECIAL_CLIENT_SUBTYPES = {
 
 SPECIAL_SERVER_SUBTYPES = {("Input", "MessageContent"): "InputMessageContent"}
 
-TELEGRAM_TYPE_PATTERN = r"(^|\[){type}(\]|$|,)"
+TELEGRAM_TYPE_PATTERN = r"(^|\[| ){type}(\]|$|,)"

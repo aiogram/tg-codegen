@@ -2,8 +2,8 @@ import functools
 
 from generator.consts import (
     BUILTIN_TYPES,
-    RETURN_PATTERNS,
     READ_MORE_PATTERN,
+    RETURN_PATTERNS,
     SYMBOLS_MAP,
 )
 
@@ -56,6 +56,10 @@ def normalize_type(string):
         split_types = string.split(" or ")
         norm_str = ", ".join(map(normalize_type, map(str.strip, split_types)))
         return f"Union[{norm_str}]"
+    if "and" in split:
+        split_types = string.split(" and ")
+        norm_str = ", ".join(map(normalize_type, map(str.strip, split_types)))
+        return f"Union[{norm_str}]"
     if "number" in lower:
         return normalize_type(string.replace("number", "").strip())
     if lower in ["true", "false"]:
@@ -101,14 +105,3 @@ def pythonize_name(name: str) -> str:
     return "".join(
         f"_{s}" if i > 0 and s.isupper() else s for i, s in enumerate(name)
     ).lower()
-
-
-def collect_imports(python_type, telegram_types):
-    from generator.structures import Import
-
-    for typing_import in {"Any", "Union", "Optional", "List"}:
-        if typing_import in python_type:
-            yield Import("typing", {typing_import})
-    for telegram_import in telegram_types:
-        if telegram_import in python_type:
-            yield Import(f".{pythonize_name(telegram_import)}", {telegram_import})
