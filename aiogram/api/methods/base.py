@@ -30,9 +30,7 @@ class Response(ResponseParameters, GenericModel, Generic[T]):
 class TelegramMethod(abc.ABC, BaseModel, Generic[T]):
     class Config(BaseConfig):
         use_enum_values = True
-        orm_mode = True
         extra = Extra.allow
-        allow_mutation = True
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
 
@@ -46,4 +44,5 @@ class TelegramMethod(abc.ABC, BaseModel, Generic[T]):
         pass
 
     def build_response(self, data: Dict[str, Any]) -> Response[T]:
-        return Response[self.__returning__](**data)
+        # noinspection PyTypeChecker
+        return Response[self.__returning__].construct(**data)  # type: ignore
