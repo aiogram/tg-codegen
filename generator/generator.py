@@ -4,7 +4,7 @@ import pathlib
 import re
 from collections import defaultdict
 from functools import reduce
-from typing import Any, Dict, List
+from typing import Any, DefaultDict, Dict, List, Optional, Set
 
 import autoflake
 import black
@@ -30,6 +30,7 @@ class Generator:
             {
                 "pythonize": pythonize_name,
                 "class_name": lambda name: name[0].upper() + name[1:],
+                "first_line": lambda text: text.split("\n")[0],
             }
         )
 
@@ -57,6 +58,8 @@ class Generator:
             f.write(self.render_template("types.py.jinja2", {"groups": self.groups}))
         with self.open_file(out_dir, "api", "methods", "__init__.py") as f:
             f.write(self.render_template("methods.py.jinja2", {"groups": self.groups}))
+        with self.open_file(out_dir, "api", "client", "bot.py") as f:
+            f.write(self.render_template("bot.py.jinja2", {"groups": self.groups}))
 
     def render_template(self, template_name: str, context: Dict[str, Any]):
         log.info("Render template %r with context %s", template_name, context)
@@ -71,6 +74,7 @@ class Generator:
             remove_unused_variables=False,
             ignore_init_module_imports=False,
         )
+        code = isort.SortImports(file_contents=code,).output
         try:
             code = black.format_file_contents(
                 code,
@@ -86,7 +90,7 @@ class Generator:
 
     def generate_method(self, entity: Entity, out_dir: pathlib.Path):
         log.info("Visit method %r -> %r", entity.name, entity.pythonic_name)
-        imports = self.extract_imports_from_type(entity, with_returning=True)
+        imports = self.extract_imports(entity, with_returning=True)
         imports["typing"].update({"Dict", "Any"})
         with self.open_entity_file(out_dir, entity) as f:
             code = self.render_template(
@@ -99,12 +103,18 @@ class Generator:
         with self.open_entity_file(out_dir, entity) as f:
             code = self.render_template(
                 "type.py.jinja2",
-                {"entity": entity, "imports": self.extract_imports_from_type(entity)},
+                {"entity": entity, "imports": self.extract_imports(entity)},
             )
             f.write(code)
 
-    def extract_imports_from_type(self, entity: Entity, with_returning: bool = False):
-        imports = defaultdict(set)
+    def extract_imports(
+        self,
+        entity: Entity,
+        with_returning: bool = False,
+        imports: Optional[DefaultDict[str, Set[str]]] = None,
+    ):
+        if imports is None:
+            imports = defaultdict(set)
 
         for annotation in entity.annotations:
             # typing

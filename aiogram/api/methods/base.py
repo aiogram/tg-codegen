@@ -1,8 +1,8 @@
 import abc
 import io
-from typing import Dict, Union, Optional, TypeVar, Generic, Any
+from typing import Any, Dict, Generic, Optional, Type, TypeVar, Union
 
-from pydantic import BaseModel, BaseConfig, Extra
+from pydantic import BaseConfig, BaseModel, Extra
 from pydantic.generics import GenericModel
 
 from aiogram.api.types import InputFile, ResponseParameters
@@ -27,7 +27,7 @@ class Response(ResponseParameters, GenericModel, Generic[T]):
     error_code: Optional[int] = None
 
 
-class TelegramMethod(abc.ABC, BaseModel):
+class TelegramMethod(abc.ABC, BaseModel, Generic[T]):
     class Config(BaseConfig):
         use_enum_values = True
         orm_mode = True
@@ -36,10 +36,14 @@ class TelegramMethod(abc.ABC, BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
 
+    @property
+    @abc.abstractmethod
+    def __returning__(self) -> Type:
+        pass
+
     @abc.abstractmethod
     def build_request(self) -> Request:
         pass
 
-    @abc.abstractmethod
     def build_response(self, data: Dict[str, Any]) -> Response[T]:
-        pass
+        return Response[self.__returning__](**data)

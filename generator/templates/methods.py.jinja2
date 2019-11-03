@@ -1,4 +1,4 @@
-from .base import TelegramMethod
+from .base import TelegramMethod, Request, Response
 
 {%- for group in groups %}
     {%- for child in group.childs %}
@@ -10,6 +10,8 @@ from .{{child.pythonic_name}} import {{ child.name|class_name }}
 
 __all__ = (
     "TelegramMethod",
+    "Request",
+    "Response",
 {%- for group in groups %}
     {%- for child in group.childs %}
         {%- if child.is_method %}

@@ -14,18 +14,22 @@ from .base import TelegramMethod, Request, Response
 {%- endif %}
 
 
-class {{ entity.name|class_name }}({{ (entity.extends or ['TelegramMethod'])|join(', ') }}):
+class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_type }}]):
     """
     {{ entity.description|indent(width=4) }}
 
     Source: https://core.telegram.org/bots/api#{{ entity.anchor }}
     """
+    __returning__ = {{ entity.python_returning_type }}
+
 {% for annotation in entity.annotations %}
     {{ annotation.python_field }}
     """{{ annotation.description|indent(width=4) }}"""
 {% endfor %}
     def build_request(self) -> Request:
-        return Request(method="{{ entity.name }}", data=self.dict(exclude_unset=True))
+        data: Dict[str, Any] = self.dict(exclude_unset=True, exclude={})
+        files: Dict[str, Any] = {}
+        return Request(method="{{ entity.name }}", data=data, files=files)
 
-    def build_response(self, data: Dict[str, Any]) -> Response[{{ entity.python_returning_type }}]:
-        return Response[{{ entity.python_returning_type }}](**data)
+{#    def build_response(self, data: Dict[str, Any]) -> Response[{{ entity.python_returning_type }}]:#}
+{#        return Response[{{ entity.python_returning_type }}](**data)#}

@@ -1,0 +1,46 @@
+from .base import BaseBot
+
+from typing import Any, List, Optional, Union
+
+{% for group in groups %}{% for entity in group.childs %}
+{#from ..{% if entity.is_method %}methods{% else %}types{% endif %}.{{ entity.name|pythonize }} import {{ entity.name|class_name }}#}
+from ..{% if entity.is_method %}methods{% else %}types{% endif %} import {{ entity.name|class_name }}
+{%- endfor %}{% endfor %}
+
+class Bot(BaseBot):
+    """
+    Class where located all API methods
+    """
+
+{% for group in groups %}{% if group.has_methods %}
+	# =============================================================================================
+	# Group: {{ group.title }}
+    # Source: https://core.telegram.org/bots/api#{{ group.anchor }}
+	# =============================================================================================
+    {% for entity in group.childs %}{% if entity.is_method %}
+    async def {{ entity.name|pythonize }}(
+        self,
+        {% for annotation in entity.annotations %}
+            {{ annotation.python_name }}:{{ annotation.python_type }}{% if not annotation.required %} = None{% endif %},
+        {% endfor %}
+    ) -> {{ entity.python_returning_type }}:
+        """
+        {{ entity.description|indent(width=8) }}
+
+        Source: https://core.telegram.org/bots/api#{{ entity.anchor }}
+
+        {% for annotation in entity.annotations -%}
+        :param {{ annotation.python_name }}: {{ annotation.description|first_line }}
+        :type {{ annotation.python_name }}: :obj:`{{ annotation.python_type }}`
+        {% endfor -%}
+        :return: {{ entity.returning|first_line }}
+        :rtype: :obj:`{{ entity.python_returning_type }}`
+        """
+        call = {{ entity.name|class_name }}(
+        {% for annotation in entity.annotations %}
+            {{ annotation.python_name }}={{ annotation.python_name }},
+        {% endfor %}
+        )
+        return await self.emit(call)
+    {% endif %}{% endfor %}
+{% endif %}{% endfor %}

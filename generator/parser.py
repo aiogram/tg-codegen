@@ -126,6 +126,7 @@ class Parser:
             anchor=anchor, name=name, description=description, annotations=annotations
         )
         self._set_specific_entity_attributes(block)
+        block.fix_annotations_ordering()
         log.info("%s", block)
         return block
 

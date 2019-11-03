@@ -55,6 +55,19 @@ class Entity:
 
     extends: typing.Optional[typing.List[str]] = None
 
+    def fix_annotations_ordering(self):
+        if not self.annotations:
+            return
+        required_annotations = []
+        not_required_annotations = []
+        for annotation in self.annotations:
+            if annotation.required:
+                required_annotations.append(annotation)
+            else:
+                not_required_annotations.append(annotation)
+
+        self.annotations = required_annotations + not_required_annotations
+
     @property
     def is_method(self) -> bool:
         return self.name[0].islower()

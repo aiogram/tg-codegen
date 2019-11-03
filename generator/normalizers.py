@@ -1,4 +1,5 @@
 import functools
+from typing import Iterable
 
 from generator.consts import (
     BUILTIN_TYPES,
@@ -52,6 +53,8 @@ def normalize_type(string):
     if split[0] == "array":
         new_string = string[lower.index("of") + 2 :].strip()
         return f"List[{normalize_type(new_string)}]"
+    if "messages" in split:
+        return normalize_type(string.replace("Messages", "array of Message"))
     if "or" in split:
         split_types = string.split(" or ")
         norm_str = ", ".join(map(normalize_type, map(str.strip, split_types)))
