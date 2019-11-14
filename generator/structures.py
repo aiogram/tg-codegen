@@ -31,6 +31,8 @@ class Annotation:
         result = normalize_type(self.type)
         if self.name == "date":
             return normalize_optional("datetime.datetime", self.required)
+        if self.name == 'media':
+            return normalize_optional('Union[str, InputFile]', required=self.required)
         return normalize_optional(result, self.required)
 
     @property
