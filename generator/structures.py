@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import typing
 from dataclasses import dataclass, field
 
@@ -97,6 +98,14 @@ class Entity:
     @property
     def python_returning_type(self):
         return normalize_type(self.returning_type)
+
+    @property
+    def file_annotations(self):
+        result = []
+        for item in self.annotations:
+            if 'InputFile' in item.python_type:
+                result.append(item)
+        return result
 
 
 @dataclass

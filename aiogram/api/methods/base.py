@@ -46,3 +46,11 @@ class TelegramMethod(abc.ABC, BaseModel, Generic[T]):
     def build_response(self, data: Dict[str, Any]) -> Response[T]:
         # noinspection PyTypeChecker
         return Response[self.__returning__].construct(**data)  # type: ignore
+
+    def prepare_file(
+        self, name: str, value: Any, data: Dict[str, Any], files: Dict[str, Any]
+    ):
+        if isinstance(value, InputFile):
+            files[name] = value
+        else:
+            data[name] = value
