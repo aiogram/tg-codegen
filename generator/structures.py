@@ -31,8 +31,13 @@ class Annotation:
         result = normalize_type(self.type)
         if self.name == "date":
             return normalize_optional("datetime.datetime", self.required)
-        if self.name == 'media':
-            return normalize_optional('Union[str, InputFile]', required=self.required)
+        if self.name == "media":
+            return normalize_optional("Union[str, InputFile]", required=self.required)
+        if self.name == "until_date":
+            return normalize_optional(
+                f"Union[int, datetime.datetime, datetime.timedelta]",
+                required=self.required,
+            )
         return normalize_optional(result, self.required)
 
     @property
@@ -105,7 +110,7 @@ class Entity:
     def file_annotations(self):
         result = []
         for item in self.annotations:
-            if 'InputFile' in item.python_type:
+            if "InputFile" in item.python_type:
                 result.append(item)
         return result
 

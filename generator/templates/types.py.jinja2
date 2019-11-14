@@ -1,5 +1,8 @@
 from .base import TelegramObject
-
+from .input_file import (
+    BufferedInputFile
+    FSInputFile
+)
 {%- for group in groups %}
     {%- for child in group.childs %}
         {%- if child.is_type %}
@@ -10,6 +13,8 @@ from .{{child.pythonic_name}} import {{ child.name }}
 
 __all__ = (
     "TelegramObject",
+    "BufferedInputFile",
+    "FSInputFile",
 {%- for group in groups %}
     {%- for child in group.childs %}
         {%- if child.is_type %}
@@ -20,6 +25,12 @@ __all__ = (
 )
 
 # Load typing forward refs for every TelegramObject
-for entity in __all__[1:]:
-    globals()[entity].update_forward_refs(**globals())
+for _entity_name in __all__:
+    _entity = globals()[_entity_name]
+    if not hasattr(_entity, 'update_forward_refs'):
+        continue
+    _entity.update_forward_refs(**globals())
+
+del _entity
+del _entity_name
 

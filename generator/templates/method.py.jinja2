@@ -27,7 +27,7 @@ class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_typ
     """{{ annotation.description|indent(width=4) }}"""
 {% endfor %}
     def build_request(self) -> Request:
-        data: Dict[str, Any] = self.dict(exclude_unset=True, {% if entity.file_annotations %}exclude={ {% for annotation in entity.file_annotations %}"{{ annotation.python_name }}", {% endfor %} }{% endif %})
+        data: Dict[str, Any] = self.dict({% if entity.file_annotations %}exclude={ {% for annotation in entity.file_annotations %}"{{ annotation.python_name }}", {% endfor %} }{% endif %})
 
         {% if entity.file_annotations %}files: Dict[str, InputFile] = {}{% endif %}
         {%- for file in entity.file_annotations %}
@@ -36,6 +36,3 @@ class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_typ
 
         return Request(method="{{ entity.name }}", data=data{% if entity.file_annotations %}, files=files{% endif %})
 
-
-{#    def build_response(self, data: Dict[str, Any]) -> Response[{{ entity.python_returning_type }}]:#}
-{#        return Response[{{ entity.python_returning_type }}](**data)#}
