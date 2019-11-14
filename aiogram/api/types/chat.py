@@ -6,8 +6,8 @@ from .base import TelegramObject
 
 if TYPE_CHECKING:
     from .message import Message
-    from .chat_permissions import ChatPermissions
     from .chat_photo import ChatPhoto
+    from .chat_permissions import ChatPermissions
 
 
 class Chat(TelegramObject):

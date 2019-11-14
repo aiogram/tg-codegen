@@ -6,8 +6,8 @@ from .base import TelegramObject
 
 if TYPE_CHECKING:
     from .animation import Animation
-    from .message_entity import MessageEntity
     from .photo_size import PhotoSize
+    from .message_entity import MessageEntity
 
 
 class Game(TelegramObject):

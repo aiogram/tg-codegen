@@ -4,12 +4,7 @@ import functools
 import typing
 from dataclasses import dataclass, field
 
-from generator.normalizers import (
-    get_returning,
-    normalize_optional,
-    normalize_type,
-    pythonize_name,
-)
+from generator.normalizers import get_returning, normalize_optional, normalize_type, pythonize_name
 
 
 @dataclass
@@ -31,12 +26,12 @@ class Annotation:
         result = normalize_type(self.type)
         if self.name == "date":
             return normalize_optional("datetime.datetime", self.required)
-        if self.name == "media":
+        if self.name == "media" and result == "str":
+            print(self.name, result)
             return normalize_optional("Union[str, InputFile]", required=self.required)
         if self.name == "until_date":
             return normalize_optional(
-                f"Union[int, datetime.datetime, datetime.timedelta]",
-                required=self.required,
+                f"Union[int, datetime.datetime, datetime.timedelta]", required=self.required
             )
         return normalize_optional(result, self.required)
 

@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Union
 
-from ..types import InlineKeyboardMarkup, InputFile, Message
+from ..types import InlineKeyboardMarkup, InputMedia, Message
 from .base import Request, TelegramMethod
 
 
@@ -13,7 +13,7 @@ class EditMessageMedia(TelegramMethod[Union[Message, bool]]):
 
     __returning__ = Union[Message, bool]
 
-    media: Union[str, InputFile]
+    media: InputMedia
     """A JSON-serialized object for a new media content of the message"""
 
     chat_id: Optional[Union[int, str]] = None
@@ -29,11 +29,6 @@ class EditMessageMedia(TelegramMethod[Union[Message, bool]]):
     """A JSON-serialized object for a new inline keyboard."""
 
     def build_request(self) -> Request:
-        data: Dict[str, Any] = self.dict(
-            exclude={"media",}
-        )
+        data: Dict[str, Any] = self.dict()
 
-        files: Dict[str, InputFile] = {}
-        self.prepare_file(data=data, files=files, name="media", value=self.media)
-
-        return Request(method="editMessageMedia", data=data, files=files)
+        return Request(method="editMessageMedia", data=data)

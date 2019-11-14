@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 
-from ..types import InputFile, Message
+from ..types import InputMediaPhoto, InputMediaVideo, Message
 from .base import Request, TelegramMethod
 
 
@@ -16,7 +16,7 @@ class SendMediaGroup(TelegramMethod[List[Message]]):
     chat_id: Union[int, str]
     """Unique identifier for the target chat or username of the target channel (in the format @channelusername)"""
 
-    media: Union[str, InputFile]
+    media: List[Union[InputMediaPhoto, InputMediaVideo]]
     """A JSON-serialized array describing photos and videos to be sent, must include 2–10 items"""
 
     disable_notification: Optional[bool] = None
@@ -26,11 +26,6 @@ class SendMediaGroup(TelegramMethod[List[Message]]):
     """If the messages are a reply, ID of the original message"""
 
     def build_request(self) -> Request:
-        data: Dict[str, Any] = self.dict(
-            exclude={"media",}
-        )
+        data: Dict[str, Any] = self.dict()
 
-        files: Dict[str, InputFile] = {}
-        self.prepare_file(data=data, files=files, name="media", value=self.media)
-
-        return Request(method="sendMediaGroup", data=data, files=files)
+        return Request(method="sendMediaGroup", data=data)
