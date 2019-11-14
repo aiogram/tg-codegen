@@ -16,7 +16,7 @@ from .base import TelegramMethod, Request, Response
 
 class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_type }}]):
     """
-    {{ entity.description|indent(width=4) }}
+    {{ entity.description|limit_length(width=95)|indent(width=4) }}
 
     Source: https://core.telegram.org/bots/api#{{ entity.anchor }}
     """
@@ -24,8 +24,8 @@ class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_typ
 
 {% for annotation in entity.annotations %}
     {{ annotation.python_field }}
-    """{{ annotation.description|indent(width=4) }}"""
-{% endfor %}
+    """{{ annotation.description|first_line|limit_length(width=92)|indent(width=4) }}"""
+{%- endfor %}
     def build_request(self) -> Request:
         data: Dict[str, Any] = self.dict({% if entity.file_annotations %}exclude={ {% for annotation in entity.file_annotations %}"{{ annotation.python_name }}", {% endfor %} }{% endif %})
 

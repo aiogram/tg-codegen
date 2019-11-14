@@ -12,7 +12,7 @@ import isort
 import jinja2
 
 from generator.consts import TELEGRAM_TYPE_PATTERN
-from generator.normalizers import pythonize_name
+from generator.normalizers import limit_length, pythonize_name
 from generator.structures import Entity, Group
 
 templates_dir: pathlib.Path = pathlib.Path(__file__).parent / "templates"
@@ -23,25 +23,24 @@ log = logging.getLogger(__name__)
 class Generator:
     def __init__(self, groups: List[Group]):
         self.groups = groups
-        self.env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(searchpath=[templates_dir])
-        )
+        self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=[templates_dir]))
         self.env.filters.update(
             {
                 "pythonize": pythonize_name,
                 "class_name": lambda name: name[0].upper() + name[1:],
                 "first_line": lambda text: text.split("\n")[0],
+                "limit_length": limit_length,
             }
+        )
+        self.env.globals.update(
+            {"len": len,}
         )
 
         self.telegram_types = {
             entity.name for group in groups for entity in group.childs if entity.is_type
         }
         self.telegram_methods = {
-            entity.name
-            for group in groups
-            for entity in group.childs
-            if entity.is_method
+            entity.name for group in groups for entity in group.childs if entity.is_method
         }
 
     def generate(self, out_dir: pathlib.Path):
@@ -79,9 +78,7 @@ class Generator:
             code = black.format_file_contents(
                 code,
                 fast=True,
-                mode=black.FileMode(
-                    target_versions={black.TargetVersion.PY37}, line_length=99
-                ),
+                mode=black.FileMode(target_versions={black.TargetVersion.PY37}, line_length=99),
             )
         except black.NothingChanged:
             pass
@@ -102,8 +99,7 @@ class Generator:
         log.info("Visit type %r", entity.name)
         with self.open_entity_file(out_dir, entity) as f:
             code = self.render_template(
-                "type.py.jinja2",
-                {"entity": entity, "imports": self.extract_imports(entity)},
+                "type.py.jinja2", {"entity": entity, "imports": self.extract_imports(entity)},
             )
             f.write(code)
 
@@ -124,8 +120,7 @@ class Generator:
             # Telegram
             for telegram_type in self.telegram_types:
                 if telegram_type != entity.name and re.findall(
-                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type),
-                    annotation.python_type,
+                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type), annotation.python_type,
                 ):
                     imports["telegram"].add(telegram_type)
                     imports["typing"].add("TYPE_CHECKING")
@@ -142,8 +137,7 @@ class Generator:
                     imports["typing"].add(from_typing)
             for telegram_type in self.telegram_types:
                 if re.findall(
-                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type),
-                    entity.python_returning_type,
+                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type), entity.python_returning_type,
                 ):
                     imports["telegram"].add(telegram_type)
         return imports
@@ -151,10 +145,7 @@ class Generator:
     @contextlib.contextmanager
     def open_entity_file(self, out_dir: pathlib.Path, entity: Entity):
         with self.open_file(
-            out_dir,
-            "api",
-            ["types", "methods"][entity.is_method],
-            f"{entity.pythonic_name}.py",
+            out_dir, "api", ["types", "methods"][entity.is_method], f"{entity.pythonic_name}.py",
         ) as f:
             yield f
 

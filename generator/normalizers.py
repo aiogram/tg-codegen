@@ -1,12 +1,6 @@
 import functools
-from typing import Iterable
 
-from generator.consts import (
-    BUILTIN_TYPES,
-    READ_MORE_PATTERN,
-    RETURN_PATTERNS,
-    SYMBOLS_MAP,
-)
+from generator.consts import BUILTIN_TYPES, READ_MORE_PATTERN, RETURN_PATTERNS, SYMBOLS_MAP
 
 
 def normalize_description(text: str) -> str:
@@ -105,6 +99,28 @@ def normalize_optional(python_type: str, required: bool = True) -> str:
 
 
 def pythonize_name(name: str) -> str:
-    return "".join(
-        f"_{s}" if i > 0 and s.isupper() else s for i, s in enumerate(name)
-    ).lower()
+    return "".join(f"_{s}" if i > 0 and s.isupper() else s for i, s in enumerate(name)).lower()
+
+
+def limit_length(text: str, width: int = 80) -> str:
+    lines = []
+
+    while text:
+        if len(text) < width:
+            lines.append(text)
+            break
+        try:
+            pos = text.index("\n", 0, width)
+        except ValueError:
+            try:
+                pos = text.rindex(" ", 0, width)
+            except ValueError:
+                break
+        line, text = text[:pos], text[pos + 1 :]
+        lines.append(line)
+
+    return "\n".join(lines)
+
+
+def first_line(text: str) -> str:
+    return text.split("\n")[0]

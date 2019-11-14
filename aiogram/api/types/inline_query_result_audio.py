@@ -13,8 +13,11 @@ if TYPE_CHECKING:
 
 class InlineQueryResultAudio(InlineQueryResult):
     """
-    Represents a link to an MP3 audio file. By default, this audio file will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the audio.
-    Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+    Represents a link to an MP3 audio file. By default, this audio file will be sent by the user.
+    Alternatively, you can use input_message_content to send a message with the specified content
+    instead of the audio.
+    Note: This will only work in Telegram versions released after 9 April, 2016. Older clients
+    will ignore them.
 
     Source: https://core.telegram.org/bots/api#inlinequeryresultaudio
     """
@@ -30,7 +33,8 @@ class InlineQueryResultAudio(InlineQueryResult):
     caption: Optional[str] = None
     """Caption, 0-1024 characters"""
     parse_mode: Optional[str] = None
-    """Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in the media caption."""
+    """Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or
+    inline URLs in the media caption."""
     performer: Optional[str] = None
     """Performer"""
     audio_duration: Optional[int] = None

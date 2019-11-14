@@ -17,13 +17,13 @@ if TYPE_CHECKING:
 
 class {{ entity.name }}({{ (entity.extends or ['TelegramObject'])|join(', ') }}):
     """
-    {{ entity.description|indent(width=4) }}
+    {{ entity.description|limit_length(width=95)|indent(width=4) }}
 
     Source: https://core.telegram.org/bots/api#{{ entity.anchor }}
     """
 {% for annotation in entity.annotations %}
     {{ annotation.python_field }}
-    """{{ annotation.description|indent(width=4) }}"""
+    """{{ annotation.description|first_line|limit_length(width=92)|indent(width=4) }}"""
 {%- else %}
     pass
 {% endfor %}

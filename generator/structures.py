@@ -27,7 +27,6 @@ class Annotation:
         if self.name == "date":
             return normalize_optional("datetime.datetime", self.required)
         if self.name == "media" and result == "str":
-            print(self.name, result)
             return normalize_optional("Union[str, InputFile]", required=self.required)
         if self.name == "until_date":
             return normalize_optional(

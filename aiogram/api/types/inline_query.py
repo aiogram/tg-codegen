@@ -7,13 +7,14 @@ from pydantic import Field
 from .base import TelegramObject
 
 if TYPE_CHECKING:
-    from .location import Location
     from .user import User
+    from .location import Location
 
 
 class InlineQuery(TelegramObject):
     """
-    This object represents an incoming inline query. When the user sends an empty query, your bot could return some default or trending results.
+    This object represents an incoming inline query. When the user sends an empty query, your bot
+    could return some default or trending results.
 
     Source: https://core.telegram.org/bots/api#inlinequery
     """

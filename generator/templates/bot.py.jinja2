@@ -26,16 +26,14 @@ class Bot(BaseBot):
         {% endfor %}
     ) -> {{ entity.python_returning_type }}:
         """
-        {{ entity.description|indent(width=8) }}
+        {{ entity.description|limit_length(width=91)|indent(width=8) }}
 
         Source: https://core.telegram.org/bots/api#{{ entity.anchor }}
 
         {% for annotation in entity.annotations -%}
-        :param {{ annotation.python_name }}: {{ annotation.description|first_line }}
-        :type {{ annotation.python_name }}: :obj:`{{ annotation.python_type }}`
+        :param {{ annotation.python_name }}: {{ annotation.description|first_line|limit_length(width=82 - len(annotation.python_name))|indent(width=8)  }}
         {% endfor -%}
-        :return: {{ entity.returning|first_line }}
-        :rtype: :obj:`{{ entity.python_returning_type }}`
+        :return: {{ entity.returning|first_line|limit_length(width=82)|indent(width=8) }}
         """
         call = {{ entity.name|class_name }}(
         {% for annotation in entity.annotations %}
