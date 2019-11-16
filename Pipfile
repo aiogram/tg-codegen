@@ -19,6 +19,7 @@ lxml = "*"
 aiohttp = "==3.6.2"
 mypy = "*"
 autoflake = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.7"

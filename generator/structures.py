@@ -108,6 +108,17 @@ class Entity:
                 result.append(item)
         return result
 
+    @property
+    def can_be_used_in_webhook(self):
+        if self.is_type:
+            return False
+        if self.name.startswith("get"):
+            return False
+        for annotation in self.annotations:
+            if annotation.python_type == "InputFile":
+                return False
+        return True
+
 
 @dataclass
 class Group:

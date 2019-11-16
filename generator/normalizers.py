@@ -124,3 +124,7 @@ def limit_length(text: str, width: int = 80) -> str:
 
 def first_line(text: str) -> str:
     return text.split("\n")[0]
+
+
+def md_line_breaks(text: str):
+    return text.replace('\n', '\n\n')

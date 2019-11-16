@@ -8,26 +8,26 @@ from pydantic import Field
 from .base import TelegramObject
 
 if TYPE_CHECKING:
-    from .photo_size import PhotoSize
-    from .location import Location
-    from .contact import Contact
-    from .game import Game
-    from .message_entity import MessageEntity
-    from .invoice import Invoice
-    from .animation import Animation
-    from .venue import Venue
-    from .user import User
-    from .passport_data import PassportData
-    from .video_note import VideoNote
-    from .audio import Audio
-    from .successful_payment import SuccessfulPayment
-    from .sticker import Sticker
     from .poll import Poll
-    from .chat import Chat
-    from .document import Document
-    from .inline_keyboard_markup import InlineKeyboardMarkup
-    from .voice import Voice
+    from .passport_data import PassportData
     from .video import Video
+    from .message_entity import MessageEntity
+    from .photo_size import PhotoSize
+    from .contact import Contact
+    from .document import Document
+    from .animation import Animation
+    from .successful_payment import SuccessfulPayment
+    from .chat import Chat
+    from .audio import Audio
+    from .game import Game
+    from .voice import Voice
+    from .video_note import VideoNote
+    from .invoice import Invoice
+    from .location import Location
+    from .sticker import Sticker
+    from .inline_keyboard_markup import InlineKeyboardMarkup
+    from .user import User
+    from .venue import Venue
 
 
 class Message(TelegramObject):

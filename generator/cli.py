@@ -7,7 +7,7 @@ from generator.generator import Generator
 from generator.parser import Parser
 
 script_path = pathlib.Path(__file__).parent
-out_dir = script_path.parent / "aiogram"
+out_dir = script_path.parent
 
 
 def main(argv: typing.List[str]) -> int:

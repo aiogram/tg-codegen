@@ -10,9 +10,10 @@ import autoflake
 import black
 import isort
 import jinja2
+import yaml
 
 from generator.consts import TELEGRAM_TYPE_PATTERN
-from generator.normalizers import limit_length, pythonize_name
+from generator.normalizers import limit_length, md_line_breaks, pythonize_name
 from generator.structures import Entity, Group
 
 templates_dir: pathlib.Path = pathlib.Path(__file__).parent / "templates"
@@ -30,6 +31,7 @@ class Generator:
                 "class_name": lambda name: name[0].upper() + name[1:],
                 "first_line": lambda text: text.split("\n")[0],
                 "limit_length": limit_length,
+                "md_line_breaks": md_line_breaks,
             }
         )
         self.env.globals.update(
@@ -45,43 +47,62 @@ class Generator:
 
     def generate(self, out_dir: pathlib.Path):
         log.info("Start generating code")
+        docs_methods = []
+        docs_types = []
         for group in self.groups:
             log.info("Visit group %r", group.title)
+            docs_group_methods = []
+            docs_group_types = []
             for entity in group.childs:
                 if entity.is_method:
+                    docs_group_methods.append(f"api/methods/{pythonize_name(entity.name)}.md")
                     self.generate_method(entity, out_dir)
                 else:
+                    docs_group_types.append(f"api/types/{pythonize_name(entity.name)}.md")
                     self.generate_type(entity, out_dir)
+            if docs_group_methods:
+                docs_methods.append({group.title: docs_group_methods})
+            if docs_group_types:
+                docs_types.append({group.title: docs_group_types})
             log.info("Leave group %r", group.title)
-        with self.open_file(out_dir, "api", "types", "__init__.py") as f:
+        with self.open_file(out_dir, "aiogram", "api", "types", "__init__.py") as f:
             f.write(self.render_template("types.py.jinja2", {"groups": self.groups}))
-        with self.open_file(out_dir, "api", "methods", "__init__.py") as f:
+        with self.open_file(out_dir, "aiogram", "api", "methods", "__init__.py") as f:
             f.write(self.render_template("methods.py.jinja2", {"groups": self.groups}))
-        with self.open_file(out_dir, "api", "client", "bot.py") as f:
+        with self.open_file(out_dir, "aiogram", "api", "client", "bot.py") as f:
             f.write(self.render_template("bot.py.jinja2", {"groups": self.groups}))
 
-    def render_template(self, template_name: str, context: Dict[str, Any]):
+        docs_mapping = {"nav": [{"Bot API": [{"Methods": docs_methods}, {"Types": docs_types}]}]}
+        with self.open_file(out_dir, "mkdocs.yml") as f:
+            yaml.safe_dump(docs_mapping, stream=f)
+
+    def render_template(
+        self, template_name: str, context: Dict[str, Any], reformat_code: bool = True
+    ):
         log.info("Render template %r with context %s", template_name, context)
         code = self.env.get_template(template_name).render(context)
 
-        code = autoflake.fix_code(
-            code,
-            additional_imports=None,
-            expand_star_imports=True,
-            remove_all_unused_imports=True,
-            remove_duplicate_keys=True,
-            remove_unused_variables=False,
-            ignore_init_module_imports=False,
-        )
-        code = isort.SortImports(file_contents=code,).output
-        try:
-            code = black.format_file_contents(
+        if reformat_code:
+            code = autoflake.fix_code(
                 code,
-                fast=True,
-                mode=black.FileMode(target_versions={black.TargetVersion.PY37}, line_length=99),
+                additional_imports=None,
+                expand_star_imports=True,
+                remove_all_unused_imports=True,
+                remove_duplicate_keys=True,
+                remove_unused_variables=False,
+                ignore_init_module_imports=False,
             )
-        except black.NothingChanged:
-            pass
+            code = isort.SortImports(file_contents=code,).output
+            try:
+                code = black.format_file_contents(
+                    code,
+                    fast=True,
+                    mode=black.FileMode(
+                        target_versions={black.TargetVersion.PY37}, line_length=99
+                    ),
+                )
+            except black.NothingChanged:
+                pass
 
         return code
 
@@ -89,19 +110,31 @@ class Generator:
         log.info("Visit method %r -> %r", entity.name, entity.pythonic_name)
         imports = self.extract_imports(entity, with_returning=True)
         imports["typing"].update({"Dict", "Any"})
-        with self.open_entity_file(out_dir, entity) as f:
+        with self.open_entity_file(out_dir / "aiogram", entity) as f:
             code = self.render_template(
                 "method.py.jinja2", {"entity": entity, "imports": imports},
             )
             f.write(code)
+        with self.open_entity_file(out_dir / "docs", entity, is_doc=True) as f:
+            doc = self.render_template(
+                "method.md.jinja2", {"entity": entity, "imports": imports}, reformat_code=False
+            )
+            f.write(doc)
 
     def generate_type(self, entity: Entity, out_dir: pathlib.Path):
         log.info("Visit type %r", entity.name)
-        with self.open_entity_file(out_dir, entity) as f:
+        imports = self.extract_imports(entity)
+        with self.open_entity_file(out_dir / "aiogram", entity) as f:
             code = self.render_template(
-                "type.py.jinja2", {"entity": entity, "imports": self.extract_imports(entity)},
+                "type.py.jinja2", {"entity": entity, "imports": imports},
             )
             f.write(code)
+
+        with self.open_entity_file(out_dir / "docs", entity, is_doc=True) as f:
+            doc = self.render_template(
+                "type.md.jinja2", {"entity": entity, "imports": imports}, reformat_code=False
+            )
+            f.write(doc)
 
     def extract_imports(
         self,
@@ -143,9 +176,13 @@ class Generator:
         return imports
 
     @contextlib.contextmanager
-    def open_entity_file(self, out_dir: pathlib.Path, entity: Entity):
+    def open_entity_file(self, out_dir: pathlib.Path, entity: Entity, is_doc: bool = False):
+        ext = "md" if is_doc else "py"
         with self.open_file(
-            out_dir, "api", ["types", "methods"][entity.is_method], f"{entity.pythonic_name}.py",
+            out_dir,
+            "api",
+            ["types", "methods"][entity.is_method],
+            f"{entity.pythonic_name}.{ext}",
         ) as f:
             yield f
 
