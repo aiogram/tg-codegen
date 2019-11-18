@@ -65,8 +65,8 @@ result: Message = await SendVenue(...)
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#sendvenue)
+- [aiogram.types.InlineKeyboardMarkup](../types/inline_keyboard_markup.md)
 - [aiogram.types.ForceReply](../types/force_reply.md)
-- [aiogram.types.ReplyKeyboardMarkup](../types/reply_keyboard_markup.md)
 - [aiogram.types.Message](../types/message.md)
 - [aiogram.types.ReplyKeyboardRemove](../types/reply_keyboard_remove.md)
-- [aiogram.types.InlineKeyboardMarkup](../types/inline_keyboard_markup.md)
+- [aiogram.types.ReplyKeyboardMarkup](../types/reply_keyboard_markup.md)

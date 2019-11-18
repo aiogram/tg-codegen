@@ -1,0 +1,33 @@
+import pytest
+
+from aiogram.api.methods import {{ entity.name|class_name }}, Request
+from tests.mocked_bot import MockedBot
+
+
+@pytest.mark.skip
+class Test{{ entity.name|class_name }}:
+    @pytest.mark.asyncio
+    async def test_method(self, bot: MockedBot):
+        prepare_result = bot.add_result_for({{ entity.name|class_name }}, ok=True, result=None)
+
+        response: {{ entity.python_returning_type }} = await {{ entity.name|class_name }}(
+{% for annotation in entity.annotations %}{% if annotation.required %}{{ annotation.name }}=...,{% endif %}
+{% endfor %}
+)
+        request: Request = bot.get_request()
+        assert request.method == "{{ entity.name }}"
+        # assert request.data == {}
+        assert response == prepare_result.result
+
+    @pytest.mark.asyncio
+    async def test_bot_method(self, bot: MockedBot):
+        prepare_result = bot.add_result_for({{ entity.name|class_name }}, ok=True, result=None)
+
+        response: {{ entity.python_returning_type }} = await bot.{{ entity.pythonic_name }}(
+{% for annotation in entity.annotations %}{% if annotation.required %}{{ annotation.name }}=...,{% endif %}
+{% endfor %}
+)
+        request: Request = bot.get_request()
+        assert request.method == "{{ entity.name }}"
+        # assert request.data == {}
+        assert response == prepare_result.result

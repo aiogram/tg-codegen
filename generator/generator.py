@@ -120,14 +120,17 @@ class Generator:
                 "method.md.jinja2", {"entity": entity, "imports": imports}, reformat_code=False
             )
             f.write(doc)
+        with self.open_file(
+            out_dir / "tests" / "test_api" / "test_methods" / f"test_{entity.pythonic_name}.py"
+        ) as f:
+            doc = self.render_template("test_method.py.jinja2", {"entity": entity})
+            f.write(doc)
 
     def generate_type(self, entity: Entity, out_dir: pathlib.Path):
         log.info("Visit type %r", entity.name)
         imports = self.extract_imports(entity)
         with self.open_entity_file(out_dir / "aiogram", entity) as f:
-            code = self.render_template(
-                "type.py.jinja2", {"entity": entity, "imports": imports},
-            )
+            code = self.render_template("type.py.jinja2", {"entity": entity, "imports": imports},)
             f.write(code)
 
         with self.open_entity_file(out_dir / "docs", entity, is_doc=True) as f:

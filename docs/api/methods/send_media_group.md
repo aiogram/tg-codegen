@@ -59,6 +59,6 @@ result: List[Message] = await SendMediaGroup(...)
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#sendmediagroup)
-- [aiogram.types.InputMediaPhoto](../types/input_media_photo.md)
 - [aiogram.types.InputMediaVideo](../types/input_media_video.md)
+- [aiogram.types.InputMediaPhoto](../types/input_media_photo.md)
 - [aiogram.types.Message](../types/message.md)

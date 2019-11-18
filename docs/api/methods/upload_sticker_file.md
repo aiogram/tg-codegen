@@ -53,5 +53,5 @@ result: File = await UploadStickerFile(...)
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#uploadstickerfile)
-- [aiogram.types.InputFile](../types/input_file.md)
 - [aiogram.types.File](../types/file.md)
+- [aiogram.types.InputFile](../types/input_file.md)

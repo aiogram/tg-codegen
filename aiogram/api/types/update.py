@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING, Optional
 from .base import TelegramObject
 
 if TYPE_CHECKING:
-    from .poll import Poll
-    from .callback_query import CallbackQuery
-    from .inline_query import InlineQuery
-    from .chosen_inline_result import ChosenInlineResult
-    from .message import Message
-    from .shipping_query import ShippingQuery
     from .pre_checkout_query import PreCheckoutQuery
+    from .callback_query import CallbackQuery
+    from .chosen_inline_result import ChosenInlineResult
+    from .poll import Poll
+    from .shipping_query import ShippingQuery
+    from .inline_query import InlineQuery
+    from .message import Message
 
 
 class Update(TelegramObject):

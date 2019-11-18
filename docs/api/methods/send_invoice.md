@@ -78,6 +78,6 @@ result: Message = await SendInvoice(...)
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#sendinvoice)
-- [aiogram.types.LabeledPrice](../types/labeled_price.md)
 - [aiogram.types.InlineKeyboardMarkup](../types/inline_keyboard_markup.md)
+- [aiogram.types.LabeledPrice](../types/labeled_price.md)
 - [aiogram.types.Message](../types/message.md)
