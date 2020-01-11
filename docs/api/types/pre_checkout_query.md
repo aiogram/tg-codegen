@@ -28,5 +28,5 @@ This object contains information about an incoming pre-checkout query.
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#precheckoutquery)
-- [aiogram.types.User](../types/user.md)
 - [aiogram.types.OrderInfo](../types/order_info.md)
+- [aiogram.types.User](../types/user.md)

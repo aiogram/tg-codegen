@@ -25,5 +25,5 @@ This object contains information about an incoming shipping query.
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#shippingquery)
-- [aiogram.types.User](../types/user.md)
 - [aiogram.types.ShippingAddress](../types/shipping_address.md)
+- [aiogram.types.User](../types/user.md)
