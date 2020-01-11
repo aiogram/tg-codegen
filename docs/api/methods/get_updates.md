@@ -42,20 +42,20 @@ result: List[Update] = await bot.get_updates(...)
 
 Imports:
 
-- `from aiogram.types import GetUpdates`
-- `from aiogram.api.types import GetUpdates`
-- `from aiogram.api.types.get_updates import GetUpdates`
-
-
-#### With specific bot
-```python3
-result: List[Update] = await bot.emit(GetUpdates(...))
-```
+- `from aiogram.methods import GetUpdates`
+- `from aiogram.api.methods import GetUpdates`
+- `from aiogram.api.methods.get_updates import GetUpdates`
 
 #### In handlers with current bot
 ```python3
 result: List[Update] = await GetUpdates(...)
 ```
+
+#### With specific bot
+```python3
+result: List[Update] = await bot(GetUpdates(...))
+```
+
 
 
 ## Related pages:

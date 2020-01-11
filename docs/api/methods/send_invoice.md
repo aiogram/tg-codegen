@@ -55,29 +55,29 @@ result: Message = await bot.send_invoice(...)
 
 Imports:
 
-- `from aiogram.types import SendInvoice`
-- `from aiogram.api.types import SendInvoice`
-- `from aiogram.api.types.send_invoice import SendInvoice`
-
-#### As reply into Webhook
-```python3
-return SendInvoice(...)
-```
-
-#### With specific bot
-```python3
-result: Message = await bot.emit(SendInvoice(...))
-```
+- `from aiogram.methods import SendInvoice`
+- `from aiogram.api.methods import SendInvoice`
+- `from aiogram.api.methods.send_invoice import SendInvoice`
 
 #### In handlers with current bot
 ```python3
 result: Message = await SendInvoice(...)
 ```
 
+#### With specific bot
+```python3
+result: Message = await bot(SendInvoice(...))
+```
+#### As reply into Webhook in handler
+```python3
+return SendInvoice(...)
+```
+
+
 
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#sendinvoice)
 - [aiogram.types.InlineKeyboardMarkup](../types/inline_keyboard_markup.md)
-- [aiogram.types.Message](../types/message.md)
 - [aiogram.types.LabeledPrice](../types/labeled_price.md)
+- [aiogram.types.Message](../types/message.md)

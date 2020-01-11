@@ -37,32 +37,33 @@ result: Message = await bot.send_sticker(...)
 
 Imports:
 
-- `from aiogram.types import SendSticker`
-- `from aiogram.api.types import SendSticker`
-- `from aiogram.api.types.send_sticker import SendSticker`
-
-#### As reply into Webhook
-```python3
-return SendSticker(...)
-```
-
-#### With specific bot
-```python3
-result: Message = await bot.emit(SendSticker(...))
-```
+- `from aiogram.methods import SendSticker`
+- `from aiogram.api.methods import SendSticker`
+- `from aiogram.api.methods.send_sticker import SendSticker`
 
 #### In handlers with current bot
 ```python3
 result: Message = await SendSticker(...)
 ```
 
+#### With specific bot
+```python3
+result: Message = await bot(SendSticker(...))
+```
+#### As reply into Webhook in handler
+```python3
+return SendSticker(...)
+```
+
+
 
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#sendsticker)
-- [aiogram.types.Message](../types/message.md)
-- [aiogram.types.InlineKeyboardMarkup](../types/inline_keyboard_markup.md)
-- [aiogram.types.ReplyKeyboardRemove](../types/reply_keyboard_remove.md)
-- [aiogram.types.InputFile](../types/input_file.md)
 - [aiogram.types.ForceReply](../types/force_reply.md)
+- [aiogram.types.InlineKeyboardMarkup](../types/inline_keyboard_markup.md)
+- [aiogram.types.InputFile](../types/input_file.md)
+- [aiogram.types.Message](../types/message.md)
 - [aiogram.types.ReplyKeyboardMarkup](../types/reply_keyboard_markup.md)
+- [aiogram.types.ReplyKeyboardRemove](../types/reply_keyboard_remove.md)
+- [How to upload file?](../sending_files.md)

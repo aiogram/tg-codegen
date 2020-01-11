@@ -38,24 +38,24 @@ result: Union[Message, bool] = await bot.edit_message_live_location(...)
 
 Imports:
 
-- `from aiogram.types import EditMessageLiveLocation`
-- `from aiogram.api.types import EditMessageLiveLocation`
-- `from aiogram.api.types.edit_message_live_location import EditMessageLiveLocation`
-
-#### As reply into Webhook
-```python3
-return EditMessageLiveLocation(...)
-```
-
-#### With specific bot
-```python3
-result: Union[Message, bool] = await bot.emit(EditMessageLiveLocation(...))
-```
+- `from aiogram.methods import EditMessageLiveLocation`
+- `from aiogram.api.methods import EditMessageLiveLocation`
+- `from aiogram.api.methods.edit_message_live_location import EditMessageLiveLocation`
 
 #### In handlers with current bot
 ```python3
 result: Union[Message, bool] = await EditMessageLiveLocation(...)
 ```
+
+#### With specific bot
+```python3
+result: Union[Message, bool] = await bot(EditMessageLiveLocation(...))
+```
+#### As reply into Webhook in handler
+```python3
+return EditMessageLiveLocation(...)
+```
+
 
 
 ## Related pages:

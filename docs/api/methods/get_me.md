@@ -27,20 +27,20 @@ result: User = await bot.get_me(...)
 
 Imports:
 
-- `from aiogram.types import GetMe`
-- `from aiogram.api.types import GetMe`
-- `from aiogram.api.types.get_me import GetMe`
-
-
-#### With specific bot
-```python3
-result: User = await bot.emit(GetMe(...))
-```
+- `from aiogram.methods import GetMe`
+- `from aiogram.api.methods import GetMe`
+- `from aiogram.api.methods.get_me import GetMe`
 
 #### In handlers with current bot
 ```python3
 result: User = await GetMe(...)
 ```
+
+#### With specific bot
+```python3
+result: User = await bot(GetMe(...))
+```
+
 
 
 ## Related pages:

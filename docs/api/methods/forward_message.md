@@ -36,24 +36,24 @@ result: Message = await bot.forward_message(...)
 
 Imports:
 
-- `from aiogram.types import ForwardMessage`
-- `from aiogram.api.types import ForwardMessage`
-- `from aiogram.api.types.forward_message import ForwardMessage`
-
-#### As reply into Webhook
-```python3
-return ForwardMessage(...)
-```
-
-#### With specific bot
-```python3
-result: Message = await bot.emit(ForwardMessage(...))
-```
+- `from aiogram.methods import ForwardMessage`
+- `from aiogram.api.methods import ForwardMessage`
+- `from aiogram.api.methods.forward_message import ForwardMessage`
 
 #### In handlers with current bot
 ```python3
 result: Message = await ForwardMessage(...)
 ```
+
+#### With specific bot
+```python3
+result: Message = await bot(ForwardMessage(...))
+```
+#### As reply into Webhook in handler
+```python3
+return ForwardMessage(...)
+```
+
 
 
 ## Related pages:

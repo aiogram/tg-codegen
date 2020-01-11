@@ -24,5 +24,7 @@
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#{{ entity.anchor }})
-{% for import in imports.telegram %}- [aiogram.types.{{ import }}](../types/{{ import|pythonize }}.md)
-{% endfor %}
+{% for import in imports.telegram|sort %}- [aiogram.types.{{ import }}](../types/{{ import|pythonize }}.md)
+{% endfor -%}
+{% if 'InputFile' in imports.telegram or entity.name == 'InputFile' %}- [How to upload file?](../sending_files.md)
+{% endif %}

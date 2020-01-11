@@ -39,24 +39,24 @@ result: bool = await bot.answer_callback_query(...)
 
 Imports:
 
-- `from aiogram.types import AnswerCallbackQuery`
-- `from aiogram.api.types import AnswerCallbackQuery`
-- `from aiogram.api.types.answer_callback_query import AnswerCallbackQuery`
-
-#### As reply into Webhook
-```python3
-return AnswerCallbackQuery(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(AnswerCallbackQuery(...))
-```
+- `from aiogram.methods import AnswerCallbackQuery`
+- `from aiogram.api.methods import AnswerCallbackQuery`
+- `from aiogram.api.methods.answer_callback_query import AnswerCallbackQuery`
 
 #### In handlers with current bot
 ```python3
 result: bool = await AnswerCallbackQuery(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(AnswerCallbackQuery(...))
+```
+#### As reply into Webhook in handler
+```python3
+return AnswerCallbackQuery(...)
+```
+
 
 
 ## Related pages:

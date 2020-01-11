@@ -35,24 +35,24 @@ result: bool = await bot.pin_chat_message(...)
 
 Imports:
 
-- `from aiogram.types import PinChatMessage`
-- `from aiogram.api.types import PinChatMessage`
-- `from aiogram.api.types.pin_chat_message import PinChatMessage`
-
-#### As reply into Webhook
-```python3
-return PinChatMessage(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(PinChatMessage(...))
-```
+- `from aiogram.methods import PinChatMessage`
+- `from aiogram.api.methods import PinChatMessage`
+- `from aiogram.api.methods.pin_chat_message import PinChatMessage`
 
 #### In handlers with current bot
 ```python3
 result: bool = await PinChatMessage(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(PinChatMessage(...))
+```
+#### As reply into Webhook in handler
+```python3
+return PinChatMessage(...)
+```
+
 
 
 ## Related pages:

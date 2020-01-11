@@ -34,20 +34,20 @@ result: File = await bot.upload_sticker_file(...)
 
 Imports:
 
-- `from aiogram.types import UploadStickerFile`
-- `from aiogram.api.types import UploadStickerFile`
-- `from aiogram.api.types.upload_sticker_file import UploadStickerFile`
-
-
-#### With specific bot
-```python3
-result: File = await bot.emit(UploadStickerFile(...))
-```
+- `from aiogram.methods import UploadStickerFile`
+- `from aiogram.api.methods import UploadStickerFile`
+- `from aiogram.api.methods.upload_sticker_file import UploadStickerFile`
 
 #### In handlers with current bot
 ```python3
 result: File = await UploadStickerFile(...)
 ```
+
+#### With specific bot
+```python3
+result: File = await bot(UploadStickerFile(...))
+```
+
 
 
 ## Related pages:
@@ -55,3 +55,4 @@ result: File = await UploadStickerFile(...)
 - [Official documentation](https://core.telegram.org/bots/api#uploadstickerfile)
 - [aiogram.types.File](../types/file.md)
 - [aiogram.types.InputFile](../types/input_file.md)
+- [How to upload file?](../sending_files.md)

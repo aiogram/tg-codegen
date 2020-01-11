@@ -28,5 +28,5 @@ Note: It is necessary to enable inline feedback via @Botfather in order to recei
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#choseninlineresult)
-- [aiogram.types.User](../types/user.md)
 - [aiogram.types.Location](../types/location.md)
+- [aiogram.types.User](../types/user.md)

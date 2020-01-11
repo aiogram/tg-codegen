@@ -35,29 +35,31 @@ result: {{ entity.python_returning_type }} = await bot.{{ entity.pythonic_name }
 
 Imports:
 
-- `from aiogram.types import {{ entity.name|class_name }}`
-- `from aiogram.api.types import {{ entity.name|class_name }}`
-- `from aiogram.api.types.{{ entity.pythonic_name }} import {{ entity.name|class_name }}`
-
-{% if entity.can_be_used_in_webhook -%}
-#### As reply into Webhook
-```python3
-return {{ entity.name|class_name }}(...)
-```
-{% endif %}
-#### With specific bot
-```python3
-result: {{ entity.python_returning_type }} = await bot.emit({{ entity.name|class_name }}(...))
-```
+- `from aiogram.methods import {{ entity.name|class_name }}`
+- `from aiogram.api.methods import {{ entity.name|class_name }}`
+- `from aiogram.api.methods.{{ entity.pythonic_name }} import {{ entity.name|class_name }}`
 
 #### In handlers with current bot
 ```python3
 result: {{ entity.python_returning_type }} = await {{ entity.name|class_name }}(...)
 ```
 
+#### With specific bot
+```python3
+result: {{ entity.python_returning_type }} = await bot({{ entity.name|class_name }}(...))
+```
+{% if entity.can_be_used_in_webhook -%}
+#### As reply into Webhook in handler
+```python3
+return {{ entity.name|class_name }}(...)
+```
+{% endif %}
+
 
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#{{ entity.anchor }})
-{% for import in imports.telegram %}- [aiogram.types.{{ import }}](../types/{{ import|pythonize }}.md)
-{% endfor %}
+{% for import in imports.telegram|sort %}- [aiogram.types.{{ import }}](../types/{{ import|pythonize }}.md)
+{% endfor -%}
+{% if 'InputFile' in imports.telegram %}- [How to upload file?](../sending_files.md)
+{% endif %}

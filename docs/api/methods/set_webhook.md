@@ -48,27 +48,28 @@ result: bool = await bot.set_webhook(...)
 
 Imports:
 
-- `from aiogram.types import SetWebhook`
-- `from aiogram.api.types import SetWebhook`
-- `from aiogram.api.types.set_webhook import SetWebhook`
-
-#### As reply into Webhook
-```python3
-return SetWebhook(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(SetWebhook(...))
-```
+- `from aiogram.methods import SetWebhook`
+- `from aiogram.api.methods import SetWebhook`
+- `from aiogram.api.methods.set_webhook import SetWebhook`
 
 #### In handlers with current bot
 ```python3
 result: bool = await SetWebhook(...)
 ```
 
+#### With specific bot
+```python3
+result: bool = await bot(SetWebhook(...))
+```
+#### As reply into Webhook in handler
+```python3
+return SetWebhook(...)
+```
+
+
 
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#setwebhook)
 - [aiogram.types.InputFile](../types/input_file.md)
+- [How to upload file?](../sending_files.md)

@@ -42,31 +42,31 @@ result: Message = await bot.send_venue(...)
 
 Imports:
 
-- `from aiogram.types import SendVenue`
-- `from aiogram.api.types import SendVenue`
-- `from aiogram.api.types.send_venue import SendVenue`
-
-#### As reply into Webhook
-```python3
-return SendVenue(...)
-```
-
-#### With specific bot
-```python3
-result: Message = await bot.emit(SendVenue(...))
-```
+- `from aiogram.methods import SendVenue`
+- `from aiogram.api.methods import SendVenue`
+- `from aiogram.api.methods.send_venue import SendVenue`
 
 #### In handlers with current bot
 ```python3
 result: Message = await SendVenue(...)
 ```
 
+#### With specific bot
+```python3
+result: Message = await bot(SendVenue(...))
+```
+#### As reply into Webhook in handler
+```python3
+return SendVenue(...)
+```
+
+
 
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#sendvenue)
-- [aiogram.types.Message](../types/message.md)
-- [aiogram.types.InlineKeyboardMarkup](../types/inline_keyboard_markup.md)
-- [aiogram.types.ReplyKeyboardRemove](../types/reply_keyboard_remove.md)
 - [aiogram.types.ForceReply](../types/force_reply.md)
+- [aiogram.types.InlineKeyboardMarkup](../types/inline_keyboard_markup.md)
+- [aiogram.types.Message](../types/message.md)
 - [aiogram.types.ReplyKeyboardMarkup](../types/reply_keyboard_markup.md)
+- [aiogram.types.ReplyKeyboardRemove](../types/reply_keyboard_remove.md)

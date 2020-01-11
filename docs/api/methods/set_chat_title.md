@@ -34,24 +34,24 @@ result: bool = await bot.set_chat_title(...)
 
 Imports:
 
-- `from aiogram.types import SetChatTitle`
-- `from aiogram.api.types import SetChatTitle`
-- `from aiogram.api.types.set_chat_title import SetChatTitle`
-
-#### As reply into Webhook
-```python3
-return SetChatTitle(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(SetChatTitle(...))
-```
+- `from aiogram.methods import SetChatTitle`
+- `from aiogram.api.methods import SetChatTitle`
+- `from aiogram.api.methods.set_chat_title import SetChatTitle`
 
 #### In handlers with current bot
 ```python3
 result: bool = await SetChatTitle(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(SetChatTitle(...))
+```
+#### As reply into Webhook in handler
+```python3
+return SetChatTitle(...)
+```
+
 
 
 ## Related pages:

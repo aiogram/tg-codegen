@@ -34,24 +34,24 @@ result: bool = await bot.unban_chat_member(...)
 
 Imports:
 
-- `from aiogram.types import UnbanChatMember`
-- `from aiogram.api.types import UnbanChatMember`
-- `from aiogram.api.types.unban_chat_member import UnbanChatMember`
-
-#### As reply into Webhook
-```python3
-return UnbanChatMember(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(UnbanChatMember(...))
-```
+- `from aiogram.methods import UnbanChatMember`
+- `from aiogram.api.methods import UnbanChatMember`
+- `from aiogram.api.methods.unban_chat_member import UnbanChatMember`
 
 #### In handlers with current bot
 ```python3
 result: bool = await UnbanChatMember(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(UnbanChatMember(...))
+```
+#### As reply into Webhook in handler
+```python3
+return UnbanChatMember(...)
+```
+
 
 
 ## Related pages:

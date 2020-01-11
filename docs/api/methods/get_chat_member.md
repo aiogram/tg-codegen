@@ -34,20 +34,20 @@ result: ChatMember = await bot.get_chat_member(...)
 
 Imports:
 
-- `from aiogram.types import GetChatMember`
-- `from aiogram.api.types import GetChatMember`
-- `from aiogram.api.types.get_chat_member import GetChatMember`
-
-
-#### With specific bot
-```python3
-result: ChatMember = await bot.emit(GetChatMember(...))
-```
+- `from aiogram.methods import GetChatMember`
+- `from aiogram.api.methods import GetChatMember`
+- `from aiogram.api.methods.get_chat_member import GetChatMember`
 
 #### In handlers with current bot
 ```python3
 result: ChatMember = await GetChatMember(...)
 ```
+
+#### With specific bot
+```python3
+result: ChatMember = await bot(GetChatMember(...))
+```
+
 
 
 ## Related pages:

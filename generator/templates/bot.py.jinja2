@@ -40,6 +40,6 @@ class Bot(BaseBot):
             {{ annotation.python_name }}={{ annotation.python_name }},
         {% endfor %}
         )
-        return await self.emit(call)
+        return await self(call)
     {% endif %}{% endfor %}
 {% endif %}{% endfor %}

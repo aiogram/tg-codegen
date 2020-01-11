@@ -35,20 +35,20 @@ result: File = await bot.get_file(...)
 
 Imports:
 
-- `from aiogram.types import GetFile`
-- `from aiogram.api.types import GetFile`
-- `from aiogram.api.types.get_file import GetFile`
-
-
-#### With specific bot
-```python3
-result: File = await bot.emit(GetFile(...))
-```
+- `from aiogram.methods import GetFile`
+- `from aiogram.api.methods import GetFile`
+- `from aiogram.api.methods.get_file import GetFile`
 
 #### In handlers with current bot
 ```python3
 result: File = await GetFile(...)
 ```
+
+#### With specific bot
+```python3
+result: File = await bot(GetFile(...))
+```
+
 
 
 ## Related pages:

@@ -42,24 +42,24 @@ result: bool = await bot.promote_chat_member(...)
 
 Imports:
 
-- `from aiogram.types import PromoteChatMember`
-- `from aiogram.api.types import PromoteChatMember`
-- `from aiogram.api.types.promote_chat_member import PromoteChatMember`
-
-#### As reply into Webhook
-```python3
-return PromoteChatMember(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(PromoteChatMember(...))
-```
+- `from aiogram.methods import PromoteChatMember`
+- `from aiogram.api.methods import PromoteChatMember`
+- `from aiogram.api.methods.promote_chat_member import PromoteChatMember`
 
 #### In handlers with current bot
 ```python3
 result: bool = await PromoteChatMember(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(PromoteChatMember(...))
+```
+#### As reply into Webhook in handler
+```python3
+return PromoteChatMember(...)
+```
+
 
 
 ## Related pages:

@@ -33,20 +33,20 @@ result: List[ChatMember] = await bot.get_chat_administrators(...)
 
 Imports:
 
-- `from aiogram.types import GetChatAdministrators`
-- `from aiogram.api.types import GetChatAdministrators`
-- `from aiogram.api.types.get_chat_administrators import GetChatAdministrators`
-
-
-#### With specific bot
-```python3
-result: List[ChatMember] = await bot.emit(GetChatAdministrators(...))
-```
+- `from aiogram.methods import GetChatAdministrators`
+- `from aiogram.api.methods import GetChatAdministrators`
+- `from aiogram.api.methods.get_chat_administrators import GetChatAdministrators`
 
 #### In handlers with current bot
 ```python3
 result: List[ChatMember] = await GetChatAdministrators(...)
 ```
+
+#### With specific bot
+```python3
+result: List[ChatMember] = await bot(GetChatAdministrators(...))
+```
+
 
 
 ## Related pages:

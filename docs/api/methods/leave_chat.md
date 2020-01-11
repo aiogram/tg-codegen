@@ -33,24 +33,24 @@ result: bool = await bot.leave_chat(...)
 
 Imports:
 
-- `from aiogram.types import LeaveChat`
-- `from aiogram.api.types import LeaveChat`
-- `from aiogram.api.types.leave_chat import LeaveChat`
-
-#### As reply into Webhook
-```python3
-return LeaveChat(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(LeaveChat(...))
-```
+- `from aiogram.methods import LeaveChat`
+- `from aiogram.api.methods import LeaveChat`
+- `from aiogram.api.methods.leave_chat import LeaveChat`
 
 #### In handlers with current bot
 ```python3
 result: bool = await LeaveChat(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(LeaveChat(...))
+```
+#### As reply into Webhook in handler
+```python3
+return LeaveChat(...)
+```
+
 
 
 ## Related pages:

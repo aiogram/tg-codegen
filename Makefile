@@ -1,7 +1,8 @@
+.DEFAULT_GOAL := build
+
 base_python := python3
 py := poetry run
 python := $(py) python
-
 
 .PHONY: isort
 isort:
@@ -14,6 +15,5 @@ black:
 .PHONY: generate
 generate:
 	$(python) -m generator
-
 
 build: generate isort black

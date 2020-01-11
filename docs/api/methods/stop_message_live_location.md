@@ -36,24 +36,24 @@ result: Union[Message, bool] = await bot.stop_message_live_location(...)
 
 Imports:
 
-- `from aiogram.types import StopMessageLiveLocation`
-- `from aiogram.api.types import StopMessageLiveLocation`
-- `from aiogram.api.types.stop_message_live_location import StopMessageLiveLocation`
-
-#### As reply into Webhook
-```python3
-return StopMessageLiveLocation(...)
-```
-
-#### With specific bot
-```python3
-result: Union[Message, bool] = await bot.emit(StopMessageLiveLocation(...))
-```
+- `from aiogram.methods import StopMessageLiveLocation`
+- `from aiogram.api.methods import StopMessageLiveLocation`
+- `from aiogram.api.methods.stop_message_live_location import StopMessageLiveLocation`
 
 #### In handlers with current bot
 ```python3
 result: Union[Message, bool] = await StopMessageLiveLocation(...)
 ```
+
+#### With specific bot
+```python3
+result: Union[Message, bool] = await bot(StopMessageLiveLocation(...))
+```
+#### As reply into Webhook in handler
+```python3
+return StopMessageLiveLocation(...)
+```
+
 
 
 ## Related pages:

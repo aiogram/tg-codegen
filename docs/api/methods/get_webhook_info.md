@@ -27,20 +27,20 @@ result: WebhookInfo = await bot.get_webhook_info(...)
 
 Imports:
 
-- `from aiogram.types import GetWebhookInfo`
-- `from aiogram.api.types import GetWebhookInfo`
-- `from aiogram.api.types.get_webhook_info import GetWebhookInfo`
-
-
-#### With specific bot
-```python3
-result: WebhookInfo = await bot.emit(GetWebhookInfo(...))
-```
+- `from aiogram.methods import GetWebhookInfo`
+- `from aiogram.api.methods import GetWebhookInfo`
+- `from aiogram.api.methods.get_webhook_info import GetWebhookInfo`
 
 #### In handlers with current bot
 ```python3
 result: WebhookInfo = await GetWebhookInfo(...)
 ```
+
+#### With specific bot
+```python3
+result: WebhookInfo = await bot(GetWebhookInfo(...))
+```
+
 
 
 ## Related pages:

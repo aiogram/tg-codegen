@@ -33,24 +33,24 @@ result: bool = await bot.delete_chat_photo(...)
 
 Imports:
 
-- `from aiogram.types import DeleteChatPhoto`
-- `from aiogram.api.types import DeleteChatPhoto`
-- `from aiogram.api.types.delete_chat_photo import DeleteChatPhoto`
-
-#### As reply into Webhook
-```python3
-return DeleteChatPhoto(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(DeleteChatPhoto(...))
-```
+- `from aiogram.methods import DeleteChatPhoto`
+- `from aiogram.api.methods import DeleteChatPhoto`
+- `from aiogram.api.methods.delete_chat_photo import DeleteChatPhoto`
 
 #### In handlers with current bot
 ```python3
 result: bool = await DeleteChatPhoto(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(DeleteChatPhoto(...))
+```
+#### As reply into Webhook in handler
+```python3
+return DeleteChatPhoto(...)
+```
+
 
 
 ## Related pages:

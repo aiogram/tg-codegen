@@ -39,28 +39,29 @@ result: bool = await bot.create_new_sticker_set(...)
 
 Imports:
 
-- `from aiogram.types import CreateNewStickerSet`
-- `from aiogram.api.types import CreateNewStickerSet`
-- `from aiogram.api.types.create_new_sticker_set import CreateNewStickerSet`
-
-#### As reply into Webhook
-```python3
-return CreateNewStickerSet(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(CreateNewStickerSet(...))
-```
+- `from aiogram.methods import CreateNewStickerSet`
+- `from aiogram.api.methods import CreateNewStickerSet`
+- `from aiogram.api.methods.create_new_sticker_set import CreateNewStickerSet`
 
 #### In handlers with current bot
 ```python3
 result: bool = await CreateNewStickerSet(...)
 ```
 
+#### With specific bot
+```python3
+result: bool = await bot(CreateNewStickerSet(...))
+```
+#### As reply into Webhook in handler
+```python3
+return CreateNewStickerSet(...)
+```
+
+
 
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#createnewstickerset)
-- [aiogram.types.MaskPosition](../types/mask_position.md)
 - [aiogram.types.InputFile](../types/input_file.md)
+- [aiogram.types.MaskPosition](../types/mask_position.md)
+- [How to upload file?](../sending_files.md)

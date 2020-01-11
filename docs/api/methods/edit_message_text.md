@@ -39,24 +39,24 @@ result: Union[Message, bool] = await bot.edit_message_text(...)
 
 Imports:
 
-- `from aiogram.types import EditMessageText`
-- `from aiogram.api.types import EditMessageText`
-- `from aiogram.api.types.edit_message_text import EditMessageText`
-
-#### As reply into Webhook
-```python3
-return EditMessageText(...)
-```
-
-#### With specific bot
-```python3
-result: Union[Message, bool] = await bot.emit(EditMessageText(...))
-```
+- `from aiogram.methods import EditMessageText`
+- `from aiogram.api.methods import EditMessageText`
+- `from aiogram.api.methods.edit_message_text import EditMessageText`
 
 #### In handlers with current bot
 ```python3
 result: Union[Message, bool] = await EditMessageText(...)
 ```
+
+#### With specific bot
+```python3
+result: Union[Message, bool] = await bot(EditMessageText(...))
+```
+#### As reply into Webhook in handler
+```python3
+return EditMessageText(...)
+```
+
 
 
 ## Related pages:

@@ -33,24 +33,24 @@ result: bool = await bot.delete_sticker_from_set(...)
 
 Imports:
 
-- `from aiogram.types import DeleteStickerFromSet`
-- `from aiogram.api.types import DeleteStickerFromSet`
-- `from aiogram.api.types.delete_sticker_from_set import DeleteStickerFromSet`
-
-#### As reply into Webhook
-```python3
-return DeleteStickerFromSet(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(DeleteStickerFromSet(...))
-```
+- `from aiogram.methods import DeleteStickerFromSet`
+- `from aiogram.api.methods import DeleteStickerFromSet`
+- `from aiogram.api.methods.delete_sticker_from_set import DeleteStickerFromSet`
 
 #### In handlers with current bot
 ```python3
 result: bool = await DeleteStickerFromSet(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(DeleteStickerFromSet(...))
+```
+#### As reply into Webhook in handler
+```python3
+return DeleteStickerFromSet(...)
+```
+
 
 
 ## Related pages:

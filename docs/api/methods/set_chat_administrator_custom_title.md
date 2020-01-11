@@ -35,24 +35,24 @@ result: bool = await bot.set_chat_administrator_custom_title(...)
 
 Imports:
 
-- `from aiogram.types import SetChatAdministratorCustomTitle`
-- `from aiogram.api.types import SetChatAdministratorCustomTitle`
-- `from aiogram.api.types.set_chat_administrator_custom_title import SetChatAdministratorCustomTitle`
-
-#### As reply into Webhook
-```python3
-return SetChatAdministratorCustomTitle(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(SetChatAdministratorCustomTitle(...))
-```
+- `from aiogram.methods import SetChatAdministratorCustomTitle`
+- `from aiogram.api.methods import SetChatAdministratorCustomTitle`
+- `from aiogram.api.methods.set_chat_administrator_custom_title import SetChatAdministratorCustomTitle`
 
 #### In handlers with current bot
 ```python3
 result: bool = await SetChatAdministratorCustomTitle(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(SetChatAdministratorCustomTitle(...))
+```
+#### As reply into Webhook in handler
+```python3
+return SetChatAdministratorCustomTitle(...)
+```
+
 
 
 ## Related pages:

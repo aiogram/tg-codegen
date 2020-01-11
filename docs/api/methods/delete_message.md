@@ -48,24 +48,24 @@ result: bool = await bot.delete_message(...)
 
 Imports:
 
-- `from aiogram.types import DeleteMessage`
-- `from aiogram.api.types import DeleteMessage`
-- `from aiogram.api.types.delete_message import DeleteMessage`
-
-#### As reply into Webhook
-```python3
-return DeleteMessage(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(DeleteMessage(...))
-```
+- `from aiogram.methods import DeleteMessage`
+- `from aiogram.api.methods import DeleteMessage`
+- `from aiogram.api.methods.delete_message import DeleteMessage`
 
 #### In handlers with current bot
 ```python3
 result: bool = await DeleteMessage(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(DeleteMessage(...))
+```
+#### As reply into Webhook in handler
+```python3
+return DeleteMessage(...)
+```
+
 
 
 ## Related pages:

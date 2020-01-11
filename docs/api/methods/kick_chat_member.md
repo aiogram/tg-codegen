@@ -35,24 +35,24 @@ result: bool = await bot.kick_chat_member(...)
 
 Imports:
 
-- `from aiogram.types import KickChatMember`
-- `from aiogram.api.types import KickChatMember`
-- `from aiogram.api.types.kick_chat_member import KickChatMember`
-
-#### As reply into Webhook
-```python3
-return KickChatMember(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(KickChatMember(...))
-```
+- `from aiogram.methods import KickChatMember`
+- `from aiogram.api.methods import KickChatMember`
+- `from aiogram.api.methods.kick_chat_member import KickChatMember`
 
 #### In handlers with current bot
 ```python3
 result: bool = await KickChatMember(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(KickChatMember(...))
+```
+#### As reply into Webhook in handler
+```python3
+return KickChatMember(...)
+```
+
 
 
 ## Related pages:

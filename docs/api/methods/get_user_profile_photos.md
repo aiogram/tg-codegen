@@ -35,20 +35,20 @@ result: UserProfilePhotos = await bot.get_user_profile_photos(...)
 
 Imports:
 
-- `from aiogram.types import GetUserProfilePhotos`
-- `from aiogram.api.types import GetUserProfilePhotos`
-- `from aiogram.api.types.get_user_profile_photos import GetUserProfilePhotos`
-
-
-#### With specific bot
-```python3
-result: UserProfilePhotos = await bot.emit(GetUserProfilePhotos(...))
-```
+- `from aiogram.methods import GetUserProfilePhotos`
+- `from aiogram.api.methods import GetUserProfilePhotos`
+- `from aiogram.api.methods.get_user_profile_photos import GetUserProfilePhotos`
 
 #### In handlers with current bot
 ```python3
 result: UserProfilePhotos = await GetUserProfilePhotos(...)
 ```
+
+#### With specific bot
+```python3
+result: UserProfilePhotos = await bot(GetUserProfilePhotos(...))
+```
+
 
 
 ## Related pages:

@@ -35,24 +35,24 @@ result: str = await bot.export_chat_invite_link(...)
 
 Imports:
 
-- `from aiogram.types import ExportChatInviteLink`
-- `from aiogram.api.types import ExportChatInviteLink`
-- `from aiogram.api.types.export_chat_invite_link import ExportChatInviteLink`
-
-#### As reply into Webhook
-```python3
-return ExportChatInviteLink(...)
-```
-
-#### With specific bot
-```python3
-result: str = await bot.emit(ExportChatInviteLink(...))
-```
+- `from aiogram.methods import ExportChatInviteLink`
+- `from aiogram.api.methods import ExportChatInviteLink`
+- `from aiogram.api.methods.export_chat_invite_link import ExportChatInviteLink`
 
 #### In handlers with current bot
 ```python3
 result: str = await ExportChatInviteLink(...)
 ```
+
+#### With specific bot
+```python3
+result: str = await bot(ExportChatInviteLink(...))
+```
+#### As reply into Webhook in handler
+```python3
+return ExportChatInviteLink(...)
+```
+
 
 
 ## Related pages:

@@ -33,20 +33,20 @@ result: StickerSet = await bot.get_sticker_set(...)
 
 Imports:
 
-- `from aiogram.types import GetStickerSet`
-- `from aiogram.api.types import GetStickerSet`
-- `from aiogram.api.types.get_sticker_set import GetStickerSet`
-
-
-#### With specific bot
-```python3
-result: StickerSet = await bot.emit(GetStickerSet(...))
-```
+- `from aiogram.methods import GetStickerSet`
+- `from aiogram.api.methods import GetStickerSet`
+- `from aiogram.api.methods.get_sticker_set import GetStickerSet`
 
 #### In handlers with current bot
 ```python3
 result: StickerSet = await GetStickerSet(...)
 ```
+
+#### With specific bot
+```python3
+result: StickerSet = await bot(GetStickerSet(...))
+```
+
 
 
 ## Related pages:

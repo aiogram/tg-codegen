@@ -27,24 +27,24 @@ result: bool = await bot.delete_webhook(...)
 
 Imports:
 
-- `from aiogram.types import DeleteWebhook`
-- `from aiogram.api.types import DeleteWebhook`
-- `from aiogram.api.types.delete_webhook import DeleteWebhook`
-
-#### As reply into Webhook
-```python3
-return DeleteWebhook(...)
-```
-
-#### With specific bot
-```python3
-result: bool = await bot.emit(DeleteWebhook(...))
-```
+- `from aiogram.methods import DeleteWebhook`
+- `from aiogram.api.methods import DeleteWebhook`
+- `from aiogram.api.methods.delete_webhook import DeleteWebhook`
 
 #### In handlers with current bot
 ```python3
 result: bool = await DeleteWebhook(...)
 ```
+
+#### With specific bot
+```python3
+result: bool = await bot(DeleteWebhook(...))
+```
+#### As reply into Webhook in handler
+```python3
+return DeleteWebhook(...)
+```
+
 
 
 ## Related pages:

@@ -36,29 +36,29 @@ result: List[Message] = await bot.send_media_group(...)
 
 Imports:
 
-- `from aiogram.types import SendMediaGroup`
-- `from aiogram.api.types import SendMediaGroup`
-- `from aiogram.api.types.send_media_group import SendMediaGroup`
-
-#### As reply into Webhook
-```python3
-return SendMediaGroup(...)
-```
-
-#### With specific bot
-```python3
-result: List[Message] = await bot.emit(SendMediaGroup(...))
-```
+- `from aiogram.methods import SendMediaGroup`
+- `from aiogram.api.methods import SendMediaGroup`
+- `from aiogram.api.methods.send_media_group import SendMediaGroup`
 
 #### In handlers with current bot
 ```python3
 result: List[Message] = await SendMediaGroup(...)
 ```
 
+#### With specific bot
+```python3
+result: List[Message] = await bot(SendMediaGroup(...))
+```
+#### As reply into Webhook in handler
+```python3
+return SendMediaGroup(...)
+```
+
+
 
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#sendmediagroup)
+- [aiogram.types.InputMediaPhoto](../types/input_media_photo.md)
 - [aiogram.types.InputMediaVideo](../types/input_media_video.md)
 - [aiogram.types.Message](../types/message.md)
-- [aiogram.types.InputMediaPhoto](../types/input_media_photo.md)
