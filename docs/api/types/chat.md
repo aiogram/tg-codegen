@@ -34,6 +34,6 @@ This object represents a chat.
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#chat)
-- [aiogram.types.ChatPermissions](../types/chat_permissions.md)
 - [aiogram.types.ChatPhoto](../types/chat_photo.md)
 - [aiogram.types.Message](../types/message.md)
+- [aiogram.types.ChatPermissions](../types/chat_permissions.md)

@@ -6,9 +6,9 @@ from pydantic import Field
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:
-    from .location import Location
+if TYPE_CHECKING:  # pragma: no cover
     from .user import User
+    from .location import Location
 
 
 class ChosenInlineResult(TelegramObject):

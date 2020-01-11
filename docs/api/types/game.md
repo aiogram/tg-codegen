@@ -28,5 +28,5 @@ This object represents a game. Use BotFather to create and edit games, their sho
 
 - [Official documentation](https://core.telegram.org/bots/api#game)
 - [aiogram.types.Animation](../types/animation.md)
-- [aiogram.types.PhotoSize](../types/photo_size.md)
 - [aiogram.types.MessageEntity](../types/message_entity.md)
+- [aiogram.types.PhotoSize](../types/photo_size.md)

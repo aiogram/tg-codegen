@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:
-    from .pre_checkout_query import PreCheckoutQuery
+if TYPE_CHECKING:  # pragma: no cover
     from .callback_query import CallbackQuery
-    from .chosen_inline_result import ChosenInlineResult
     from .poll import Poll
+    from .chosen_inline_result import ChosenInlineResult
+    from .pre_checkout_query import PreCheckoutQuery
+    from .message import Message
     from .shipping_query import ShippingQuery
     from .inline_query import InlineQuery
-    from .message import Message
 
 
 class Update(TelegramObject):

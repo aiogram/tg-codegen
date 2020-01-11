@@ -6,9 +6,9 @@ from pydantic import Field
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:
-    from .order_info import OrderInfo
+if TYPE_CHECKING:  # pragma: no cover
     from .user import User
+    from .order_info import OrderInfo
 
 
 class PreCheckoutQuery(TelegramObject):

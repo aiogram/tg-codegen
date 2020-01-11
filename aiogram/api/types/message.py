@@ -7,27 +7,27 @@ from pydantic import Field
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:
-    from .invoice import Invoice
-    from .video import Video
-    from .video_note import VideoNote
-    from .audio import Audio
-    from .passport_data import PassportData
-    from .location import Location
-    from .successful_payment import SuccessfulPayment
-    from .poll import Poll
-    from .message_entity import MessageEntity
-    from .user import User
-    from .voice import Voice
-    from .inline_keyboard_markup import InlineKeyboardMarkup
-    from .sticker import Sticker
-    from .animation import Animation
-    from .game import Game
-    from .chat import Chat
-    from .venue import Venue
-    from .photo_size import PhotoSize
+if TYPE_CHECKING:  # pragma: no cover
     from .document import Document
+    from .photo_size import PhotoSize
+    from .successful_payment import SuccessfulPayment
     from .contact import Contact
+    from .chat import Chat
+    from .inline_keyboard_markup import InlineKeyboardMarkup
+    from .user import User
+    from .message_entity import MessageEntity
+    from .video_note import VideoNote
+    from .game import Game
+    from .animation import Animation
+    from .video import Video
+    from .location import Location
+    from .poll import Poll
+    from .invoice import Invoice
+    from .venue import Venue
+    from .voice import Voice
+    from .sticker import Sticker
+    from .passport_data import PassportData
+    from .audio import Audio
 
 
 class Message(TelegramObject):

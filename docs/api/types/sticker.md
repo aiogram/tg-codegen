@@ -30,5 +30,5 @@ This object represents a sticker.
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#sticker)
-- [aiogram.types.MaskPosition](../types/mask_position.md)
 - [aiogram.types.PhotoSize](../types/photo_size.md)
+- [aiogram.types.MaskPosition](../types/mask_position.md)

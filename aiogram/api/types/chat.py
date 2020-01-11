@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:
-    from .chat_permissions import ChatPermissions
+if TYPE_CHECKING:  # pragma: no cover
     from .chat_photo import ChatPhoto
     from .message import Message
+    from .chat_permissions import ChatPermissions
 
 
 class Chat(TelegramObject):

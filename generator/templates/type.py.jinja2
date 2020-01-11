@@ -9,7 +9,7 @@ from .base import TelegramObject
 {% endfor %}{% endif %}
 {% if imports.typing %}from typing import {{ imports.typing|join(', ') }}{% endif %}
 {% if imports.telegram %}
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     {% for import in imports.telegram %}from .{{ import|pythonize }} import {{ import }}
     {% endfor %}
 {%- endif %}

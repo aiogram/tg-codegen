@@ -26,5 +26,5 @@ This object represents an incoming inline query. When the user sends an empty qu
 ## Related pages:
 
 - [Official documentation](https://core.telegram.org/bots/api#inlinequery)
-- [aiogram.types.Location](../types/location.md)
 - [aiogram.types.User](../types/user.md)
+- [aiogram.types.Location](../types/location.md)

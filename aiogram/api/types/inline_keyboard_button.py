@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:
-    from .login_url import LoginUrl
+if TYPE_CHECKING:  # pragma: no cover
     from .callback_game import CallbackGame
+    from .login_url import LoginUrl
 
 
 class InlineKeyboardButton(TelegramObject):
