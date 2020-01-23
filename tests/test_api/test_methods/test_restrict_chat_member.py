@@ -1,4 +1,5 @@
 import pytest
+
 from aiogram.api.methods import Request, RestrictChatMember
 from tests.mocked_bot import MockedBot
 

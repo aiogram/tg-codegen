@@ -5,13 +5,14 @@ from typing import TYPE_CHECKING, Optional
 from .base import TelegramObject
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .poll import Poll
-    from .chosen_inline_result import ChosenInlineResult
-    from .shipping_query import ShippingQuery
-    from .message import Message
-    from .pre_checkout_query import PreCheckoutQuery
-    from .inline_query import InlineQuery
     from .callback_query import CallbackQuery
+    from .chosen_inline_result import ChosenInlineResult
+    from .inline_query import InlineQuery
+    from .message import Message
+    from .poll import Poll
+    from .poll_answer import PollAnswer
+    from .pre_checkout_query import PreCheckoutQuery
+    from .shipping_query import ShippingQuery
 
 
 class Update(TelegramObject):
@@ -51,3 +52,6 @@ class Update(TelegramObject):
     poll: Optional[Poll] = None
     """New poll state. Bots receive only updates about stopped polls and polls, which are sent by
     the bot"""
+    poll_answer: Optional[PollAnswer] = None
+    """A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls
+    that were sent by the bot itself."""
