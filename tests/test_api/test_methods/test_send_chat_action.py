@@ -1,5 +1,4 @@
 import pytest
-
 from aiogram.api.methods import Request, SendChatAction
 from tests.mocked_bot import MockedBot
 

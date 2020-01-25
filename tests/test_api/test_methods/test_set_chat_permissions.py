@@ -1,5 +1,4 @@
 import pytest
-
 from aiogram.api.methods import Request, SetChatPermissions
 from tests.mocked_bot import MockedBot
 

@@ -1,5 +1,4 @@
 import pytest
-
 from aiogram.api.methods import ForwardMessage, Request
 from tests.mocked_bot import MockedBot
 

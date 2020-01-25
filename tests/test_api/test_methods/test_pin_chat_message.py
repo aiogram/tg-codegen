@@ -1,5 +1,4 @@
 import pytest
-
 from aiogram.api.methods import PinChatMessage, Request
 from tests.mocked_bot import MockedBot
 
