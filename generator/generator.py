@@ -34,9 +34,7 @@ class Generator:
                 "md_line_breaks": md_line_breaks,
             }
         )
-        self.env.globals.update(
-            {"len": len,}
-        )
+        self.env.globals.update({"len": len})
 
         self.telegram_types = {
             entity.name for group in groups for entity in group.childs if entity.is_type
@@ -47,8 +45,8 @@ class Generator:
 
     def generate(self, out_dir: pathlib.Path):
         log.info("Start generating code")
-        docs_methods = []
-        docs_types = []
+        docs_methods = [{'Available methods': 'api/methods/index.md'}]
+        docs_types = [{'Available types': 'api/types/index.md'}]
         for group in self.groups:
             log.info("Visit group %r", group.title)
             docs_group_methods = []
@@ -75,6 +73,18 @@ class Generator:
         docs_mapping = {"nav": [{"Bot API": [{"Methods": docs_methods}, {"Types": docs_types}]}]}
         with self.open_file(out_dir, "mkdocs.yml") as f:
             yaml.safe_dump(docs_mapping, stream=f)
+        with self.open_file(out_dir, "docs", "api", "methods", "index.md") as f:
+            f.write(
+                self.render_template(
+                    "methods_list.md.jinja2", {"groups": self.groups}, reformat_code=False
+                )
+            )
+        with self.open_file(out_dir, "docs", "api", "types", "index.md") as f:
+            f.write(
+                self.render_template(
+                    "types_list.md.jinja2", {"groups": self.groups}, reformat_code=False
+                )
+            )
 
     def render_template(
         self, template_name: str, context: Dict[str, Any], reformat_code: bool = True
@@ -92,7 +102,7 @@ class Generator:
                 remove_unused_variables=False,
                 ignore_init_module_imports=False,
             )
-            code = isort.SortImports(file_contents=code,).output
+            code = isort.SortImports(file_contents=code).output
             try:
                 code = black.format_file_contents(
                     code,
@@ -111,9 +121,7 @@ class Generator:
         imports = self.extract_imports(entity, with_returning=True)
         imports["typing"].update({"Dict", "Any"})
         with self.open_entity_file(out_dir / "aiogram", entity) as f:
-            code = self.render_template(
-                "method.py.jinja2", {"entity": entity, "imports": imports},
-            )
+            code = self.render_template("method.py.jinja2", {"entity": entity, "imports": imports})
             f.write(code)
         with self.open_entity_file(out_dir / "docs", entity, is_doc=True) as f:
             doc = self.render_template(
@@ -130,7 +138,7 @@ class Generator:
         log.info("Visit type %r", entity.name)
         imports = self.extract_imports(entity)
         with self.open_entity_file(out_dir / "aiogram", entity) as f:
-            code = self.render_template("type.py.jinja2", {"entity": entity, "imports": imports},)
+            code = self.render_template("type.py.jinja2", {"entity": entity, "imports": imports})
             f.write(code)
 
         with self.open_entity_file(out_dir / "docs", entity, is_doc=True) as f:
@@ -156,7 +164,7 @@ class Generator:
             # Telegram
             for telegram_type in self.telegram_types:
                 if telegram_type != entity.name and re.findall(
-                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type), annotation.python_type,
+                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type), annotation.python_type
                 ):
                     imports["telegram"].add(telegram_type)
                     imports["typing"].add("TYPE_CHECKING")
@@ -173,7 +181,7 @@ class Generator:
                     imports["typing"].add(from_typing)
             for telegram_type in self.telegram_types:
                 if re.findall(
-                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type), entity.python_returning_type,
+                    TELEGRAM_TYPE_PATTERN.format(type=telegram_type), entity.python_returning_type
                 ):
                     imports["telegram"].add(telegram_type)
         return imports
@@ -182,10 +190,7 @@ class Generator:
     def open_entity_file(self, out_dir: pathlib.Path, entity: Entity, is_doc: bool = False):
         ext = "md" if is_doc else "py"
         with self.open_file(
-            out_dir,
-            "api",
-            ["types", "methods"][entity.is_method],
-            f"{entity.pythonic_name}.{ext}",
+            out_dir, "api", ["types", "methods"][entity.is_method], f"{entity.pythonic_name}.{ext}"
         ) as f:
             yield f
 
