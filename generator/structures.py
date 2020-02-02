@@ -133,4 +133,4 @@ class Group:
 
     @property
     def has_types(self):
-        return any(entity.is_method for entity in self.childs)
+        return any(entity.is_type for entity in self.childs)

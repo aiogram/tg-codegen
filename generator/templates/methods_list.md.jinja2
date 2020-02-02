@@ -1,0 +1,14 @@
+# Methods
+
+Here is list of all available API methods:
+{% for group in groups %}
+{%- if group.childs and group.has_methods %}
+* {{ group.title }}
+{%- for entity in group.childs %}
+{%- if entity.is_method %}
+  - [{{ entity.name }}]({{ entity.pythonic_name }}.md)
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+{%- endfor %}
+
