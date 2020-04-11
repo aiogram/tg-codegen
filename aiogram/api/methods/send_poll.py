@@ -25,7 +25,7 @@ class SendPoll(TelegramMethod[Message]):
     question: str
     """Poll question, 1-255 characters"""
     options: List[str]
-    """List of answer options, 2-10 strings 1-100 characters each"""
+    """A JSON-serialized list of answer options, 2-10 strings 1-100 characters each"""
     is_anonymous: Optional[bool] = None
     """True, if the poll needs to be anonymous, defaults to True"""
     type: Optional[str] = None
@@ -36,7 +36,7 @@ class SendPoll(TelegramMethod[Message]):
     correct_option_id: Optional[int] = None
     """0-based identifier of the correct answer option, required for polls in quiz mode"""
     is_closed: Optional[bool] = None
-    """Pass True, if the poll needs to be immediately closed"""
+    """Pass True, if the poll needs to be immediately closed. This can be useful for poll preview."""
     disable_notification: Optional[bool] = None
     """Sends the message silently. Users will receive a notification with no sound."""
     reply_to_message_id: Optional[int] = None

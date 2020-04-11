@@ -25,6 +25,7 @@ nav:
       - api/methods/send_venue.md
       - api/methods/send_contact.md
       - api/methods/send_poll.md
+      - api/methods/send_dice.md
       - api/methods/send_chat_action.md
       - api/methods/get_user_profile_photos.md
       - api/methods/get_file.md
@@ -49,6 +50,8 @@ nav:
       - api/methods/set_chat_sticker_set.md
       - api/methods/delete_chat_sticker_set.md
       - api/methods/answer_callback_query.md
+      - api/methods/set_my_commands.md
+      - api/methods/get_my_commands.md
     - Updating messages:
       - api/methods/edit_message_text.md
       - api/methods/edit_message_caption.md
@@ -64,6 +67,7 @@ nav:
       - api/methods/add_sticker_to_set.md
       - api/methods/set_sticker_position_in_set.md
       - api/methods/delete_sticker_from_set.md
+      - api/methods/set_sticker_set_thumb.md
     - Inline mode:
       - api/methods/answer_inline_query.md
     - Payments:
@@ -99,6 +103,7 @@ nav:
       - api/types/poll_option.md
       - api/types/poll_answer.md
       - api/types/poll.md
+      - api/types/dice.md
       - api/types/user_profile_photos.md
       - api/types/file.md
       - api/types/reply_keyboard_markup.md
@@ -113,6 +118,7 @@ nav:
       - api/types/chat_photo.md
       - api/types/chat_member.md
       - api/types/chat_permissions.md
+      - api/types/bot_command.md
       - api/types/response_parameters.md
       - api/types/input_media.md
       - api/types/input_media_photo.md

@@ -32,7 +32,7 @@ class SendAudio(TelegramMethod[Message]):
     Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an audio
     file from the Internet, or upload a new one using multipart/form-data."""
     caption: Optional[str] = None
-    """Audio caption, 0-1024 characters"""
+    """Audio caption, 0-1024 characters after entities parsing"""
     parse_mode: Optional[str] = None
     """Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or
     inline URLs in the media caption."""
@@ -65,7 +65,7 @@ class SendAudio(TelegramMethod[Message]):
         )
 
         files: Dict[str, InputFile] = {}
-        self.prepare_file(data=data, files=files, name="audio", value=self.audio)
-        self.prepare_file(data=data, files=files, name="thumb", value=self.thumb)
+        prepare_file(data=data, files=files, name="audio", value=self.audio)
+        prepare_file(data=data, files=files, name="thumb", value=self.thumb)
 
         return Request(method="sendAudio", data=data, files=files)

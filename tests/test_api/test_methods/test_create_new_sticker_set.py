@@ -10,7 +10,7 @@ class TestCreateNewStickerSet:
         prepare_result = bot.add_result_for(CreateNewStickerSet, ok=True, result=None)
 
         response: bool = await CreateNewStickerSet(
-            user_id=..., name=..., title=..., png_sticker=..., emojis=...,
+            user_id=..., name=..., title=..., emojis=...,
         )
         request: Request = bot.get_request()
         assert request.method == "createNewStickerSet"
@@ -22,7 +22,7 @@ class TestCreateNewStickerSet:
         prepare_result = bot.add_result_for(CreateNewStickerSet, ok=True, result=None)
 
         response: bool = await bot.create_new_sticker_set(
-            user_id=..., name=..., title=..., png_sticker=..., emojis=...,
+            user_id=..., name=..., title=..., emojis=...,
         )
         request: Request = bot.get_request()
         assert request.method == "createNewStickerSet"

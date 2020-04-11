@@ -3,10 +3,10 @@
 Here is list of all available API types:
 {% for group in groups %}
 {%- if group.childs and group.has_types %}
-* {{ group.title }}
+- {{ group.title }}
 {%- for entity in group.childs %}
 {%- if entity.is_type %}
-  - [{{ entity.name }}]({{ entity.pythonic_name }}.md)
+    - [{{ entity.name }}]({{ entity.pythonic_name }}.md)
 {%- endif %}
 {%- endfor %}
 {%- endif %}

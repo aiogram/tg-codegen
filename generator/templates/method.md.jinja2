@@ -24,8 +24,7 @@ Description: {{ entity.returning }}
 
 ## Usage
 
-
-### As bot method bot
+### As bot method
 
 ```python3
 result: {{ entity.python_returning_type }} = await bot.{{ entity.pythonic_name }}(...)
@@ -53,7 +52,7 @@ result: {{ entity.python_returning_type }} = await bot({{ entity.name|class_name
 ```python3
 return {{ entity.name|class_name }}(...)
 ```
-{% endif %}
+{%- endif %}
 
 
 ## Related pages:

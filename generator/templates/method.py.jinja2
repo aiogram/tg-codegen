@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from .base import TelegramMethod, Request, Response
+from .base import TelegramMethod, Request, Response, prepare_input_media, prepare_media_file, prepare_parse_mode
 
 
 {% if imports %}
@@ -31,7 +31,7 @@ class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_typ
 
         {% if entity.file_annotations %}files: Dict[str, InputFile] = {}{% endif %}
         {%- for file in entity.file_annotations %}
-        self.prepare_file(data=data, files=files, name="{{ file.name }}", value=self.{{ file.python_name }})
+        prepare_file(data=data, files=files, name="{{ file.name }}", value=self.{{ file.python_name }})
         {%- endfor %}
 
         return Request(method="{{ entity.name }}", data=data{% if entity.file_annotations %}, files=files{% endif %})

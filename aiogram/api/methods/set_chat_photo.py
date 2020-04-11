@@ -27,6 +27,6 @@ class SetChatPhoto(TelegramMethod[bool]):
         )
 
         files: Dict[str, InputFile] = {}
-        self.prepare_file(data=data, files=files, name="photo", value=self.photo)
+        prepare_file(data=data, files=files, name="photo", value=self.photo)
 
         return Request(method="setChatPhoto", data=data, files=files)
