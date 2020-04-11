@@ -1,4 +1,4 @@
-from .base import TelegramObject
+from .base import TelegramObject, UNSET
 from .input_file import (
     BufferedInputFile
     FSInputFile
@@ -13,6 +13,7 @@ from .{{child.pythonic_name}} import {{ child.name }}
 
 __all__ = (
     "TelegramObject",
+    "UNSET",
     "BufferedInputFile",
     "FSInputFile",
 {%- for group in groups %}

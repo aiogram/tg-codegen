@@ -1,7 +1,7 @@
 from pydantic import Field
 
 from .base import TelegramMethod, Request, Response, prepare_input_media, prepare_media_file, prepare_parse_mode
-
+from ..types import UNSET
 
 {% if imports %}
 {%- if imports.extra %}{% for import in imports.extra %}{{ import }}

@@ -170,7 +170,6 @@ class Generator:
                     imports["typing"].add("TYPE_CHECKING")
             if "datetime" in annotation.python_type:
                 imports["extra"].add("import datetime")
-
         if entity.extends:
             imports["extra"].add(
                 f"from .{pythonize_name(entity.extends[0])} import {entity.extends[0]}"
