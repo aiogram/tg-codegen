@@ -18,6 +18,7 @@ RETURN_PATTERNS = [
         flags=RE_FLAGS,
     ),
     re.compile(r"(?P<type>Array of [a-z]+) objects", flags=RE_FLAGS),
+    re.compile(r"Returns (?P<type>Array of [a-z]+) on success", flags=RE_FLAGS),
     re.compile(r"a (?P<type>[a-z]+) object", flags=RE_FLAGS),
     re.compile(r"Returns (?P<type>[a-z]+) on success", flags=RE_FLAGS),
     re.compile(r"(?P<type>[a-z]+) on success", flags=RE_FLAGS),

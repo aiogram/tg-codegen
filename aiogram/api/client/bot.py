@@ -1587,7 +1587,7 @@ class Bot(BaseBot):
         call = SetMyCommands(commands=commands,)
         return await self(call)
 
-    async def get_my_commands(self,) -> BotCommand:
+    async def get_my_commands(self,) -> List[BotCommand]:
         """
         Use this method to get the current list of the bot's commands. Requires no parameters.
         Returns Array of BotCommand on success.

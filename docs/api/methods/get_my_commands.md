@@ -9,7 +9,7 @@ Use this method to get the current list of the bot's commands. Requires no param
 
 ## Response
 
-Type: `#!python3 BotCommand`
+Type: `#!python3 List[BotCommand]`
 
 Description: Returns Array of BotCommand on success.
 
@@ -19,7 +19,7 @@ Description: Returns Array of BotCommand on success.
 ### As bot method
 
 ```python3
-result: BotCommand = await bot.get_my_commands(...)
+result: List[BotCommand] = await bot.get_my_commands(...)
 ```
 
 ### Method as object
@@ -32,12 +32,12 @@ Imports:
 
 #### In handlers with current bot
 ```python3
-result: BotCommand = await GetMyCommands(...)
+result: List[BotCommand] = await GetMyCommands(...)
 ```
 
 #### With specific bot
 ```python3
-result: BotCommand = await bot(GetMyCommands(...))
+result: List[BotCommand] = await bot(GetMyCommands(...))
 ```
 
 
