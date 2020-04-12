@@ -16,6 +16,16 @@ class Annotation:
     const: typing.Optional[str] = None
 
     @property
+    def python_default_value(self) -> typing.Optional[str]:
+        if self.name == 'parse_mode':
+            default_value = "UNSET"
+        elif not self.required:
+            default_value = 'None'
+        else:
+            default_value = None
+        return default_value
+
+    @property
     def python_name(self):
         if self.name == "from":
             return "from_user"
@@ -35,10 +45,10 @@ class Annotation:
         return normalize_optional(result, self.required)
 
     @property
-    def python_field(self):
+    def python_field(self) -> str:
         result = f"{self.python_name}: {self.python_type}"
 
-        value = "" if self.required else "None"
+        value = self.python_default_value
         if self.name == "from":
             value = f"Field({value or '...'}, alias=\"from\")"
         elif self.name == 'parse_mode':
