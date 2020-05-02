@@ -28,9 +28,9 @@ class Annotation:
             return normalize_optional("datetime.datetime", self.required)
         if self.name == "media" and result == "str":
             return normalize_optional("Union[str, InputFile]", required=self.required)
-        if self.name == "until_date":
+        if self.name in ["until_date", "close_date"]:
             return normalize_optional(
-                f"Union[int, datetime.datetime, datetime.timedelta]", required=self.required
+                f"Union[datetime.datetime, datetime.timedelta, int]", required=self.required
             )
         return normalize_optional(result, self.required)
 
@@ -41,6 +41,8 @@ class Annotation:
         value = "" if self.required else "None"
         if self.name == "from":
             value = f"Field({value or '...'}, alias=\"from\")"
+        elif self.name == "remove_keyboard":
+            value = "True"
         elif self.const:
             value = f"Field({self.const!r}, const=True)"
         if value:
