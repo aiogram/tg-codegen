@@ -12,10 +12,11 @@ Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). B
 | `type` | `#!python str` | Type of the result, must be mpeg4_gif |
 | `id` | `#!python str` | Unique identifier for this result, 1-64 bytes |
 | `mpeg4_url` | `#!python str` | A valid URL for the MP4 file. File size must not exceed 1MB |
-| `thumb_url` | `#!python str` | URL of the static thumbnail (jpeg or gif) for the result |
+| `thumb_url` | `#!python str` | URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result |
 | `mpeg4_width` | `#!python Optional[int]` | Optional. Video width |
 | `mpeg4_height` | `#!python Optional[int]` | Optional. Video height |
 | `mpeg4_duration` | `#!python Optional[int]` | Optional. Video duration |
+| `thumb_mime_type` | `#!python Optional[str]` | Optional. MIME type of the thumbnail, must be one of 'image/jpeg', 'image/gif', or 'video/mp4'. Defaults to 'image/jpeg' |
 | `title` | `#!python Optional[str]` | Optional. Title for the result |
 | `caption` | `#!python Optional[str]` | Optional. Caption of the MPEG-4 file to be sent, 0-1024 characters after entities parsing |
 | `parse_mode` | `#!python Optional[str]` | Optional. Mode for parsing entities in the caption. See formatting options for more details. |

@@ -1,4 +1,6 @@
-from typing import Any, Dict, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from ..types import (
     UNSET,
@@ -10,6 +12,9 @@ from ..types import (
     ReplyKeyboardRemove,
 )
 from .base import Request, TelegramMethod
+
+if TYPE_CHECKING:  # pragma: no cover
+    from ..client.bot import Bot
 
 
 class SendPhoto(TelegramMethod[Message]):
@@ -32,8 +37,7 @@ class SendPhoto(TelegramMethod[Message]):
     """Photo caption (may also be used when resending photos by file_id), 0-1024 characters after
     entities parsing"""
     parse_mode: Optional[str] = UNSET
-    """Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or
-    inline URLs in the media caption."""
+    """Mode for parsing entities in the photo caption. See formatting options for more details."""
     disable_notification: Optional[bool] = None
     """Sends the message silently. Users will receive a notification with no sound."""
     reply_to_message_id: Optional[int] = None
@@ -44,10 +48,8 @@ class SendPhoto(TelegramMethod[Message]):
     """Additional interface options. A JSON-serialized object for an inline keyboard, custom reply
     keyboard, instructions to remove reply keyboard or to force a reply from the user."""
 
-    def build_request(self) -> Request:
-        data: Dict[str, Any] = self.dict(
-            exclude={"photo",}
-        )
+    def build_request(self, bot: Bot) -> Request:
+        data: Dict[str, Any] = self.dict(exclude={"photo"})
 
         files: Dict[str, InputFile] = {}
         prepare_file(data=data, files=files, name="photo", value=self.photo)

@@ -25,6 +25,7 @@ class Bot(BaseBot):
         {% for annotation in entity.annotations %}
             {{ annotation.python_name }}:{{ annotation.python_type }}{% if annotation.python_default_value %} = {{ annotation.python_default_value }}{% endif %},
         {% endfor %}
+        request_timeout: Optional[int] = None,
     ) -> {{ entity.python_returning_type }}:
         """
         {{ entity.description|limit_length(width=91)|indent(width=8) }}
@@ -34,6 +35,7 @@ class Bot(BaseBot):
         {% for annotation in entity.annotations -%}
         :param {{ annotation.python_name }}: {{ annotation.description|first_line|limit_length(width=82 - len(annotation.python_name))|indent(width=8)  }}
         {% endfor -%}
+        :param request_timeout: Request timeout
         :return: {{ entity.returning|first_line|limit_length(width=82)|indent(width=8) }}
         """
         call = {{ entity.name|class_name }}(
@@ -41,6 +43,6 @@ class Bot(BaseBot):
             {{ annotation.python_name }}={{ annotation.python_name }},
         {% endfor %}
         )
-        return await self(call)
+        return await self(call, request_timeout=request_timeout)
     {% endif %}{% endfor %}
 {% endif %}{% endfor %}

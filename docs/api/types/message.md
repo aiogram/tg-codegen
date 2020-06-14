@@ -20,35 +20,36 @@ This object represents a message.
 | `forward_sender_name` | `#!python Optional[str]` | Optional. Sender's name for messages forwarded from users who disallow adding a link to their account in forwarded messages |
 | `forward_date` | `#!python Optional[int]` | Optional. For forwarded messages, date the original message was sent in Unix time |
 | `reply_to_message` | `#!python Optional[Message]` | Optional. For replies, the original message. Note that the Message object in this field will not contain further reply_to_message fields even if it itself is a reply. |
+| `via_bot` | `#!python Optional[User]` | Optional. Bot through which the message was sent |
 | `edit_date` | `#!python Optional[int]` | Optional. Date the message was last edited in Unix time |
 | `media_group_id` | `#!python Optional[str]` | Optional. The unique identifier of a media message group this message belongs to |
 | `author_signature` | `#!python Optional[str]` | Optional. Signature of the post author for messages in channels |
 | `text` | `#!python Optional[str]` | Optional. For text messages, the actual UTF-8 text of the message, 0-4096 characters |
 | `entities` | `#!python Optional[List[MessageEntity]]` | Optional. For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text |
-| `caption_entities` | `#!python Optional[List[MessageEntity]]` | Optional. For messages with a caption, special entities like usernames, URLs, bot commands, etc. that appear in the caption |
+| `animation` | `#!python Optional[Animation]` | Optional. Message is an animation, information about the animation. For backward compatibility, when this field is set, the document field will also be set |
 | `audio` | `#!python Optional[Audio]` | Optional. Message is an audio file, information about the file |
 | `document` | `#!python Optional[Document]` | Optional. Message is a general file, information about the file |
-| `animation` | `#!python Optional[Animation]` | Optional. Message is an animation, information about the animation. For backward compatibility, when this field is set, the document field will also be set |
-| `game` | `#!python Optional[Game]` | Optional. Message is a game, information about the game. |
 | `photo` | `#!python Optional[List[PhotoSize]]` | Optional. Message is a photo, available sizes of the photo |
 | `sticker` | `#!python Optional[Sticker]` | Optional. Message is a sticker, information about the sticker |
 | `video` | `#!python Optional[Video]` | Optional. Message is a video, information about the video |
-| `voice` | `#!python Optional[Voice]` | Optional. Message is a voice message, information about the file |
 | `video_note` | `#!python Optional[VideoNote]` | Optional. Message is a video note, information about the video message |
+| `voice` | `#!python Optional[Voice]` | Optional. Message is a voice message, information about the file |
 | `caption` | `#!python Optional[str]` | Optional. Caption for the animation, audio, document, photo, video or voice, 0-1024 characters |
+| `caption_entities` | `#!python Optional[List[MessageEntity]]` | Optional. For messages with a caption, special entities like usernames, URLs, bot commands, etc. that appear in the caption |
 | `contact` | `#!python Optional[Contact]` | Optional. Message is a shared contact, information about the contact |
-| `location` | `#!python Optional[Location]` | Optional. Message is a shared location, information about the location |
-| `venue` | `#!python Optional[Venue]` | Optional. Message is a venue, information about the venue |
-| `poll` | `#!python Optional[Poll]` | Optional. Message is a native poll, information about the poll |
 | `dice` | `#!python Optional[Dice]` | Optional. Message is a dice with random value from 1 to 6 |
+| `game` | `#!python Optional[Game]` | Optional. Message is a game, information about the game. |
+| `poll` | `#!python Optional[Poll]` | Optional. Message is a native poll, information about the poll |
+| `venue` | `#!python Optional[Venue]` | Optional. Message is a venue, information about the venue. For backward compatibility, when this field is set, the location field will also be set |
+| `location` | `#!python Optional[Location]` | Optional. Message is a shared location, information about the location |
 | `new_chat_members` | `#!python Optional[List[User]]` | Optional. New members that were added to the group or supergroup and information about them (the bot itself may be one of these members) |
 | `left_chat_member` | `#!python Optional[User]` | Optional. A member was removed from the group, information about them (this member may be the bot itself) |
 | `new_chat_title` | `#!python Optional[str]` | Optional. A chat title was changed to this value |
 | `new_chat_photo` | `#!python Optional[List[PhotoSize]]` | Optional. A chat photo was change to this value |
 | `delete_chat_photo` | `#!python Optional[bool]` | Optional. Service message: the chat photo was deleted |
 | `group_chat_created` | `#!python Optional[bool]` | Optional. Service message: the group has been created |
-| `supergroup_chat_created` | `#!python Optional[bool]` | Optional. Service message: the supergroup has been created. This field can‘t be received in a message coming through updates, because bot can’t be a member of a supergroup when it is created. It can only be found in reply_to_message if someone replies to a very first message in a directly created supergroup. |
-| `channel_chat_created` | `#!python Optional[bool]` | Optional. Service message: the channel has been created. This field can‘t be received in a message coming through updates, because bot can’t be a member of a channel when it is created. It can only be found in reply_to_message if someone replies to a very first message in a channel. |
+| `supergroup_chat_created` | `#!python Optional[bool]` | Optional. Service message: the supergroup has been created. This field can't be received in a message coming through updates, because bot can't be a member of a supergroup when it is created. It can only be found in reply_to_message if someone replies to a very first message in a directly created supergroup. |
+| `channel_chat_created` | `#!python Optional[bool]` | Optional. Service message: the channel has been created. This field can't be received in a message coming through updates, because bot can't be a member of a channel when it is created. It can only be found in reply_to_message if someone replies to a very first message in a channel. |
 | `migrate_to_chat_id` | `#!python Optional[int]` | Optional. The group has been migrated to a supergroup with the specified identifier. This number may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier. |
 | `migrate_from_chat_id` | `#!python Optional[int]` | Optional. The supergroup has been migrated from a group with the specified identifier. This number may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier. |
 | `pinned_message` | `#!python Optional[Message]` | Optional. Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply. |

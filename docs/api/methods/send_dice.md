@@ -2,7 +2,7 @@
 
 ## Description
 
-Use this method to send a dice, which will have a random value from 1 to 6. On success, the sent Message is returned. (Yes, we're aware of the 'proper' singular of die. But it's awkward, and we decided to help it change. One dice at a time!)
+Use this method to send an animated emoji that will display a random value. On success, the sent Message is returned.
 
 
 ## Arguments
@@ -10,7 +10,7 @@ Use this method to send a dice, which will have a random value from 1 to 6. On s
 | Name | Type | Description |
 | - | - | - |
 | `chat_id` | `#!python3 Union[int, str]` | Unique identifier for the target chat or username of the target channel (in the format @channelusername) |
-| `emoji` | `#!python3 Optional[str]` | Optional. Emoji on which the dice throw animation is based. Currently, must be one of '' or ''. Defauts to '' |
+| `emoji` | `#!python3 Optional[str]` | Optional. Emoji on which the dice throw animation is based. Currently, must be one of '', '', or ''. Dice can have values 1-6 for '' and '', and values 1-5 for ''. Defaults to '' |
 | `disable_notification` | `#!python3 Optional[bool]` | Optional. Sends the message silently. Users will receive a notification with no sound. |
 | `reply_to_message_id` | `#!python3 Optional[int]` | Optional. If the message is a reply, ID of the original message |
 | `reply_markup` | `#!python3 Optional[Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]]` | Optional. Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user. |

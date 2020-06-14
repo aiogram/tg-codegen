@@ -155,7 +155,7 @@ class Generator:
     ):
         if imports is None:
             imports = defaultdict(set)
-
+        imports["typing"].add("TYPE_CHECKING")
         for annotation in entity.annotations:
             # typing
             for from_typing in {"Any", "Union", "Optional", "List"}:
@@ -167,7 +167,7 @@ class Generator:
                     TELEGRAM_TYPE_PATTERN.format(type=telegram_type), annotation.python_type
                 ):
                     imports["telegram"].add(telegram_type)
-                    imports["typing"].add("TYPE_CHECKING")
+
             if "datetime" in annotation.python_type:
                 imports["extra"].add("import datetime")
         if entity.extends:

@@ -91,19 +91,19 @@ nav:
       - api/types/message.md
       - api/types/message_entity.md
       - api/types/photo_size.md
+      - api/types/animation.md
       - api/types/audio.md
       - api/types/document.md
       - api/types/video.md
-      - api/types/animation.md
-      - api/types/voice.md
       - api/types/video_note.md
+      - api/types/voice.md
       - api/types/contact.md
-      - api/types/location.md
-      - api/types/venue.md
+      - api/types/dice.md
       - api/types/poll_option.md
       - api/types/poll_answer.md
       - api/types/poll.md
-      - api/types/dice.md
+      - api/types/location.md
+      - api/types/venue.md
       - api/types/user_profile_photos.md
       - api/types/file.md
       - api/types/reply_keyboard_markup.md

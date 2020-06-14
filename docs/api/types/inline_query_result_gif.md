@@ -12,10 +12,11 @@ Represents a link to an animated GIF file. By default, this animated GIF file wi
 | `type` | `#!python str` | Type of the result, must be gif |
 | `id` | `#!python str` | Unique identifier for this result, 1-64 bytes |
 | `gif_url` | `#!python str` | A valid URL for the GIF file. File size must not exceed 1MB |
-| `thumb_url` | `#!python str` | URL of the static thumbnail for the result (jpeg or gif) |
+| `thumb_url` | `#!python str` | URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result |
 | `gif_width` | `#!python Optional[int]` | Optional. Width of the GIF |
 | `gif_height` | `#!python Optional[int]` | Optional. Height of the GIF |
 | `gif_duration` | `#!python Optional[int]` | Optional. Duration of the GIF |
+| `thumb_mime_type` | `#!python Optional[str]` | Optional. MIME type of the thumbnail, must be one of 'image/jpeg', 'image/gif', or 'video/mp4'. Defaults to 'image/jpeg' |
 | `title` | `#!python Optional[str]` | Optional. Title for the result |
 | `caption` | `#!python Optional[str]` | Optional. Caption of the GIF file to be sent, 0-1024 characters after entities parsing |
 | `parse_mode` | `#!python Optional[str]` | Optional. Mode for parsing entities in the caption. See formatting options for more details. |

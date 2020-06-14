@@ -1,5 +1,5 @@
+from __future__ import annotations
 from pydantic import Field
-
 from .base import TelegramMethod, Request, Response, prepare_input_media, prepare_media_file, prepare_parse_mode
 from ..types import UNSET
 
@@ -12,7 +12,8 @@ from ..types import UNSET
 {% endfor %}
 {%- endif %}
 {%- endif %}
-
+if TYPE_CHECKING:  # pragma: no cover
+    from ..client.bot import Bot
 
 class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_type }}]):
     """
@@ -26,8 +27,8 @@ class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_typ
     {{ annotation.python_field }}
     """{{ annotation.description|first_line|limit_length(width=92)|indent(width=4) }}"""
 {%- endfor %}
-    def build_request(self) -> Request:
-        data: Dict[str, Any] = self.dict({% if entity.file_annotations %}exclude={ {% for annotation in entity.file_annotations %}"{{ annotation.python_name }}", {% endfor %} }{% endif %})
+    def build_request(self, bot: Bot) -> Request:
+        data: Dict[str, Any] = self.dict({% if entity.file_annotations %}exclude={ {% for annotation in entity.file_annotations %}"{{ annotation.python_name }}"{% if not loop.last %}, {% endif %}{% endfor %} }{% endif %})
 
         {% if entity.file_annotations %}files: Dict[str, InputFile] = {}{% endif %}
         {%- for file in entity.file_annotations %}

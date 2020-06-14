@@ -17,10 +17,10 @@ class Annotation:
 
     @property
     def python_default_value(self) -> typing.Optional[str]:
-        if self.name == 'parse_mode':
+        if self.name == "parse_mode":
             default_value = "UNSET"
         elif not self.required:
-            default_value = 'None'
+            default_value = "None"
         else:
             default_value = None
         return default_value
@@ -38,9 +38,9 @@ class Annotation:
             return normalize_optional("datetime.datetime", required=self.required)
         if self.name == "media" and result == "str":
             return normalize_optional("Union[str, InputFile]", required=self.required)
-        if self.name == "until_date":
+        if self.name in {"until_date", "close_date"}:
             return normalize_optional(
-                "Union[int, datetime.datetime, datetime.timedelta]", required=self.required
+                "Union[datetime.datetime, datetime.timedelta, int]", required=self.required
             )
         return normalize_optional(result, self.required)
 
@@ -51,7 +51,7 @@ class Annotation:
         value = self.python_default_value
         if self.name == "from":
             value = f"Field({value or '...'}, alias=\"from\")"
-        elif self.name == 'parse_mode':
+        elif self.name == "parse_mode":
             value = "UNSET"
         elif self.const:
             value = f"Field({self.const!r}, const=True)"
