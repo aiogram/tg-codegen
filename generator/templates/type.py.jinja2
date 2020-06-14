@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import Field
 
-from .base import TelegramObject
+from .base import TelegramObject, UNSET
 
 {% if imports %}
 {%- if imports.extra %}{% for import in imports.extra %}{{ import }}

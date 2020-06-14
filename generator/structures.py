@@ -16,6 +16,16 @@ class Annotation:
     const: typing.Optional[str] = None
 
     @property
+    def python_default_value(self) -> typing.Optional[str]:
+        if self.name == 'parse_mode':
+            default_value = "UNSET"
+        elif not self.required:
+            default_value = 'None'
+        else:
+            default_value = None
+        return default_value
+
+    @property
     def python_name(self):
         if self.name == "from":
             return "from_user"
@@ -25,24 +35,24 @@ class Annotation:
     def python_type(self) -> str:
         result = normalize_type(self.type)
         if self.name == "date":
-            return normalize_optional("datetime.datetime", self.required)
+            return normalize_optional("datetime.datetime", required=self.required)
         if self.name == "media" and result == "str":
             return normalize_optional("Union[str, InputFile]", required=self.required)
-        if self.name in ["until_date", "close_date"]:
+        if self.name == "until_date":
             return normalize_optional(
-                f"Union[datetime.datetime, datetime.timedelta, int]", required=self.required
+                "Union[int, datetime.datetime, datetime.timedelta]", required=self.required
             )
         return normalize_optional(result, self.required)
 
     @property
-    def python_field(self):
+    def python_field(self) -> str:
         result = f"{self.python_name}: {self.python_type}"
 
-        value = "" if self.required else "None"
+        value = self.python_default_value
         if self.name == "from":
             value = f"Field({value or '...'}, alias=\"from\")"
-        elif self.name == "remove_keyboard":
-            value = "True"
+        elif self.name == 'parse_mode':
+            value = "UNSET"
         elif self.const:
             value = f"Field({self.const!r}, const=True)"
         if value:

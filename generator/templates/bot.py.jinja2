@@ -3,6 +3,7 @@ from .base import BaseBot
 from typing import Any, List, Optional, Union
 import datetime
 from ...utils.mixins import ContextInstanceMixin
+from ..types import UNSET
 
 {% for group in groups %}{% for entity in group.childs %}
 from ..{% if entity.is_method %}methods{% else %}types{% endif %} import {{ entity.name|class_name }}
@@ -22,7 +23,7 @@ class Bot(BaseBot):
     async def {{ entity.name|pythonize }}(
         self,
         {% for annotation in entity.annotations %}
-            {{ annotation.python_name }}:{{ annotation.python_type }}{% if not annotation.required %} = None{% endif %},
+            {{ annotation.python_name }}:{{ annotation.python_type }}{% if annotation.python_default_value %} = {{ annotation.python_default_value }}{% endif %},
         {% endfor %}
     ) -> {{ entity.python_returning_type }}:
         """
