@@ -29,6 +29,7 @@ class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_typ
 {%- endfor %}
     def build_request(self, bot: Bot) -> Request:
         data: Dict[str, Any] = self.dict({% if entity.file_annotations %}exclude={ {% for annotation in entity.file_annotations %}"{{ annotation.python_name }}"{% if not loop.last %}, {% endif %}{% endfor %} }{% endif %})
+        {% for annotation in entity.annotations %}{% if annotation.name == 'parse_mode'%}prepare_parse_mode(bot, data){% elif annotation.name == 'explanation_parse_mode' %}prepare_parse_mode(bot, data, parse_mode_property="explanation_parse_mode"){% endif %}{% endfor %}
 
         {% if entity.file_annotations %}files: Dict[str, InputFile] = {}{% endif %}
         {%- for file in entity.file_annotations %}
