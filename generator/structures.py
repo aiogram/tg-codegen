@@ -17,7 +17,7 @@ class Annotation:
 
     @property
     def python_default_value(self) -> typing.Optional[str]:
-        if self.name == "parse_mode":
+        if self.name == "parse_mode" or self.name == "explanation_parse_mode":
             default_value = "UNSET"
         elif not self.required:
             default_value = "None"
@@ -51,7 +51,7 @@ class Annotation:
         value = self.python_default_value
         if self.name == "from":
             value = f"Field({value or '...'}, alias=\"from\")"
-        elif self.name == "parse_mode":
+        elif self.name == "parse_mode" or self.name == 'explanation_parse_mode':
             value = "UNSET"
         elif self.const:
             value = f"Field({self.const!r}, const=True)"
