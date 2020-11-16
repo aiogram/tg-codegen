@@ -4,13 +4,15 @@ import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from ..types import (
+    UNSET,
     ForceReply,
     InlineKeyboardMarkup,
     Message,
+    MessageEntity,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
-from .base import Request, TelegramMethod
+from .base import Request, TelegramMethod, prepare_parse_mode
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..client.bot import Bot
@@ -29,7 +31,7 @@ class SendPoll(TelegramMethod[Message]):
     """Unique identifier for the target chat or username of the target channel (in the format
     @channelusername)"""
     question: str
-    """Poll question, 1-255 characters"""
+    """Poll question, 1-300 characters"""
     options: List[str]
     """A JSON-serialized list of answer options, 2-10 strings 1-100 characters each"""
     is_anonymous: Optional[bool] = None
@@ -44,8 +46,11 @@ class SendPoll(TelegramMethod[Message]):
     explanation: Optional[str] = None
     """Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a
     quiz-style poll, 0-200 characters with at most 2 line feeds after entities parsing"""
-    explanation_parse_mode: Optional[str] = None
+    explanation_parse_mode: Optional[str] = UNSET
     """Mode for parsing entities in the explanation. See formatting options for more details."""
+    explanation_entities: Optional[List[MessageEntity]] = None
+    """List of special entities that appear in the poll explanation, which can be specified
+    instead of parse_mode"""
     open_period: Optional[int] = None
     """Amount of time in seconds the poll will be active after creation, 5-600. Can't be used
     together with close_date."""
@@ -58,6 +63,9 @@ class SendPoll(TelegramMethod[Message]):
     """Sends the message silently. Users will receive a notification with no sound."""
     reply_to_message_id: Optional[int] = None
     """If the message is a reply, ID of the original message"""
+    allow_sending_without_reply: Optional[bool] = None
+    """Pass True, if the message should be sent even if the specified replied-to message is not
+    found"""
     reply_markup: Optional[
         Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
     ] = None
@@ -66,5 +74,12 @@ class SendPoll(TelegramMethod[Message]):
 
     def build_request(self, bot: Bot) -> Request:
         data: Dict[str, Any] = self.dict()
+
+        prepare_parse_mode(
+            bot,
+            data,
+            parse_mode_property="explanation_parse_mode",
+            entities_property="explanation_entities",
+        )
 
         return Request(method="sendPoll", data=data)

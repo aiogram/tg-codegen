@@ -1,14 +1,21 @@
-# Types
+#####
+Types
+#####
 
 Here is list of all available API types:
+
 {% for group in groups %}
 {%- if group.childs and group.has_types %}
-- {{ group.title }}
-{%- for entity in group.childs %}
+{{ group.title }}
+{{ group.title|header('=') }}
+
+.. toctree::
+    :maxdepth: 1
+{% for entity in group.childs %}
 {%- if entity.is_type %}
-    - [{{ entity.name }}]({{ entity.pythonic_name }}.md)
+    {{ entity.pythonic_name }}
 {%- endif %}
 {%- endfor %}
 {%- endif %}
-{%- endfor %}
+{% endfor %}
 

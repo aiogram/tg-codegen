@@ -1,64 +1,57 @@
-# {{ entity.name }}
-
-## Description
+{{ entity.name|header('#') }}
+{{ entity.name }}
+{{ entity.name|header('#') }}
 
 {{ entity.description|md_line_breaks }}
 
-{% if entity.annotations %}
-## Arguments
+Returns: :obj:`{{ entity.python_returning_type }}`
 
-| Name | Type | Description |
-| - | - | - |
-{%- for annotation in entity.annotations %}
-| `{{ annotation.python_name }}` | `#!python3 {{ annotation.python_type }}` | {% if not annotation.required %}Optional. {% endif %}{{ annotation.description|first_line }} |
-{%- endfor %}
-{% endif %}
+.. automodule:: aiogram.api.methods.{{ entity.pythonic_name }}
+    :members:
+    :member-order: bysource
+    :special-members: __init__
+    :undoc-members: True
 
 
-## Response
+Usage
+=====
 
-Type: `#!python3 {{ entity.python_returning_type }}`
+As bot method
+-------------
 
-Description: {{ entity.returning }}
+.. code-block::
+
+    result: {{ entity.python_returning_type }} = await bot.{{ entity.pythonic_name }}(...)
 
 
-## Usage
-
-### As bot method
-
-```python3
-result: {{ entity.python_returning_type }} = await bot.{{ entity.pythonic_name }}(...)
-```
-
-### Method as object
+Method as object
+----------------
 
 Imports:
 
-- `from aiogram.methods import {{ entity.name|class_name }}`
-- `from aiogram.api.methods import {{ entity.name|class_name }}`
-- `from aiogram.api.methods.{{ entity.pythonic_name }} import {{ entity.name|class_name }}`
+- :code:`from aiogram.methods import {{ entity.name|class_name }}`
+- :code:`from aiogram.api.methods import {{ entity.name|class_name }}`
+- :code:`from aiogram.api.methods.{{ entity.pythonic_name }} import {{ entity.name|class_name }}`
 
-#### In handlers with current bot
-```python3
-result: {{ entity.python_returning_type }} = await {{ entity.name|class_name }}(...)
-```
+In handlers with current bot
+----------------------------
 
-#### With specific bot
-```python3
-result: {{ entity.python_returning_type }} = await bot({{ entity.name|class_name }}(...))
-```
+.. code-block::
+
+    result: {{ entity.python_returning_type }} = await {{ entity.name|class_name }}(...)
+
+With specific bot
+~~~~~~~~~~~~~~~~~
+
+.. code-block::
+
+    result: {{ entity.python_returning_type }} = await bot({{ entity.name|class_name }}(...))
+
 {% if entity.can_be_used_in_webhook -%}
-#### As reply into Webhook in handler
-```python3
-return {{ entity.name|class_name }}(...)
-```
+As reply into Webhook in handler
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block::
+
+    return {{ entity.name|class_name }}(...)
 {%- endif %}
-
-
-## Related pages:
-
-- [Official documentation](https://core.telegram.org/bots/api#{{ entity.anchor }})
-{% for import in imports.telegram|sort %}- [aiogram.types.{{ import }}](../types/{{ import|pythonize }}.md)
-{% endfor -%}
-{% if 'InputFile' in imports.telegram %}- [How to upload file?](../sending_files.md)
-{% endif %}

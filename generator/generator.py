@@ -32,6 +32,7 @@ class Generator:
                 "first_line": lambda text: text.split("\n")[0],
                 "limit_length": limit_length,
                 "md_line_breaks": md_line_breaks,
+                "header": lambda value, symbol: symbol * len(value)
             }
         )
         self.env.globals.update({"len": len})
@@ -45,23 +46,13 @@ class Generator:
 
     def generate(self, out_dir: pathlib.Path):
         log.info("Start generating code")
-        docs_methods = [{'Available methods': 'api/methods/index.md'}]
-        docs_types = [{'Available types': 'api/types/index.md'}]
         for group in self.groups:
             log.info("Visit group %r", group.title)
-            docs_group_methods = []
-            docs_group_types = []
             for entity in group.childs:
                 if entity.is_method:
-                    docs_group_methods.append(f"api/methods/{pythonize_name(entity.name)}.md")
                     self.generate_method(entity, out_dir)
                 else:
-                    docs_group_types.append(f"api/types/{pythonize_name(entity.name)}.md")
                     self.generate_type(entity, out_dir)
-            if docs_group_methods:
-                docs_methods.append({group.title: docs_group_methods})
-            if docs_group_types:
-                docs_types.append({group.title: docs_group_types})
             log.info("Leave group %r", group.title)
         with self.open_file(out_dir, "aiogram", "api", "types", "__init__.py") as f:
             f.write(self.render_template("types.py.jinja2", {"groups": self.groups}))
@@ -70,16 +61,13 @@ class Generator:
         with self.open_file(out_dir, "aiogram", "api", "client", "bot.py") as f:
             f.write(self.render_template("bot.py.jinja2", {"groups": self.groups}))
 
-        docs_mapping = {"nav": [{"Bot API": [{"Methods": docs_methods}, {"Types": docs_types}]}]}
-        with self.open_file(out_dir, "mkdocs.yml") as f:
-            yaml.safe_dump(docs_mapping, stream=f)
-        with self.open_file(out_dir, "docs", "api", "methods", "index.md") as f:
+        with self.open_file(out_dir, "docs", "api", "methods", "index.rst") as f:
             f.write(
                 self.render_template(
                     "methods_list.md.jinja2", {"groups": self.groups}, reformat_code=False
                 )
             )
-        with self.open_file(out_dir, "docs", "api", "types", "index.md") as f:
+        with self.open_file(out_dir, "docs", "api", "types", "index.rst") as f:
             f.write(
                 self.render_template(
                     "types_list.md.jinja2", {"groups": self.groups}, reformat_code=False
@@ -187,7 +175,7 @@ class Generator:
 
     @contextlib.contextmanager
     def open_entity_file(self, out_dir: pathlib.Path, entity: Entity, is_doc: bool = False):
-        ext = "md" if is_doc else "py"
+        ext = "rst" if is_doc else "py"
         with self.open_file(
             out_dir, "api", ["types", "methods"][entity.is_method], f"{entity.pythonic_name}.{ext}"
         ) as f:

@@ -10,7 +10,7 @@ from ..types import (
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
-from .base import Request, TelegramMethod
+from .base import Request, TelegramMethod, prepare_file
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..client.bot import Bot
@@ -48,6 +48,9 @@ class SendVideoNote(TelegramMethod[Message]):
     """Sends the message silently. Users will receive a notification with no sound."""
     reply_to_message_id: Optional[int] = None
     """If the message is a reply, ID of the original message"""
+    allow_sending_without_reply: Optional[bool] = None
+    """Pass True, if the message should be sent even if the specified replied-to message is not
+    found"""
     reply_markup: Optional[
         Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
     ] = None

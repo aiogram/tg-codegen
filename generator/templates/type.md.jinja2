@@ -1,30 +1,11 @@
-# {{ entity.name }}
-
-## Description
+{{ entity.name|header('#') }}
+{{ entity.name }}
+{{ entity.name|header('#') }}
 
 {{ entity.description|md_line_breaks }}
 
-{% if entity.annotations %}
-## Attributes
-
-| Name | Type | Description |
-| - | - | - |
-{%- for annotation in entity.annotations %}
-| `{{ annotation.python_name }}` | `#!python {{ annotation.python_type }}` | {% if not annotation.required %}Optional. {% endif %}{{ annotation.description|first_line }} |
-{%- endfor %}
-{% endif %}
-
-
-## Location
-
-- `from aiogram.types import {{ entity.name|class_name }}`
-- `from aiogram.api.types import {{ entity.name|class_name }}`
-- `from aiogram.api.types.{{ entity.pythonic_name }} import {{ entity.name|class_name }}`
-
-## Related pages:
-
-- [Official documentation](https://core.telegram.org/bots/api#{{ entity.anchor }})
-{% for import in imports.telegram|sort %}- [aiogram.types.{{ import }}](../types/{{ import|pythonize }}.md)
-{% endfor -%}
-{% if 'InputFile' in imports.telegram or entity.name == 'InputFile' %}- [How to upload file?](../sending_files.md)
-{% endif %}
+.. automodule:: aiogram.api.types.{{ entity.pythonic_name }}
+    :members:
+    :member-order: bysource
+    :special-members: __init__
+    :undoc-members: True

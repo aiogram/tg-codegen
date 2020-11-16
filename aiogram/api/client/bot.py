@@ -7,6 +7,8 @@ from ..methods import (
     AnswerInlineQuery,
     AnswerPreCheckoutQuery,
     AnswerShippingQuery,
+    Close,
+    CopyMessage,
     CreateNewStickerSet,
     DeleteChatPhoto,
     DeleteChatStickerSet,
@@ -34,6 +36,7 @@ from ..methods import (
     GetWebhookInfo,
     KickChatMember,
     LeaveChat,
+    LogOut,
     PinChatMessage,
     PromoteChatMember,
     RestrictChatMember,
@@ -70,6 +73,7 @@ from ..methods import (
     StopMessageLiveLocation,
     StopPoll,
     UnbanChatMember,
+    UnpinAllChatMessages,
     UnpinChatMessage,
     UploadStickerFile,
 )
@@ -86,11 +90,15 @@ from ..types import (
     InlineQueryResult,
     InputFile,
     InputMedia,
+    InputMediaAudio,
+    InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
     LabeledPrice,
     MaskPosition,
     Message,
+    MessageEntity,
+    MessageId,
     PassportElementError,
     Poll,
     ReplyKeyboardMarkup,
@@ -134,23 +142,23 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#getupdates
 
         :param offset: Identifier of the first update to be returned. Must be greater by one than
-        the highest among the identifiers of previously received updates. By
-        default, updates starting with the earliest unconfirmed update are
-        returned. An update is considered confirmed as soon as getUpdates is called
-        with an offset higher than its update_id. The negative offset can be
-        specified to retrieve updates starting from -offset update from the end of
-        the updates queue. All previous updates will forgotten.
+            the highest among the identifiers of previously received updates. By
+            default, updates starting with the earliest unconfirmed update are
+            returned. An update is considered confirmed as soon as getUpdates is called
+            with an offset higher than its update_id. The negative offset can be
+            specified to retrieve updates starting from -offset update from the end of
+            the updates queue. All previous updates will forgotten.
         :param limit: Limits the number of updates to be retrieved. Values between 1-100 are
-        accepted. Defaults to 100.
+            accepted. Defaults to 100.
         :param timeout: Timeout in seconds for long polling. Defaults to 0, i.e. usual short
-        polling. Should be positive, short polling should be used for testing
-        purposes only.
+            polling. Should be positive, short polling should be used for testing
+            purposes only.
         :param allowed_updates: A JSON-serialized list of the update types you want your bot to
-        receive. For example, specify ['message', 'edited_channel_post',
-        'callback_query'] to only receive updates of these types. See
-        Update for a complete list of available update types. Specify an
-        empty list to receive all updates regardless of type (default). If
-        not specified, the previous setting will be used.
+            receive. For example, specify ['message', 'edited_channel_post',
+            'callback_query'] to only receive updates of these types. See
+            Update for a complete list of available update types. Specify an
+            empty list to receive all updates regardless of type (default). If
+            not specified, the previous setting will be used.
         :param request_timeout: Request timeout
         :return: An Array of Update objects is returned.
         """
@@ -163,8 +171,10 @@ class Bot(BaseBot):
         self,
         url: str,
         certificate: Optional[InputFile] = None,
+        ip_address: Optional[str] = None,
         max_connections: Optional[int] = None,
         allowed_updates: Optional[List[str]] = None,
+        drop_pending_updates: Optional[bool] = None,
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
@@ -187,41 +197,49 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#setwebhook
 
         :param url: HTTPS url to send updates to. Use an empty string to remove webhook
-        integration
+            integration
         :param certificate: Upload your public key certificate so that the root certificate in use
-        can be checked. See our self-signed guide for details.
+            can be checked. See our self-signed guide for details.
+        :param ip_address: The fixed IP address which will be used to send webhook requests
+            instead of the IP address resolved through DNS
         :param max_connections: Maximum allowed number of simultaneous HTTPS connections to the
-        webhook for update delivery, 1-100. Defaults to 40. Use lower
-        values to limit the load on your bot's server, and higher values
-        to increase your bot's throughput.
+            webhook for update delivery, 1-100. Defaults to 40. Use lower
+            values to limit the load on your bot's server, and higher values
+            to increase your bot's throughput.
         :param allowed_updates: A JSON-serialized list of the update types you want your bot to
-        receive. For example, specify ['message', 'edited_channel_post',
-        'callback_query'] to only receive updates of these types. See
-        Update for a complete list of available update types. Specify an
-        empty list to receive all updates regardless of type (default). If
-        not specified, the previous setting will be used.
+            receive. For example, specify ['message', 'edited_channel_post',
+            'callback_query'] to only receive updates of these types. See
+            Update for a complete list of available update types. Specify an
+            empty list to receive all updates regardless of type (default). If
+            not specified, the previous setting will be used.
+        :param drop_pending_updates: Pass True to drop all pending updates
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
         call = SetWebhook(
             url=url,
             certificate=certificate,
+            ip_address=ip_address,
             max_connections=max_connections,
             allowed_updates=allowed_updates,
+            drop_pending_updates=drop_pending_updates,
         )
         return await self(call, request_timeout=request_timeout)
 
-    async def delete_webhook(self, request_timeout: Optional[int] = None,) -> bool:
+    async def delete_webhook(
+        self, drop_pending_updates: Optional[bool] = None, request_timeout: Optional[int] = None,
+    ) -> bool:
         """
         Use this method to remove webhook integration if you decide to switch back to getUpdates.
-        Returns True on success. Requires no parameters.
+        Returns True on success.
 
         Source: https://core.telegram.org/bots/api#deletewebhook
 
+        :param drop_pending_updates: Pass True to drop all pending updates
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
-        call = DeleteWebhook()
+        call = DeleteWebhook(drop_pending_updates=drop_pending_updates,)
         return await self(call, request_timeout=request_timeout)
 
     async def get_webhook_info(self, request_timeout: Optional[int] = None,) -> WebhookInfo:
@@ -234,7 +252,7 @@ class Bot(BaseBot):
 
         :param request_timeout: Request timeout
         :return: On success, returns a WebhookInfo object. If the bot is using getUpdates, will
-        return an object with the url field empty.
+            return an object with the url field empty.
         """
         call = GetWebhookInfo()
         return await self(call, request_timeout=request_timeout)
@@ -257,14 +275,48 @@ class Bot(BaseBot):
         call = GetMe()
         return await self(call, request_timeout=request_timeout)
 
+    async def log_out(self, request_timeout: Optional[int] = None,) -> bool:
+        """
+        Use this method to log out from the cloud Bot API server before launching the bot locally.
+        You must log out the bot before running it locally, otherwise there is no guarantee that
+        the bot will receive updates. After a successful call, you can immediately log in on a
+        local server, but will not be able to log in back to the cloud Bot API server for 10
+        minutes. Returns True on success. Requires no parameters.
+
+        Source: https://core.telegram.org/bots/api#logout
+
+        :param request_timeout: Request timeout
+        :return: Returns True on success.
+        """
+        call = LogOut()
+        return await self(call, request_timeout=request_timeout)
+
+    async def close(self, request_timeout: Optional[int] = None,) -> bool:
+        """
+        Use this method to close the bot instance before moving it from one local server to
+        another. You need to delete the webhook before calling this method to ensure that the bot
+        isn't launched again after server restart. The method will return error 429 in the first
+        10 minutes after the bot is launched. Returns True on success. Requires no parameters.
+
+        Source: https://core.telegram.org/bots/api#close
+
+        :param request_timeout: Request timeout
+        :return: The method will return error 429 in the first 10 minutes after the bot is
+            launched. Returns True on success.
+        """
+        call = Close()
+        return await self(call, request_timeout=request_timeout)
+
     async def send_message(
         self,
         chat_id: Union[int, str],
         text: str,
         parse_mode: Optional[str] = UNSET,
+        entities: Optional[List[MessageEntity]] = None,
         disable_web_page_preview: Optional[bool] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -276,17 +328,21 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendmessage
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param text: Text of the message to be sent, 1-4096 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the message text. See formatting options
-        for more details.
+            for more details.
+        :param entities: List of special entities that appear in message text, which can be
+            specified instead of parse_mode
         :param disable_web_page_preview: Disables link previews for links in this message
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -294,9 +350,11 @@ class Bot(BaseBot):
             chat_id=chat_id,
             text=text,
             parse_mode=parse_mode,
+            entities=entities,
             disable_web_page_preview=disable_web_page_preview,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -315,12 +373,12 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#forwardmessage
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param from_chat_id: Unique identifier for the chat where the original message was sent
-        (or channel username in the format @channelusername)
+            (or channel username in the format @channelusername)
         :param message_id: Message identifier in the chat specified in from_chat_id
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -332,14 +390,75 @@ class Bot(BaseBot):
         )
         return await self(call, request_timeout=request_timeout)
 
+    async def copy_message(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[int, str],
+        message_id: int,
+        caption: Optional[str] = None,
+        parse_mode: Optional[str] = UNSET,
+        caption_entities: Optional[List[MessageEntity]] = None,
+        disable_notification: Optional[bool] = None,
+        reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
+        reply_markup: Optional[
+            Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
+        ] = None,
+        request_timeout: Optional[int] = None,
+    ) -> MessageId:
+        """
+        Use this method to copy messages of any kind. The method is analogous to the method
+        forwardMessages, but the copied message doesn't have a link to the original message.
+        Returns the MessageId of the sent message on success.
+
+        Source: https://core.telegram.org/bots/api#copymessage
+
+        :param chat_id: Unique identifier for the target chat or username of the target channel
+            (in the format @channelusername)
+        :param from_chat_id: Unique identifier for the chat where the original message was sent
+            (or channel username in the format @channelusername)
+        :param message_id: Message identifier in the chat specified in from_chat_id
+        :param caption: New caption for media, 0-1024 characters after entities parsing. If not
+            specified, the original caption is kept
+        :param parse_mode: Mode for parsing entities in the new caption. See formatting options
+            for more details.
+        :param caption_entities: List of special entities that appear in the new caption, which
+            can be specified instead of parse_mode
+        :param disable_notification: Sends the message silently. Users will receive a notification
+            with no sound.
+        :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
+        :param reply_markup: Additional interface options. A JSON-serialized object for an inline
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
+        :param request_timeout: Request timeout
+        :return: Returns the MessageId of the sent message on success.
+        """
+        call = CopyMessage(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_id=message_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_markup=reply_markup,
+        )
+        return await self(call, request_timeout=request_timeout)
+
     async def send_photo(
         self,
         chat_id: Union[int, str],
         photo: Union[InputFile, str],
         caption: Optional[str] = None,
         parse_mode: Optional[str] = UNSET,
+        caption_entities: Optional[List[MessageEntity]] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -351,21 +470,25 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendphoto
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param photo: Photo to send. Pass a file_id as String to send a photo that exists on the
-        Telegram servers (recommended), pass an HTTP URL as a String for Telegram to
-        get a photo from the Internet, or upload a new photo using
-        multipart/form-data.
+            Telegram servers (recommended), pass an HTTP URL as a String for Telegram to
+            get a photo from the Internet, or upload a new photo using
+            multipart/form-data.
         :param caption: Photo caption (may also be used when resending photos by file_id), 0-1024
-        characters after entities parsing
+            characters after entities parsing
         :param parse_mode: Mode for parsing entities in the photo caption. See formatting options
-        for more details.
+            for more details.
+        :param caption_entities: List of special entities that appear in the caption, which can be
+            specified instead of parse_mode
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -374,8 +497,10 @@ class Bot(BaseBot):
             photo=photo,
             caption=caption,
             parse_mode=parse_mode,
+            caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -386,12 +511,14 @@ class Bot(BaseBot):
         audio: Union[InputFile, str],
         caption: Optional[str] = None,
         parse_mode: Optional[str] = UNSET,
+        caption_entities: Optional[List[MessageEntity]] = None,
         duration: Optional[int] = None,
         performer: Optional[str] = None,
         title: Optional[str] = None,
         thumb: Optional[Union[InputFile, str]] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -407,30 +534,34 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendaudio
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param audio: Audio file to send. Pass a file_id as String to send an audio file that
-        exists on the Telegram servers (recommended), pass an HTTP URL as a String
-        for Telegram to get an audio file from the Internet, or upload a new one
-        using multipart/form-data.
+            exists on the Telegram servers (recommended), pass an HTTP URL as a String
+            for Telegram to get an audio file from the Internet, or upload a new one
+            using multipart/form-data.
         :param caption: Audio caption, 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the audio caption. See formatting options
-        for more details.
+            for more details.
+        :param caption_entities: List of special entities that appear in the caption, which can be
+            specified instead of parse_mode
         :param duration: Duration of the audio in seconds
         :param performer: Performer
         :param title: Track name
         :param thumb: Thumbnail of the file sent; can be ignored if thumbnail generation for the
-        file is supported server-side. The thumbnail should be in JPEG format and
-        less than 200 kB in size. A thumbnail's width and height should not exceed
-        320. Ignored if the file is not uploaded using multipart/form-data.
-        Thumbnails can't be reused and can be only uploaded as a new file, so you
-        can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
-        multipart/form-data under <file_attach_name>.
+            file is supported server-side. The thumbnail should be in JPEG format and
+            less than 200 kB in size. A thumbnail's width and height should not exceed
+            320. Ignored if the file is not uploaded using multipart/form-data.
+            Thumbnails can't be reused and can be only uploaded as a new file, so you
+            can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
+            multipart/form-data under <file_attach_name>.
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -439,12 +570,14 @@ class Bot(BaseBot):
             audio=audio,
             caption=caption,
             parse_mode=parse_mode,
+            caption_entities=caption_entities,
             duration=duration,
             performer=performer,
             title=title,
             thumb=thumb,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -456,8 +589,11 @@ class Bot(BaseBot):
         thumb: Optional[Union[InputFile, str]] = None,
         caption: Optional[str] = None,
         parse_mode: Optional[str] = UNSET,
+        caption_entities: Optional[List[MessageEntity]] = None,
+        disable_content_type_detection: Optional[bool] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -471,28 +607,35 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#senddocument
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param document: File to send. Pass a file_id as String to send a file that exists on the
-        Telegram servers (recommended), pass an HTTP URL as a String for Telegram
-        to get a file from the Internet, or upload a new one using
-        multipart/form-data.
+            Telegram servers (recommended), pass an HTTP URL as a String for Telegram
+            to get a file from the Internet, or upload a new one using
+            multipart/form-data.
         :param thumb: Thumbnail of the file sent; can be ignored if thumbnail generation for the
-        file is supported server-side. The thumbnail should be in JPEG format and
-        less than 200 kB in size. A thumbnail's width and height should not exceed
-        320. Ignored if the file is not uploaded using multipart/form-data.
-        Thumbnails can't be reused and can be only uploaded as a new file, so you
-        can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
-        multipart/form-data under <file_attach_name>.
+            file is supported server-side. The thumbnail should be in JPEG format and
+            less than 200 kB in size. A thumbnail's width and height should not exceed
+            320. Ignored if the file is not uploaded using multipart/form-data.
+            Thumbnails can't be reused and can be only uploaded as a new file, so you
+            can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
+            multipart/form-data under <file_attach_name>.
         :param caption: Document caption (may also be used when resending documents by file_id),
-        0-1024 characters after entities parsing
+            0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the document caption. See formatting
-        options for more details.
+            options for more details.
+        :param caption_entities: List of special entities that appear in the caption, which can be
+            specified instead of parse_mode
+        :param disable_content_type_detection: Disables automatic server-side content type
+            detection for files uploaded using
+            multipart/form-data
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -502,8 +645,11 @@ class Bot(BaseBot):
             thumb=thumb,
             caption=caption,
             parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            disable_content_type_detection=disable_content_type_detection,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -518,9 +664,11 @@ class Bot(BaseBot):
         thumb: Optional[Union[InputFile, str]] = None,
         caption: Optional[str] = None,
         parse_mode: Optional[str] = UNSET,
+        caption_entities: Optional[List[MessageEntity]] = None,
         supports_streaming: Optional[bool] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -534,32 +682,36 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendvideo
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param video: Video to send. Pass a file_id as String to send a video that exists on the
-        Telegram servers (recommended), pass an HTTP URL as a String for Telegram to
-        get a video from the Internet, or upload a new video using
-        multipart/form-data.
+            Telegram servers (recommended), pass an HTTP URL as a String for Telegram to
+            get a video from the Internet, or upload a new video using
+            multipart/form-data.
         :param duration: Duration of sent video in seconds
         :param width: Video width
         :param height: Video height
         :param thumb: Thumbnail of the file sent; can be ignored if thumbnail generation for the
-        file is supported server-side. The thumbnail should be in JPEG format and
-        less than 200 kB in size. A thumbnail's width and height should not exceed
-        320. Ignored if the file is not uploaded using multipart/form-data.
-        Thumbnails can't be reused and can be only uploaded as a new file, so you
-        can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
-        multipart/form-data under <file_attach_name>.
+            file is supported server-side. The thumbnail should be in JPEG format and
+            less than 200 kB in size. A thumbnail's width and height should not exceed
+            320. Ignored if the file is not uploaded using multipart/form-data.
+            Thumbnails can't be reused and can be only uploaded as a new file, so you
+            can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
+            multipart/form-data under <file_attach_name>.
         :param caption: Video caption (may also be used when resending videos by file_id), 0-1024
-        characters after entities parsing
+            characters after entities parsing
         :param parse_mode: Mode for parsing entities in the video caption. See formatting options
-        for more details.
+            for more details.
+        :param caption_entities: List of special entities that appear in the caption, which can be
+            specified instead of parse_mode
         :param supports_streaming: Pass True, if the uploaded video is suitable for streaming
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -572,9 +724,11 @@ class Bot(BaseBot):
             thumb=thumb,
             caption=caption,
             parse_mode=parse_mode,
+            caption_entities=caption_entities,
             supports_streaming=supports_streaming,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -589,8 +743,10 @@ class Bot(BaseBot):
         thumb: Optional[Union[InputFile, str]] = None,
         caption: Optional[str] = None,
         parse_mode: Optional[str] = UNSET,
+        caption_entities: Optional[List[MessageEntity]] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -604,31 +760,35 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendanimation
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param animation: Animation to send. Pass a file_id as String to send an animation that
-        exists on the Telegram servers (recommended), pass an HTTP URL as a
-        String for Telegram to get an animation from the Internet, or upload a
-        new animation using multipart/form-data.
+            exists on the Telegram servers (recommended), pass an HTTP URL as a
+            String for Telegram to get an animation from the Internet, or upload a
+            new animation using multipart/form-data.
         :param duration: Duration of sent animation in seconds
         :param width: Animation width
         :param height: Animation height
         :param thumb: Thumbnail of the file sent; can be ignored if thumbnail generation for the
-        file is supported server-side. The thumbnail should be in JPEG format and
-        less than 200 kB in size. A thumbnail's width and height should not exceed
-        320. Ignored if the file is not uploaded using multipart/form-data.
-        Thumbnails can't be reused and can be only uploaded as a new file, so you
-        can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
-        multipart/form-data under <file_attach_name>.
+            file is supported server-side. The thumbnail should be in JPEG format and
+            less than 200 kB in size. A thumbnail's width and height should not exceed
+            320. Ignored if the file is not uploaded using multipart/form-data.
+            Thumbnails can't be reused and can be only uploaded as a new file, so you
+            can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
+            multipart/form-data under <file_attach_name>.
         :param caption: Animation caption (may also be used when resending animation by file_id),
-        0-1024 characters after entities parsing
+            0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the animation caption. See formatting
-        options for more details.
+            options for more details.
+        :param caption_entities: List of special entities that appear in the caption, which can be
+            specified instead of parse_mode
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -641,8 +801,10 @@ class Bot(BaseBot):
             thumb=thumb,
             caption=caption,
             parse_mode=parse_mode,
+            caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -653,9 +815,11 @@ class Bot(BaseBot):
         voice: Union[InputFile, str],
         caption: Optional[str] = None,
         parse_mode: Optional[str] = UNSET,
+        caption_entities: Optional[List[MessageEntity]] = None,
         duration: Optional[int] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -671,21 +835,25 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendvoice
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param voice: Audio file to send. Pass a file_id as String to send a file that exists on
-        the Telegram servers (recommended), pass an HTTP URL as a String for
-        Telegram to get a file from the Internet, or upload a new one using
-        multipart/form-data.
+            the Telegram servers (recommended), pass an HTTP URL as a String for
+            Telegram to get a file from the Internet, or upload a new one using
+            multipart/form-data.
         :param caption: Voice message caption, 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the voice message caption. See formatting
-        options for more details.
+            options for more details.
+        :param caption_entities: List of special entities that appear in the caption, which can be
+            specified instead of parse_mode
         :param duration: Duration of the voice message in seconds
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -694,9 +862,11 @@ class Bot(BaseBot):
             voice=voice,
             caption=caption,
             parse_mode=parse_mode,
+            caption_entities=caption_entities,
             duration=duration,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -710,6 +880,7 @@ class Bot(BaseBot):
         thumb: Optional[Union[InputFile, str]] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -722,26 +893,28 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendvideonote
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param video_note: Video note to send. Pass a file_id as String to send a video note that
-        exists on the Telegram servers (recommended) or upload a new video
-        using multipart/form-data.. Sending video notes by a URL is currently
-        unsupported
+            exists on the Telegram servers (recommended) or upload a new video
+            using multipart/form-data.. Sending video notes by a URL is currently
+            unsupported
         :param duration: Duration of sent video in seconds
         :param length: Video width and height, i.e. diameter of the video message
         :param thumb: Thumbnail of the file sent; can be ignored if thumbnail generation for the
-        file is supported server-side. The thumbnail should be in JPEG format and
-        less than 200 kB in size. A thumbnail's width and height should not exceed
-        320. Ignored if the file is not uploaded using multipart/form-data.
-        Thumbnails can't be reused and can be only uploaded as a new file, so you
-        can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
-        multipart/form-data under <file_attach_name>.
+            file is supported server-side. The thumbnail should be in JPEG format and
+            less than 200 kB in size. A thumbnail's width and height should not exceed
+            320. Ignored if the file is not uploaded using multipart/form-data.
+            Thumbnails can't be reused and can be only uploaded as a new file, so you
+            can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using
+            multipart/form-data under <file_attach_name>.
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -753,6 +926,7 @@ class Bot(BaseBot):
             thumb=thumb,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -760,32 +934,37 @@ class Bot(BaseBot):
     async def send_media_group(
         self,
         chat_id: Union[int, str],
-        media: List[Union[InputMediaPhoto, InputMediaVideo]],
+        media: List[Union[InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo]],
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         request_timeout: Optional[int] = None,
     ) -> List[Message]:
         """
-        Use this method to send a group of photos or videos as an album. On success, an array of
-        the sent Messages is returned.
+        Use this method to send a group of photos, videos, documents or audios as an album.
+        Documents and audio files can be only grouped in an album with messages of the same type.
+        On success, an array of Messages that were sent is returned.
 
         Source: https://core.telegram.org/bots/api#sendmediagroup
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
-        :param media: A JSON-serialized array describing photos and videos to be sent, must
-        include 2-10 items
-        :param disable_notification: Sends the messages silently. Users will receive a
-        notification with no sound.
+            (in the format @channelusername)
+        :param media: A JSON-serialized array describing messages to be sent, must include 2-10
+            items
+        :param disable_notification: Sends messages silently. Users will receive a notification
+            with no sound.
         :param reply_to_message_id: If the messages are a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param request_timeout: Request timeout
-        :return: On success, an array of the sent Messages is returned.
+        :return: On success, an array of Messages that were sent is returned.
         """
         call = SendMediaGroup(
             chat_id=chat_id,
             media=media,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
         )
         return await self(call, request_timeout=request_timeout)
 
@@ -794,9 +973,13 @@ class Bot(BaseBot):
         chat_id: Union[int, str],
         latitude: float,
         longitude: float,
+        horizontal_accuracy: Optional[float] = None,
         live_period: Optional[int] = None,
+        heading: Optional[int] = None,
+        proximity_alert_radius: Optional[int] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -808,17 +991,26 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendlocation
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param latitude: Latitude of the location
         :param longitude: Longitude of the location
+        :param horizontal_accuracy: The radius of uncertainty for the location, measured in
+            meters; 0-1500
         :param live_period: Period in seconds for which the location will be updated (see Live
-        Locations, should be between 60 and 86400.
+            Locations, should be between 60 and 86400.
+        :param heading: For live locations, a direction in which the user is moving, in degrees.
+            Must be between 1 and 360 if specified.
+        :param proximity_alert_radius: For live locations, a maximum distance for proximity alerts
+            about approaching another chat member, in meters. Must be
+            between 1 and 100000 if specified.
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -826,9 +1018,13 @@ class Bot(BaseBot):
             chat_id=chat_id,
             latitude=latitude,
             longitude=longitude,
+            horizontal_accuracy=horizontal_accuracy,
             live_period=live_period,
+            heading=heading,
+            proximity_alert_radius=proximity_alert_radius,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -840,30 +1036,40 @@ class Bot(BaseBot):
         chat_id: Optional[Union[int, str]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
+        horizontal_accuracy: Optional[float] = None,
+        heading: Optional[int] = None,
+        proximity_alert_radius: Optional[int] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         request_timeout: Optional[int] = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit live location messages. A location can be edited until its
         live_period expires or editing is explicitly disabled by a call to
-        stopMessageLiveLocation. On success, if the edited message was sent by the bot, the edited
-        Message is returned, otherwise True is returned.
+        stopMessageLiveLocation. On success, if the edited message is not an inline message, the
+        edited Message is returned, otherwise True is returned.
 
         Source: https://core.telegram.org/bots/api#editmessagelivelocation
 
         :param latitude: Latitude of new location
         :param longitude: Longitude of new location
         :param chat_id: Required if inline_message_id is not specified. Unique identifier for the
-        target chat or username of the target channel (in the format
-        @channelusername)
+            target chat or username of the target channel (in the format
+            @channelusername)
         :param message_id: Required if inline_message_id is not specified. Identifier of the
-        message to edit
+            message to edit
         :param inline_message_id: Required if chat_id and message_id are not specified. Identifier
-        of the inline message
+            of the inline message
+        :param horizontal_accuracy: The radius of uncertainty for the location, measured in
+            meters; 0-1500
+        :param heading: Direction in which the user is moving, in degrees. Must be between 1 and
+            360 if specified.
+        :param proximity_alert_radius: Maximum distance for proximity alerts about approaching
+            another chat member, in meters. Must be between 1 and
+            100000 if specified.
         :param reply_markup: A JSON-serialized object for a new inline keyboard.
         :param request_timeout: Request timeout
-        :return: On success, if the edited message was sent by the bot, the edited Message is
-        returned, otherwise True is returned.
+        :return: On success, if the edited message is not an inline message, the edited Message is
+            returned, otherwise True is returned.
         """
         call = EditMessageLiveLocation(
             latitude=latitude,
@@ -871,6 +1077,9 @@ class Bot(BaseBot):
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
+            horizontal_accuracy=horizontal_accuracy,
+            heading=heading,
+            proximity_alert_radius=proximity_alert_radius,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -891,16 +1100,16 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#stopmessagelivelocation
 
         :param chat_id: Required if inline_message_id is not specified. Unique identifier for the
-        target chat or username of the target channel (in the format
-        @channelusername)
+            target chat or username of the target channel (in the format
+            @channelusername)
         :param message_id: Required if inline_message_id is not specified. Identifier of the
-        message with live location to stop
+            message with live location to stop
         :param inline_message_id: Required if chat_id and message_id are not specified. Identifier
-        of the inline message
+            of the inline message
         :param reply_markup: A JSON-serialized object for a new inline keyboard.
         :param request_timeout: Request timeout
         :return: On success, if the message was sent by the bot, the sent Message is returned,
-        otherwise True is returned.
+            otherwise True is returned.
         """
         call = StopMessageLiveLocation(
             chat_id=chat_id,
@@ -919,8 +1128,11 @@ class Bot(BaseBot):
         address: str,
         foursquare_id: Optional[str] = None,
         foursquare_type: Optional[str] = None,
+        google_place_id: Optional[str] = None,
+        google_place_type: Optional[str] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -933,21 +1145,25 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendvenue
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param latitude: Latitude of the venue
         :param longitude: Longitude of the venue
         :param title: Name of the venue
         :param address: Address of the venue
         :param foursquare_id: Foursquare identifier of the venue
         :param foursquare_type: Foursquare type of the venue, if known. (For example,
-        'arts_entertainment/default', 'arts_entertainment/aquarium' or
-        'food/icecream'.)
+            'arts_entertainment/default', 'arts_entertainment/aquarium' or
+            'food/icecream'.)
+        :param google_place_id: Google Places identifier of the venue
+        :param google_place_type: Google Places type of the venue. (See supported types.)
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -959,8 +1175,11 @@ class Bot(BaseBot):
             address=address,
             foursquare_id=foursquare_id,
             foursquare_type=foursquare_type,
+            google_place_id=google_place_id,
+            google_place_type=google_place_type,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -974,6 +1193,7 @@ class Bot(BaseBot):
         vcard: Optional[str] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -985,17 +1205,19 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendcontact
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param phone_number: Contact's phone number
         :param first_name: Contact's first name
         :param last_name: Contact's last name
         :param vcard: Additional data about the contact in the form of a vCard, 0-2048 bytes
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove keyboard or
-        to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove keyboard or
+            to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -1007,6 +1229,7 @@ class Bot(BaseBot):
             vcard=vcard,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -1021,12 +1244,14 @@ class Bot(BaseBot):
         allows_multiple_answers: Optional[bool] = None,
         correct_option_id: Optional[int] = None,
         explanation: Optional[str] = None,
-        explanation_parse_mode: Optional[str] = None,
+        explanation_parse_mode: Optional[str] = UNSET,
+        explanation_entities: Optional[List[MessageEntity]] = None,
         open_period: Optional[int] = None,
         close_date: Optional[Union[datetime.datetime, datetime.timedelta, int]] = None,
         is_closed: Optional[bool] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -1038,34 +1263,38 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendpoll
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
-        :param question: Poll question, 1-255 characters
+            (in the format @channelusername)
+        :param question: Poll question, 1-300 characters
         :param options: A JSON-serialized list of answer options, 2-10 strings 1-100 characters
-        each
+            each
         :param is_anonymous: True, if the poll needs to be anonymous, defaults to True
         :param type: Poll type, 'quiz' or 'regular', defaults to 'regular'
         :param allows_multiple_answers: True, if the poll allows multiple answers, ignored for
-        polls in quiz mode, defaults to False
+            polls in quiz mode, defaults to False
         :param correct_option_id: 0-based identifier of the correct answer option, required for
-        polls in quiz mode
+            polls in quiz mode
         :param explanation: Text that is shown when a user chooses an incorrect answer or taps on
-        the lamp icon in a quiz-style poll, 0-200 characters with at most 2
-        line feeds after entities parsing
+            the lamp icon in a quiz-style poll, 0-200 characters with at most 2
+            line feeds after entities parsing
         :param explanation_parse_mode: Mode for parsing entities in the explanation. See
-        formatting options for more details.
+            formatting options for more details.
+        :param explanation_entities: List of special entities that appear in the poll explanation,
+            which can be specified instead of parse_mode
         :param open_period: Amount of time in seconds the poll will be active after creation,
-        5-600. Can't be used together with close_date.
+            5-600. Can't be used together with close_date.
         :param close_date: Point in time (Unix timestamp) when the poll will be automatically
-        closed. Must be at least 5 and no more than 600 seconds in the future.
-        Can't be used together with open_period.
+            closed. Must be at least 5 and no more than 600 seconds in the future.
+            Can't be used together with open_period.
         :param is_closed: Pass True, if the poll needs to be immediately closed. This can be
-        useful for poll preview.
+            useful for poll preview.
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -1079,11 +1308,13 @@ class Bot(BaseBot):
             correct_option_id=correct_option_id,
             explanation=explanation,
             explanation_parse_mode=explanation_parse_mode,
+            explanation_entities=explanation_entities,
             open_period=open_period,
             close_date=close_date,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -1094,6 +1325,7 @@ class Bot(BaseBot):
         emoji: Optional[str] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -1106,16 +1338,18 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#senddice
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param emoji: Emoji on which the dice throw animation is based. Currently, must be one of
-        '', '', or ''. Dice can have values 1-6 for '' and '', and values 1-5 for
-        ''. Defaults to ''
+            '', '', '', '', or ''. Dice can have values 1-6 for '' and '', values 1-5
+            for '' and '', and values 1-64 for ''. Defaults to ''
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -1124,6 +1358,7 @@ class Bot(BaseBot):
             emoji=emoji,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -1145,12 +1380,12 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendchataction
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param action: Type of action to broadcast. Choose one, depending on what the user is
-        about to receive: typing for text messages, upload_photo for photos,
-        record_video or upload_video for videos, record_audio or upload_audio for
-        audio files, upload_document for general files, find_location for location
-        data, record_video_note or upload_video_note for video notes.
+            about to receive: typing for text messages, upload_photo for photos,
+            record_video or upload_video for videos, record_audio or upload_audio for
+            audio files, upload_document for general files, find_location for location
+            data, record_video_note or upload_video_note for video notes.
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1172,9 +1407,9 @@ class Bot(BaseBot):
 
         :param user_id: Unique identifier of the target user
         :param offset: Sequential number of the first photo to be returned. By default, all photos
-        are returned.
+            are returned.
         :param limit: Limits the number of photos to be retrieved. Values between 1-100 are
-        accepted. Defaults to 100.
+            accepted. Defaults to 100.
         :param request_timeout: Request timeout
         :return: Returns a UserProfilePhotos object.
         """
@@ -1217,36 +1452,44 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#kickchatmember
 
         :param chat_id: Unique identifier for the target group or username of the target
-        supergroup or channel (in the format @channelusername)
+            supergroup or channel (in the format @channelusername)
         :param user_id: Unique identifier of the target user
         :param until_date: Date when the user will be unbanned, unix time. If user is banned for
-        more than 366 days or less than 30 seconds from the current time they
-        are considered to be banned forever
+            more than 366 days or less than 30 seconds from the current time they
+            are considered to be banned forever
         :param request_timeout: Request timeout
         :return: In the case of supergroups and channels, the user will not be able to return to
-        the group on their own using invite links, etc. Returns True on success.
+            the group on their own using invite links, etc. Returns True on success.
         """
         call = KickChatMember(chat_id=chat_id, user_id=user_id, until_date=until_date,)
         return await self(call, request_timeout=request_timeout)
 
     async def unban_chat_member(
-        self, chat_id: Union[int, str], user_id: int, request_timeout: Optional[int] = None,
+        self,
+        chat_id: Union[int, str],
+        user_id: int,
+        only_if_banned: Optional[bool] = None,
+        request_timeout: Optional[int] = None,
     ) -> bool:
         """
         Use this method to unban a previously kicked user in a supergroup or channel. The user
         will not return to the group or channel automatically, but will be able to join via link,
-        etc. The bot must be an administrator for this to work. Returns True on success.
+        etc. The bot must be an administrator for this to work. By default, this method guarantees
+        that after the call the user is not a member of the chat, but will be able to join it. So
+        if the user is a member of the chat they will also be removed from the chat. If you don't
+        want this, use the parameter only_if_banned. Returns True on success.
 
         Source: https://core.telegram.org/bots/api#unbanchatmember
 
         :param chat_id: Unique identifier for the target group or username of the target
-        supergroup or channel (in the format @username)
+            supergroup or channel (in the format @username)
         :param user_id: Unique identifier of the target user
+        :param only_if_banned: Do nothing if the user is not banned
         :param request_timeout: Request timeout
         :return: The user will not return to the group or channel automatically, but will be able
-        to join via link, etc. Returns True on success.
+            to join via link, etc. Returns True on success.
         """
-        call = UnbanChatMember(chat_id=chat_id, user_id=user_id,)
+        call = UnbanChatMember(chat_id=chat_id, user_id=user_id, only_if_banned=only_if_banned,)
         return await self(call, request_timeout=request_timeout)
 
     async def restrict_chat_member(
@@ -1265,12 +1508,12 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#restrictchatmember
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        (in the format @supergroupusername)
+            (in the format @supergroupusername)
         :param user_id: Unique identifier of the target user
-        :param permissions: New user permissions
+        :param permissions: A JSON-serialized object for new user permissions
         :param until_date: Date when restrictions will be lifted for the user, unix time. If user
-        is restricted for more than 366 days or less than 30 seconds from the
-        current time, they are considered to be restricted forever
+            is restricted for more than 366 days or less than 30 seconds from the
+            current time, they are considered to be restricted forever
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1283,6 +1526,7 @@ class Bot(BaseBot):
         self,
         chat_id: Union[int, str],
         user_id: int,
+        is_anonymous: Optional[bool] = None,
         can_change_info: Optional[bool] = None,
         can_post_messages: Optional[bool] = None,
         can_edit_messages: Optional[bool] = None,
@@ -1301,31 +1545,33 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#promotechatmember
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param user_id: Unique identifier of the target user
+        :param is_anonymous: Pass True, if the administrator's presence in the chat is hidden
         :param can_change_info: Pass True, if the administrator can change chat title, photo and
-        other settings
+            other settings
         :param can_post_messages: Pass True, if the administrator can create channel posts,
-        channels only
+            channels only
         :param can_edit_messages: Pass True, if the administrator can edit messages of other users
-        and can pin messages, channels only
+            and can pin messages, channels only
         :param can_delete_messages: Pass True, if the administrator can delete messages of other
-        users
+            users
         :param can_invite_users: Pass True, if the administrator can invite new users to the chat
         :param can_restrict_members: Pass True, if the administrator can restrict, ban or unban
-        chat members
+            chat members
         :param can_pin_messages: Pass True, if the administrator can pin messages, supergroups
-        only
+            only
         :param can_promote_members: Pass True, if the administrator can add new administrators
-        with a subset of their own privileges or demote administrators
-        that he has promoted, directly or indirectly (promoted by
-        administrators that were appointed by him)
+            with a subset of their own privileges or demote administrators
+            that he has promoted, directly or indirectly (promoted by
+            administrators that were appointed by him)
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
         call = PromoteChatMember(
             chat_id=chat_id,
             user_id=user_id,
+            is_anonymous=is_anonymous,
             can_change_info=can_change_info,
             can_post_messages=can_post_messages,
             can_edit_messages=can_edit_messages,
@@ -1351,10 +1597,10 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#setchatadministratorcustomtitle
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        (in the format @supergroupusername)
+            (in the format @supergroupusername)
         :param user_id: Unique identifier of the target user
         :param custom_title: New custom title for the administrator; 0-16 characters, emoji are
-        not allowed
+            not allowed
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1377,7 +1623,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#setchatpermissions
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        (in the format @supergroupusername)
+            (in the format @supergroupusername)
         :param permissions: New default chat permissions
         :param request_timeout: Request timeout
         :return: Returns True on success.
@@ -1401,7 +1647,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#exportchatinvitelink
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param request_timeout: Request timeout
         :return: Returns the new invite link as String on success.
         """
@@ -1419,7 +1665,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#setchatphoto
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param photo: New chat photo, uploaded using multipart/form-data
         :param request_timeout: Request timeout
         :return: Returns True on success.
@@ -1438,7 +1684,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#deletechatphoto
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1456,7 +1702,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#setchattitle
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param title: New chat title, 1-255 characters
         :param request_timeout: Request timeout
         :return: Returns True on success.
@@ -1478,7 +1724,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#setchatdescription
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param description: New chat description, 0-255 characters
         :param request_timeout: Request timeout
         :return: Returns True on success.
@@ -1494,19 +1740,19 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to pin a message in a group, a supergroup, or a channel. The bot must be
-        an administrator in the chat for this to work and must have the 'can_pin_messages' admin
-        right in the supergroup or 'can_edit_messages' admin right in the channel. Returns True on
-        success.
+        Use this method to add a message to the list of pinned messages in a chat. If the chat is
+        not a private chat, the bot must be an administrator in the chat for this to work and must
+        have the 'can_pin_messages' admin right in a supergroup or 'can_edit_messages' admin right
+        in a channel. Returns True on success.
 
         Source: https://core.telegram.org/bots/api#pinchatmessage
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param message_id: Identifier of a message to pin
         :param disable_notification: Pass True, if it is not necessary to send a notification to
-        all chat members about the new pinned message. Notifications
-        are always disabled in channels.
+            all chat members about the new pinned message. Notifications
+            are always disabled in channels and private chats.
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1516,22 +1762,46 @@ class Bot(BaseBot):
         return await self(call, request_timeout=request_timeout)
 
     async def unpin_chat_message(
-        self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
+        self,
+        chat_id: Union[int, str],
+        message_id: Optional[int] = None,
+        request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to unpin a message in a group, a supergroup, or a channel. The bot must be
-        an administrator in the chat for this to work and must have the 'can_pin_messages' admin
-        right in the supergroup or 'can_edit_messages' admin right in the channel. Returns True on
-        success.
+        Use this method to remove a message from the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this to work
+        and must have the 'can_pin_messages' admin right in a supergroup or 'can_edit_messages'
+        admin right in a channel. Returns True on success.
 
         Source: https://core.telegram.org/bots/api#unpinchatmessage
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
+        :param message_id: Identifier of a message to unpin. If not specified, the most recent
+            pinned message (by sending date) will be unpinned.
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
-        call = UnpinChatMessage(chat_id=chat_id,)
+        call = UnpinChatMessage(chat_id=chat_id, message_id=message_id,)
+        return await self(call, request_timeout=request_timeout)
+
+    async def unpin_all_chat_messages(
+        self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
+    ) -> bool:
+        """
+        Use this method to clear the list of pinned messages in a chat. If the chat is not a
+        private chat, the bot must be an administrator in the chat for this to work and must have
+        the 'can_pin_messages' admin right in a supergroup or 'can_edit_messages' admin right in a
+        channel. Returns True on success.
+
+        Source: https://core.telegram.org/bots/api#unpinallchatmessages
+
+        :param chat_id: Unique identifier for the target chat or username of the target channel
+            (in the format @channelusername)
+        :param request_timeout: Request timeout
+        :return: Returns True on success.
+        """
+        call = UnpinAllChatMessages(chat_id=chat_id,)
         return await self(call, request_timeout=request_timeout)
 
     async def leave_chat(
@@ -1544,7 +1814,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#leavechat
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        or channel (in the format @channelusername)
+            or channel (in the format @channelusername)
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1562,7 +1832,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#getchat
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        or channel (in the format @channelusername)
+            or channel (in the format @channelusername)
         :param request_timeout: Request timeout
         :return: Returns a Chat object on success.
         """
@@ -1581,12 +1851,12 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#getchatadministrators
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        or channel (in the format @channelusername)
+            or channel (in the format @channelusername)
         :param request_timeout: Request timeout
         :return: On success, returns an Array of ChatMember objects that contains information
-        about all chat administrators except other bots. If the chat is a group or a
-        supergroup and no administrators were appointed, only the creator will be
-        returned.
+            about all chat administrators except other bots. If the chat is a group or a
+            supergroup and no administrators were appointed, only the creator will be
+            returned.
         """
         call = GetChatAdministrators(chat_id=chat_id,)
         return await self(call, request_timeout=request_timeout)
@@ -1600,7 +1870,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#getchatmemberscount
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        or channel (in the format @channelusername)
+            or channel (in the format @channelusername)
         :param request_timeout: Request timeout
         :return: Returns Int on success.
         """
@@ -1617,7 +1887,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#getchatmember
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        or channel (in the format @channelusername)
+            or channel (in the format @channelusername)
         :param user_id: Unique identifier of the target user
         :param request_timeout: Request timeout
         :return: Returns a ChatMember object on success.
@@ -1640,11 +1910,11 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#setchatstickerset
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        (in the format @supergroupusername)
+            (in the format @supergroupusername)
         :param sticker_set_name: Name of the sticker set to be set as the group sticker set
         :param request_timeout: Request timeout
         :return: Use the field can_set_sticker_set optionally returned in getChat requests to
-        check if the bot can use this method. Returns True on success.
+            check if the bot can use this method. Returns True on success.
         """
         call = SetChatStickerSet(chat_id=chat_id, sticker_set_name=sticker_set_name,)
         return await self(call, request_timeout=request_timeout)
@@ -1661,10 +1931,10 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#deletechatstickerset
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup
-        (in the format @supergroupusername)
+            (in the format @supergroupusername)
         :param request_timeout: Request timeout
         :return: Use the field can_set_sticker_set optionally returned in getChat requests to
-        check if the bot can use this method. Returns True on success.
+            check if the bot can use this method. Returns True on success.
         """
         call = DeleteChatStickerSet(chat_id=chat_id,)
         return await self(call, request_timeout=request_timeout)
@@ -1691,15 +1961,15 @@ class Bot(BaseBot):
 
         :param callback_query_id: Unique identifier for the query to be answered
         :param text: Text of the notification. If not specified, nothing will be shown to the
-        user, 0-200 characters
+            user, 0-200 characters
         :param show_alert: If true, an alert will be shown by the client instead of a notification
-        at the top of the chat screen. Defaults to false.
+            at the top of the chat screen. Defaults to false.
         :param url: URL that will be opened by the user's client. If you have created a Game and
-        accepted the conditions via @Botfather, specify the URL that opens your game —
-        note that this will only work if the query comes from a callback_game button.
+            accepted the conditions via @Botfather, specify the URL that opens your game —
+            note that this will only work if the query comes from a callback_game button.
         :param cache_time: The maximum amount of time in seconds that the result of the callback
-        query may be cached client-side. Telegram apps will support caching
-        starting in version 3.14. Defaults to 0.
+            query may be cached client-side. Telegram apps will support caching
+            starting in version 3.14. Defaults to 0.
         :param request_timeout: Request timeout
         :return: On success, True is returned.
         """
@@ -1721,7 +1991,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#setmycommands
 
         :param commands: A JSON-serialized list of bot commands to be set as the list of the bot's
-        commands. At most 100 commands can be specified.
+            commands. At most 100 commands can be specified.
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1753,31 +2023,34 @@ class Bot(BaseBot):
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         parse_mode: Optional[str] = UNSET,
+        entities: Optional[List[MessageEntity]] = None,
         disable_web_page_preview: Optional[bool] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         request_timeout: Optional[int] = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit text and game messages. On success, if edited message is sent by
-        the bot, the edited Message is returned, otherwise True is returned.
+        Use this method to edit text and game messages. On success, if the edited message is not
+        an inline message, the edited Message is returned, otherwise True is returned.
 
         Source: https://core.telegram.org/bots/api#editmessagetext
 
         :param text: New text of the message, 1-4096 characters after entities parsing
         :param chat_id: Required if inline_message_id is not specified. Unique identifier for the
-        target chat or username of the target channel (in the format
-        @channelusername)
+            target chat or username of the target channel (in the format
+            @channelusername)
         :param message_id: Required if inline_message_id is not specified. Identifier of the
-        message to edit
+            message to edit
         :param inline_message_id: Required if chat_id and message_id are not specified. Identifier
-        of the inline message
+            of the inline message
         :param parse_mode: Mode for parsing entities in the message text. See formatting options
-        for more details.
+            for more details.
+        :param entities: List of special entities that appear in message text, which can be
+            specified instead of parse_mode
         :param disable_web_page_preview: Disables link previews for links in this message
         :param reply_markup: A JSON-serialized object for an inline keyboard.
         :param request_timeout: Request timeout
-        :return: On success, if edited message is sent by the bot, the edited Message is returned,
-        otherwise True is returned.
+        :return: On success, if the edited message is not an inline message, the edited Message is
+            returned, otherwise True is returned.
         """
         call = EditMessageText(
             text=text,
@@ -1785,6 +2058,7 @@ class Bot(BaseBot):
             message_id=message_id,
             inline_message_id=inline_message_id,
             parse_mode=parse_mode,
+            entities=entities,
             disable_web_page_preview=disable_web_page_preview,
             reply_markup=reply_markup,
         )
@@ -1797,29 +2071,32 @@ class Bot(BaseBot):
         inline_message_id: Optional[str] = None,
         caption: Optional[str] = None,
         parse_mode: Optional[str] = UNSET,
+        caption_entities: Optional[List[MessageEntity]] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         request_timeout: Optional[int] = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit captions of messages. On success, if edited message is sent by the
-        bot, the edited Message is returned, otherwise True is returned.
+        Use this method to edit captions of messages. On success, if the edited message is not an
+        inline message, the edited Message is returned, otherwise True is returned.
 
         Source: https://core.telegram.org/bots/api#editmessagecaption
 
         :param chat_id: Required if inline_message_id is not specified. Unique identifier for the
-        target chat or username of the target channel (in the format
-        @channelusername)
+            target chat or username of the target channel (in the format
+            @channelusername)
         :param message_id: Required if inline_message_id is not specified. Identifier of the
-        message to edit
+            message to edit
         :param inline_message_id: Required if chat_id and message_id are not specified. Identifier
-        of the inline message
+            of the inline message
         :param caption: New caption of the message, 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the message caption. See formatting
-        options for more details.
+            options for more details.
+        :param caption_entities: List of special entities that appear in the caption, which can be
+            specified instead of parse_mode
         :param reply_markup: A JSON-serialized object for an inline keyboard.
         :param request_timeout: Request timeout
-        :return: On success, if edited message is sent by the bot, the edited Message is returned,
-        otherwise True is returned.
+        :return: On success, if the edited message is not an inline message, the edited Message is
+            returned, otherwise True is returned.
         """
         call = EditMessageCaption(
             chat_id=chat_id,
@@ -1827,6 +2104,7 @@ class Bot(BaseBot):
             inline_message_id=inline_message_id,
             caption=caption,
             parse_mode=parse_mode,
+            caption_entities=caption_entities,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -1842,26 +2120,26 @@ class Bot(BaseBot):
     ) -> Union[Message, bool]:
         """
         Use this method to edit animation, audio, document, photo, or video messages. If a message
-        is a part of a message album, then it can be edited only to a photo or a video. Otherwise,
-        message type can be changed arbitrarily. When inline message is edited, new file can't be
-        uploaded. Use previously uploaded file via its file_id or specify a URL. On success, if
-        the edited message was sent by the bot, the edited Message is returned, otherwise True is
-        returned.
+        is part of a message album, then it can be edited only to an audio for audio albums, only
+        to a document for document albums and to a photo or a video otherwise. When an inline
+        message is edited, a new file can't be uploaded. Use a previously uploaded file via its
+        file_id or specify a URL. On success, if the edited message was sent by the bot, the
+        edited Message is returned, otherwise True is returned.
 
         Source: https://core.telegram.org/bots/api#editmessagemedia
 
         :param media: A JSON-serialized object for a new media content of the message
         :param chat_id: Required if inline_message_id is not specified. Unique identifier for the
-        target chat or username of the target channel (in the format
-        @channelusername)
+            target chat or username of the target channel (in the format
+            @channelusername)
         :param message_id: Required if inline_message_id is not specified. Identifier of the
-        message to edit
+            message to edit
         :param inline_message_id: Required if chat_id and message_id are not specified. Identifier
-        of the inline message
+            of the inline message
         :param reply_markup: A JSON-serialized object for a new inline keyboard.
         :param request_timeout: Request timeout
         :return: On success, if the edited message was sent by the bot, the edited Message is
-        returned, otherwise True is returned.
+            returned, otherwise True is returned.
         """
         call = EditMessageMedia(
             media=media,
@@ -1881,22 +2159,23 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit only the reply markup of messages. On success, if edited message
-        is sent by the bot, the edited Message is returned, otherwise True is returned.
+        Use this method to edit only the reply markup of messages. On success, if the edited
+        message is not an inline message, the edited Message is returned, otherwise True is
+        returned.
 
         Source: https://core.telegram.org/bots/api#editmessagereplymarkup
 
         :param chat_id: Required if inline_message_id is not specified. Unique identifier for the
-        target chat or username of the target channel (in the format
-        @channelusername)
+            target chat or username of the target channel (in the format
+            @channelusername)
         :param message_id: Required if inline_message_id is not specified. Identifier of the
-        message to edit
+            message to edit
         :param inline_message_id: Required if chat_id and message_id are not specified. Identifier
-        of the inline message
+            of the inline message
         :param reply_markup: A JSON-serialized object for an inline keyboard.
         :param request_timeout: Request timeout
-        :return: On success, if edited message is sent by the bot, the edited Message is returned,
-        otherwise True is returned.
+        :return: On success, if the edited message is not an inline message, the edited Message is
+            returned, otherwise True is returned.
         """
         call = EditMessageReplyMarkup(
             chat_id=chat_id,
@@ -1920,7 +2199,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#stoppoll
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param message_id: Identifier of the original message with the poll
         :param reply_markup: A JSON-serialized object for a new message inline keyboard.
         :param request_timeout: Request timeout
@@ -1949,7 +2228,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#deletemessage
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param message_id: Identifier of the message to delete
         :param request_timeout: Request timeout
         :return: Returns True on success.
@@ -1968,6 +2247,7 @@ class Bot(BaseBot):
         sticker: Union[InputFile, str],
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[
             Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply]
         ] = None,
@@ -1980,17 +2260,19 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendsticker
 
         :param chat_id: Unique identifier for the target chat or username of the target channel
-        (in the format @channelusername)
+            (in the format @channelusername)
         :param sticker: Sticker to send. Pass a file_id as String to send a file that exists on
-        the Telegram servers (recommended), pass an HTTP URL as a String for
-        Telegram to get a .WEBP file from the Internet, or upload a new one using
-        multipart/form-data.
+            the Telegram servers (recommended), pass an HTTP URL as a String for
+            Telegram to get a .WEBP file from the Internet, or upload a new one using
+            multipart/form-data.
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: Additional interface options. A JSON-serialized object for an inline
-        keyboard, custom reply keyboard, instructions to remove reply
-        keyboard or to force a reply from the user.
+            keyboard, custom reply keyboard, instructions to remove reply
+            keyboard or to force a reply from the user.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -1999,6 +2281,7 @@ class Bot(BaseBot):
             sticker=sticker,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -2030,8 +2313,8 @@ class Bot(BaseBot):
 
         :param user_id: User identifier of sticker file owner
         :param png_sticker: PNG image with the sticker, must be up to 512 kilobytes in size,
-        dimensions must not exceed 512px, and either width or height must be
-        exactly 512px.
+            dimensions must not exceed 512px, and either width or height must be
+            exactly 512px.
         :param request_timeout: Request timeout
         :return: Returns the uploaded File on success.
         """
@@ -2059,23 +2342,23 @@ class Bot(BaseBot):
 
         :param user_id: User identifier of created sticker set owner
         :param name: Short name of sticker set, to be used in t.me/addstickers/ URLs (e.g.,
-        animals). Can contain only english letters, digits and underscores. Must
-        begin with a letter, can't contain consecutive underscores and must end in
-        '_by_<bot username>'. <bot_username> is case insensitive. 1-64 characters.
+            animals). Can contain only english letters, digits and underscores. Must
+            begin with a letter, can't contain consecutive underscores and must end in
+            '_by_<bot username>'. <bot_username> is case insensitive. 1-64 characters.
         :param title: Sticker set title, 1-64 characters
         :param emojis: One or more emoji corresponding to the sticker
         :param png_sticker: PNG image with the sticker, must be up to 512 kilobytes in size,
-        dimensions must not exceed 512px, and either width or height must be
-        exactly 512px. Pass a file_id as a String to send a file that already
-        exists on the Telegram servers, pass an HTTP URL as a String for
-        Telegram to get a file from the Internet, or upload a new one using
-        multipart/form-data.
+            dimensions must not exceed 512px, and either width or height must be
+            exactly 512px. Pass a file_id as a String to send a file that already
+            exists on the Telegram servers, pass an HTTP URL as a String for
+            Telegram to get a file from the Internet, or upload a new one using
+            multipart/form-data.
         :param tgs_sticker: TGS animation with the sticker, uploaded using multipart/form-data.
-        See https://core.telegram.org/animated_stickers#technical-requirements
-        for technical requirements
+            See https://core.telegram.org/animated_stickers#technical-requirements
+            for technical requirements
         :param contains_masks: Pass True, if a set of mask stickers should be created
         :param mask_position: A JSON-serialized object for position where the mask should be
-        placed on faces
+            placed on faces
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -2113,16 +2396,16 @@ class Bot(BaseBot):
         :param name: Sticker set name
         :param emojis: One or more emoji corresponding to the sticker
         :param png_sticker: PNG image with the sticker, must be up to 512 kilobytes in size,
-        dimensions must not exceed 512px, and either width or height must be
-        exactly 512px. Pass a file_id as a String to send a file that already
-        exists on the Telegram servers, pass an HTTP URL as a String for
-        Telegram to get a file from the Internet, or upload a new one using
-        multipart/form-data.
+            dimensions must not exceed 512px, and either width or height must be
+            exactly 512px. Pass a file_id as a String to send a file that already
+            exists on the Telegram servers, pass an HTTP URL as a String for
+            Telegram to get a file from the Internet, or upload a new one using
+            multipart/form-data.
         :param tgs_sticker: TGS animation with the sticker, uploaded using multipart/form-data.
-        See https://core.telegram.org/animated_stickers#technical-requirements
-        for technical requirements
+            See https://core.telegram.org/animated_stickers#technical-requirements
+            for technical requirements
         :param mask_position: A JSON-serialized object for position where the mask should be
-        placed on faces
+            placed on faces
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -2185,14 +2468,14 @@ class Bot(BaseBot):
         :param name: Sticker set name
         :param user_id: User identifier of the sticker set owner
         :param thumb: A PNG image with the thumbnail, must be up to 128 kilobytes in size and have
-        width and height exactly 100px, or a TGS animation with the thumbnail up to
-        32 kilobytes in size; see
-        https://core.telegram.org/animated_stickers#technical-requirements for
-        animated sticker technical requirements. Pass a file_id as a String to send
-        a file that already exists on the Telegram servers, pass an HTTP URL as a
-        String for Telegram to get a file from the Internet, or upload a new one
-        using multipart/form-data.. Animated sticker set thumbnail can't be uploaded
-        via HTTP URL.
+            width and height exactly 100px, or a TGS animation with the thumbnail up to
+            32 kilobytes in size; see
+            https://core.telegram.org/animated_stickers#technical-requirements for
+            animated sticker technical requirements. Pass a file_id as a String to send
+            a file that already exists on the Telegram servers, pass an HTTP URL as a
+            String for Telegram to get a file from the Internet, or upload a new one
+            using multipart/form-data.. Animated sticker set thumbnail can't be uploaded
+            via HTTP URL.
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -2224,20 +2507,20 @@ class Bot(BaseBot):
         :param inline_query_id: Unique identifier for the answered query
         :param results: A JSON-serialized array of results for the inline query
         :param cache_time: The maximum amount of time in seconds that the result of the inline
-        query may be cached on the server. Defaults to 300.
+            query may be cached on the server. Defaults to 300.
         :param is_personal: Pass True, if results may be cached on the server side only for the
-        user that sent the query. By default, results may be returned to any
-        user who sends the same query
+            user that sent the query. By default, results may be returned to any
+            user who sends the same query
         :param next_offset: Pass the offset that a client should send in the next query with the
-        same text to receive more results. Pass an empty string if there are
-        no more results or if you don't support pagination. Offset length
-        can't exceed 64 bytes.
+            same text to receive more results. Pass an empty string if there are
+            no more results or if you don't support pagination. Offset length
+            can't exceed 64 bytes.
         :param switch_pm_text: If passed, clients will display a button with specified text that
-        switches the user to a private chat with the bot and sends the bot
-        a start message with the parameter switch_pm_parameter
+            switches the user to a private chat with the bot and sends the bot
+            a start message with the parameter switch_pm_parameter
         :param switch_pm_parameter: Deep-linking parameter for the /start message sent to the bot
-        when user presses the switch button. 1-64 characters, only
-        A-Z, a-z, 0-9, _ and - are allowed.
+            when user presses the switch button. 1-64 characters, only
+            A-Z, a-z, 0-9, _ and - are allowed.
         :param request_timeout: Request timeout
         :return: On success, True is returned.
         """
@@ -2281,6 +2564,7 @@ class Bot(BaseBot):
         is_flexible: Optional[bool] = None,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         request_timeout: Optional[int] = None,
     ) -> Message:
@@ -2293,40 +2577,42 @@ class Bot(BaseBot):
         :param title: Product name, 1-32 characters
         :param description: Product description, 1-255 characters
         :param payload: Bot-defined invoice payload, 1-128 bytes. This will not be displayed to
-        the user, use for your internal processes.
+            the user, use for your internal processes.
         :param provider_token: Payments provider token, obtained via Botfather
         :param start_parameter: Unique deep-linking parameter that can be used to generate this
-        invoice when used as a start parameter
+            invoice when used as a start parameter
         :param currency: Three-letter ISO 4217 currency code, see more on currencies
         :param prices: Price breakdown, a JSON-serialized list of components (e.g. product price,
-        tax, discount, delivery cost, delivery tax, bonus, etc.)
-        :param provider_data: JSON-encoded data about the invoice, which will be shared with the
-        payment provider. A detailed description of required fields should
-        be provided by the payment provider.
+            tax, discount, delivery cost, delivery tax, bonus, etc.)
+        :param provider_data: A JSON-serialized data about the invoice, which will be shared with
+            the payment provider. A detailed description of required fields
+            should be provided by the payment provider.
         :param photo_url: URL of the product photo for the invoice. Can be a photo of the goods or
-        a marketing image for a service. People like it better when they see
-        what they are paying for.
+            a marketing image for a service. People like it better when they see
+            what they are paying for.
         :param photo_size: Photo size
         :param photo_width: Photo width
         :param photo_height: Photo height
         :param need_name: Pass True, if you require the user's full name to complete the order
         :param need_phone_number: Pass True, if you require the user's phone number to complete
-        the order
+            the order
         :param need_email: Pass True, if you require the user's email address to complete the
-        order
+            order
         :param need_shipping_address: Pass True, if you require the user's shipping address to
-        complete the order
+            complete the order
         :param send_phone_number_to_provider: Pass True, if user's phone number should be sent to
-        provider
+            provider
         :param send_email_to_provider: Pass True, if user's email address should be sent to
-        provider
+            provider
         :param is_flexible: Pass True, if the final price depends on the shipping method
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: A JSON-serialized object for an inline keyboard. If empty, one 'Pay
-        total price' button will be shown. If not empty, the first button
-        must be a Pay button.
+            total price' button will be shown. If not empty, the first button
+            must be a Pay button.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -2353,6 +2639,7 @@ class Bot(BaseBot):
             is_flexible=is_flexible,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -2374,14 +2661,14 @@ class Bot(BaseBot):
 
         :param shipping_query_id: Unique identifier for the query to be answered
         :param ok: Specify True if delivery to the specified address is possible and False if
-        there are any problems (for example, if delivery to the specified address is
-        not possible)
+            there are any problems (for example, if delivery to the specified address is
+            not possible)
         :param shipping_options: Required if ok is True. A JSON-serialized array of available
-        shipping options.
+            shipping options.
         :param error_message: Required if ok is False. Error message in human readable form that
-        explains why it is impossible to complete the order (e.g. "Sorry,
-        delivery to your desired address is unavailable'). Telegram will
-        display this message to the user.
+            explains why it is impossible to complete the order (e.g. "Sorry,
+            delivery to your desired address is unavailable'). Telegram will
+            display this message to the user.
         :param request_timeout: Request timeout
         :return: On success, True is returned.
         """
@@ -2410,13 +2697,13 @@ class Bot(BaseBot):
 
         :param pre_checkout_query_id: Unique identifier for the query to be answered
         :param ok: Specify True if everything is alright (goods are available, etc.) and the bot
-        is ready to proceed with the order. Use False if there are any problems.
+            is ready to proceed with the order. Use False if there are any problems.
         :param error_message: Required if ok is False. Error message in human readable form that
-        explains the reason for failure to proceed with the checkout (e.g.
-        "Sorry, somebody just bought the last of our amazing black T-shirts
-        while you were busy filling out your payment details. Please choose
-        a different color or garment!"). Telegram will display this message
-        to the user.
+            explains the reason for failure to proceed with the checkout (e.g.
+            "Sorry, somebody just bought the last of our amazing black T-shirts
+            while you were busy filling out your payment details. Please choose
+            a different color or garment!"). Telegram will display this message
+            to the user.
         :param request_timeout: Request timeout
         :return: On success, True is returned.
         """
@@ -2452,8 +2739,8 @@ class Bot(BaseBot):
         :param errors: A JSON-serialized array describing the errors
         :param request_timeout: Request timeout
         :return: The user will not be able to re-submit their Passport to you until the errors are
-        fixed (the contents of the field for which you returned the error must change).
-        Returns True on success.
+            fixed (the contents of the field for which you returned the error must change).
+            Returns True on success.
         """
         call = SetPassportDataErrors(user_id=user_id, errors=errors,)
         return await self(call, request_timeout=request_timeout)
@@ -2469,6 +2756,7 @@ class Bot(BaseBot):
         game_short_name: str,
         disable_notification: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: Optional[bool] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         request_timeout: Optional[int] = None,
     ) -> Message:
@@ -2479,13 +2767,15 @@ class Bot(BaseBot):
 
         :param chat_id: Unique identifier for the target chat
         :param game_short_name: Short name of the game, serves as the unique identifier for the
-        game. Set up your games via Botfather.
+            game. Set up your games via Botfather.
         :param disable_notification: Sends the message silently. Users will receive a notification
-        with no sound.
+            with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
+        :param allow_sending_without_reply: Pass True, if the message should be sent even if the
+            specified replied-to message is not found
         :param reply_markup: A JSON-serialized object for an inline keyboard. If empty, one 'Play
-        game_title' button will be shown. If not empty, the first button must
-        launch the game.
+            game_title' button will be shown. If not empty, the first button must
+            launch the game.
         :param request_timeout: Request timeout
         :return: On success, the sent Message is returned.
         """
@@ -2494,6 +2784,7 @@ class Bot(BaseBot):
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
         )
         return await self(call, request_timeout=request_timeout)
@@ -2520,19 +2811,19 @@ class Bot(BaseBot):
         :param user_id: User identifier
         :param score: New score, must be non-negative
         :param force: Pass True, if the high score is allowed to decrease. This can be useful when
-        fixing mistakes or banning cheaters
+            fixing mistakes or banning cheaters
         :param disable_edit_message: Pass True, if the game message should not be automatically
-        edited to include the current scoreboard
+            edited to include the current scoreboard
         :param chat_id: Required if inline_message_id is not specified. Unique identifier for the
-        target chat
+            target chat
         :param message_id: Required if inline_message_id is not specified. Identifier of the sent
-        message
+            message
         :param inline_message_id: Required if chat_id and message_id are not specified. Identifier
-        of the inline message
+            of the inline message
         :param request_timeout: Request timeout
         :return: On success, if the message was sent by the bot, returns the edited Message,
-        otherwise returns True. Returns an error, if the new score is not greater than
-        the user's current score in the chat and force is False.
+            otherwise returns True. Returns an error, if the new score is not greater than
+            the user's current score in the chat and force is False.
         """
         call = SetGameScore(
             user_id=user_id,
@@ -2565,17 +2856,17 @@ class Bot(BaseBot):
 
         :param user_id: Target user id
         :param chat_id: Required if inline_message_id is not specified. Unique identifier for the
-        target chat
+            target chat
         :param message_id: Required if inline_message_id is not specified. Identifier of the sent
-        message
+            message
         :param inline_message_id: Required if chat_id and message_id are not specified. Identifier
-        of the inline message
+            of the inline message
         :param request_timeout: Request timeout
         :return: Will return the score of the specified user and several of their neighbors in a
-        game. On success, returns an Array of GameHighScore objects. This method will
-        currently return scores for the target user, plus two of their closest neighbors
-        on each side. Will also return the top three users if the user and his neighbors
-        are not among them.
+            game. On success, returns an Array of GameHighScore objects. This method will
+            currently return scores for the target user, plus two of their closest neighbors
+            on each side. Will also return the top three users if the user and his neighbors
+            are not among them.
         """
         call = GetGameHighScores(
             user_id=user_id,

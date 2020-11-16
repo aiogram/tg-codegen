@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import Field
 
@@ -10,6 +10,7 @@ from .inline_query_result import InlineQueryResult
 if TYPE_CHECKING:  # pragma: no cover
     from .inline_keyboard_markup import InlineKeyboardMarkup
     from .input_message_content import InputMessageContent
+    from .message_entity import MessageEntity
 
 
 class InlineQueryResultVideo(InlineQueryResult):
@@ -39,6 +40,9 @@ class InlineQueryResultVideo(InlineQueryResult):
     """Caption of the video to be sent, 0-1024 characters after entities parsing"""
     parse_mode: Optional[str] = UNSET
     """Mode for parsing entities in the video caption. See formatting options for more details."""
+    caption_entities: Optional[List[MessageEntity]] = None
+    """List of special entities that appear in the caption, which can be specified instead of
+    parse_mode"""
     video_width: Optional[int] = None
     """Video width"""
     video_height: Optional[int] = None

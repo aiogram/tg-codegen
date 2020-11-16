@@ -17,6 +17,10 @@ RETURN_PATTERNS = [
         r"On success, the stopped (?P<type>[a-z]+) with the final results is returned",
         flags=RE_FLAGS,
     ),
+    re.compile(
+        r"On success, an (?P<type>array of [a-z]+)s that were sent is returned", flags=RE_FLAGS
+    ),
+    re.compile(r"Returns the (?P<type>[a-z]+) of the sent message on success", flags=RE_FLAGS),
     re.compile(r"(?P<type>Array of [a-z]+) objects", flags=RE_FLAGS),
     re.compile(r"Returns (?P<type>Array of [a-z]+) on success", flags=RE_FLAGS),
     re.compile(r"a (?P<type>[a-z]+) object", flags=RE_FLAGS),
@@ -24,7 +28,6 @@ RETURN_PATTERNS = [
     re.compile(r"(?P<type>[a-z]+) on success", flags=RE_FLAGS),
     re.compile(r"(?P<type>[a-z]+) is returned", flags=RE_FLAGS),
     re.compile(r"Returns (?P<type>[a-z]+)", flags=RE_FLAGS),
-
 ]
 BUILTIN_TYPES = {
     "String": "str",

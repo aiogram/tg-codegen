@@ -17,7 +17,7 @@ class Annotation:
 
     @property
     def python_default_value(self) -> typing.Optional[str]:
-        if self.name == "parse_mode" or self.name == "explanation_parse_mode":
+        if self.name in {"parse_mode", "explanation_parse_mode"}:
             default_value = "UNSET"
         elif not self.required:
             default_value = "None"
@@ -51,7 +51,7 @@ class Annotation:
         value = self.python_default_value
         if self.name == "from":
             value = f"Field({value or '...'}, alias=\"from\")"
-        elif self.name == "parse_mode" or self.name == 'explanation_parse_mode':
+        elif self.name in {"parse_mode", "explanation_parse_mode"}:
             value = "UNSET"
         elif self.const:
             value = f"Field({self.const!r}, const=True)"
@@ -119,6 +119,18 @@ class Entity:
             if "InputFile" in item.python_type:
                 result.append(item)
         return result
+
+    @property
+    def parse_mode_annotations(self):
+        parse_mode = None
+        entities = None
+
+        for entity in self.annotations:
+            if entity.name.endswith("parse_mode"):
+                parse_mode = entity.name
+            elif entity.name.endswith("entities"):
+                entities = entity.name
+        return parse_mode, entities
 
     @property
     def can_be_used_in_webhook(self):

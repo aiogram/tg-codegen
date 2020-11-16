@@ -5,6 +5,7 @@ from .bot_command import BotCommand
 from .callback_game import CallbackGame
 from .callback_query import CallbackQuery
 from .chat import Chat
+from .chat_location import ChatLocation
 from .chat_member import ChatMember
 from .chat_permissions import ChatPermissions
 from .chat_photo import ChatPhoto
@@ -63,6 +64,7 @@ from .login_url import LoginUrl
 from .mask_position import MaskPosition
 from .message import Message
 from .message_entity import MessageEntity
+from .message_id import MessageId
 from .order_info import OrderInfo
 from .passport_data import PassportData
 from .passport_element_error import PassportElementError
@@ -81,6 +83,7 @@ from .poll import Poll
 from .poll_answer import PollAnswer
 from .poll_option import PollOption
 from .pre_checkout_query import PreCheckoutQuery
+from .proximity_alert_triggered import ProximityAlertTriggered
 from .reply_keyboard_markup import ReplyKeyboardMarkup
 from .reply_keyboard_remove import ReplyKeyboardRemove
 from .response_parameters import ResponseParameters
@@ -109,6 +112,7 @@ __all__ = (
     "User",
     "Chat",
     "Message",
+    "MessageId",
     "MessageEntity",
     "PhotoSize",
     "Animation",
@@ -124,6 +128,7 @@ __all__ = (
     "Poll",
     "Location",
     "Venue",
+    "ProximityAlertTriggered",
     "UserProfilePhotos",
     "File",
     "ReplyKeyboardMarkup",
@@ -138,6 +143,7 @@ __all__ = (
     "ChatPhoto",
     "ChatMember",
     "ChatPermissions",
+    "ChatLocation",
     "BotCommand",
     "ResponseParameters",
     "InputMedia",
