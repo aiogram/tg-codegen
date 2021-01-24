@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import functools
 import typing
 from dataclasses import dataclass, field
 
@@ -12,6 +11,7 @@ class Annotation:
     name: str
     type: str
     description: str
+    pretty_description: str
     required: bool = True
     const: typing.Optional[str] = None
 
@@ -65,6 +65,7 @@ class Entity:
     name: str
     anchor: str
     description: str = None
+    pretty_description: str = None
     annotations: typing.List[Annotation] = field(default_factory=list)
 
     extends: typing.Optional[typing.List[str]] = None
@@ -124,6 +125,8 @@ class Entity:
     def parse_mode_annotations(self):
         parse_mode = None
         entities = None
+
+        # TODO: Parse mode should be parsed for 'answerInlineQuery', 'sendMediaGroup', 'editMessageMedia'
 
         for entity in self.annotations:
             if entity.name.endswith("parse_mode"):

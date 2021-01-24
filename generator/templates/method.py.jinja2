@@ -17,7 +17,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_type }}]):
     """
-    {{ entity.description|limit_length(width=95)|indent(width=4) }}
+    {{ entity.pretty_description|indent(width=4) }}
 
     Source: https://core.telegram.org/bots/api#{{ entity.anchor }}
     """
@@ -25,19 +25,15 @@ class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_typ
 
 {% for annotation in entity.annotations %}
     {{ annotation.python_field }}
-    """{{ annotation.description|first_line|limit_length(width=92)|indent(width=4) }}"""
+    """{{ annotation.pretty_description|first_line|indent(width=4) }}"""
 {%- endfor %}
     def build_request(self, bot: Bot) -> Request:
         data: Dict[str, Any] = self.dict({% if entity.file_annotations %}exclude={ {% for annotation in entity.file_annotations %}"{{ annotation.python_name }}"{% if not loop.last %}, {% endif %}{% endfor %} }{% endif %})
+        {% if EXTRA['methods'][entity.name] %}{{ EXTRA['methods'][entity.name]|indent(width=8) }}{% else %}
         {% set parse_mode_property, entities_property = entity.parse_mode_annotations %}
         {% if parse_mode_property %}
         prepare_parse_mode(bot, data, parse_mode_property='{{ parse_mode_property }}', entities_property='{{ entities_property }}')
         {% endif %}
-{#        {% for annotation in entity.annotations %}{% if annotation.name == 'parse_mode' %}#}
-{#            prepare_parse_mode(bot, data)#}
-{#        {% elif annotation.name == 'explanation_parse_mode' %}#}
-{#            prepare_parse_mode(bot, data, parse_mode_property="explanation_parse_mode")#}
-{#        {% endif %}{% endfor %}#}
 
         {% if entity.file_annotations %}files: Dict[str, InputFile] = {}{% endif %}
         {%- for file in entity.file_annotations %}
@@ -45,4 +41,4 @@ class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_typ
         {%- endfor %}
 
         return Request(method="{{ entity.name }}", data=data{% if entity.file_annotations %}, files=files{% endif %})
-
+        {% endif %}

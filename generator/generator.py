@@ -14,6 +14,7 @@ import yaml
 
 from generator.consts import TELEGRAM_TYPE_PATTERN
 from generator.normalizers import limit_length, md_line_breaks, pythonize_name
+from generator.specials import EXTRA
 from generator.structures import Entity, Group
 
 templates_dir: pathlib.Path = pathlib.Path(__file__).parent / "templates"
@@ -32,10 +33,10 @@ class Generator:
                 "first_line": lambda text: text.split("\n")[0],
                 "limit_length": limit_length,
                 "md_line_breaks": md_line_breaks,
-                "header": lambda value, symbol: symbol * len(value)
+                "header": lambda value, symbol: symbol * len(value),
             }
         )
-        self.env.globals.update({"len": len})
+        self.env.globals.update({"len": len, 'EXTRA': EXTRA})
 
         self.telegram_types = {
             entity.name for group in groups for entity in group.childs if entity.is_type
@@ -101,6 +102,9 @@ class Generator:
                 )
             except black.NothingChanged:
                 pass
+            except black.InvalidInput:
+                print(code)
+                raise
 
         return code
 
@@ -171,6 +175,7 @@ class Generator:
                     TELEGRAM_TYPE_PATTERN.format(type=telegram_type), entity.python_returning_type
                 ):
                     imports["telegram"].add(telegram_type)
+        imports['telegram'].add('InputFile')
         return imports
 
     @contextlib.contextmanager

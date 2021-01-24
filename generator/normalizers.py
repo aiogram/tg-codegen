@@ -13,6 +13,9 @@ def normalize_description(text: str) -> str:
 
 def normalize_annotation(item: dict):
     for key in list(item.keys()):
+        if key.startswith('pretty_') and key != 'pretty_Description':
+            item.pop(key)
+            continue
         item[key.lower()] = item.pop(key)
 
     item["description"] = normalize_description(item["description"])

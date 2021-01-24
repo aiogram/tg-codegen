@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
+
+if TYPE_CHECKING:  # pragma: no cover
+    pass
 
 
 class Contact(TelegramObject):
@@ -17,8 +20,8 @@ class Contact(TelegramObject):
     first_name: str
     """Contact's first name"""
     last_name: Optional[str] = None
-    """Contact's last name"""
+    """*Optional*. Contact's last name"""
     user_id: Optional[int] = None
-    """Contact's user identifier in Telegram"""
+    """*Optional*. Contact's user identifier in Telegram"""
     vcard: Optional[str] = None
-    """Additional data about the contact in the form of a vCard"""
+    """*Optional*. Additional data about the contact in the form of a `vCard <https://en.wikipedia.org/wiki/VCard>`_"""

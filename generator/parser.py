@@ -1,4 +1,5 @@
 import logging
+from typing import Iterable, Generator
 
 import requests
 from lxml import html
@@ -8,12 +9,12 @@ from generator.consts import (
     ANCHOR_HEADER_PATTERN,
     DOCS_URL,
     SPECIAL_CLIENT_SUBTYPES,
-    SPECIAL_SERVER_SUBTYPES,
+    SPECIAL_SERVER_SUBTYPES, SYMBOLS_MAP, REF_LINKS,
 )
 from generator.normalizers import (
     normalize_description,
     normalize_method_annotation,
-    normalize_type_annotation,
+    normalize_type_annotation, pythonize_name,
 )
 from generator.structures import Annotation, Entity, Group
 
@@ -35,6 +36,7 @@ class Parser:
     @staticmethod
     def to_html(content: str, url: str) -> HtmlElement:
         page = html.fromstring(content, url)
+        # page.make_links_absolute(url)
 
         for br in page.xpath("*//br"):
             br.tail = "\n" + br.tail if br.tail else "\n"
@@ -99,6 +101,7 @@ class Parser:
     def _parse_child(self, start_tag: HtmlElement, anchor: str):
         name = start_tag.text_content()
         description = []
+        pretty_description = []
         annotations = []
 
         is_method = name[0].islower()
@@ -116,14 +119,19 @@ class Parser:
 
             elif item.tag == "p":
                 description.extend(item.text_content().splitlines())
+                pretty_description.append(node_to_rst(item))
             elif item.tag == "blockquote":
+                pretty_description.append(node_to_rst(item))
                 description.extend(self._parse_blockquote(item))
             elif item.tag == "ul":
+                pretty_description.append(node_to_rst(item))
                 description.extend(self._parse_list(item))
 
         description = normalize_description("\n".join(description))
+        pretty_description = ''.join(pretty_description).strip()
         block = Entity(
-            anchor=anchor, name=name, description=description, annotations=annotations
+            anchor=anchor, name=name, description=description, pretty_description=pretty_description,
+            annotations=annotations
         )
         self._set_specific_entity_attributes(block)
         block.fix_annotations_ordering()
@@ -139,12 +147,12 @@ class Parser:
 
     def _set_specific_type_attributes(self, entity: Entity):
         for (
-            (subtype_prefix, subtype_suffix),
-            base_type,
+                (subtype_prefix, subtype_suffix),
+                base_type,
         ) in SPECIAL_SERVER_SUBTYPES.items():
             if not (
-                entity.name.startswith(subtype_prefix)
-                and entity.name.endswith(subtype_suffix)
+                    entity.name.startswith(subtype_prefix)
+                    and entity.name.endswith(subtype_suffix)
             ):
                 continue
             log.info("Handled specific type %r based on %r", entity.name, base_type)
@@ -153,8 +161,8 @@ class Parser:
 
         for special_subtype_prefix, const_field in SPECIAL_CLIENT_SUBTYPES.items():
             if (
-                not entity.name.startswith(special_subtype_prefix)
-                or entity.name == special_subtype_prefix
+                    not entity.name.startswith(special_subtype_prefix)
+                    or entity.name == special_subtype_prefix
             ):
                 continue
             log.info(
@@ -190,10 +198,15 @@ class Parser:
         header = [item.text_content() for item in head.getchildren()[0]]
 
         for body_item in body:
-            yield {
+            item = {
                 k: v
                 for k, v in zip(header, [item.text_content() for item in body_item])
             }
+            item.update({
+                f"pretty_{k}": v
+                for k, v in zip(header, [node_to_rst(item) for item in body_item])
+            })
+            yield item
 
     def _parse_blockquote(self, blockquote: HtmlElement):
         for item in blockquote.getchildren():
@@ -202,3 +215,74 @@ class Parser:
     def _parse_list(self, data: HtmlElement):
         for item in data.getchildren():
             yield " - " + item.text_content()
+
+
+def node_to_rst(node: HtmlElement) -> str:
+    result = ''.join(_node_to_rst(node))
+    for a, b in {
+        '*True*': ':code:`True`',
+        '*False*': ':code:`False`',
+        '_*': '_ *',
+        **SYMBOLS_MAP
+    }.items():
+        result = result.replace(a, b)
+    # print(f'NODE {node.tag!r} ::{node.text_content()!r} -> {result!r}')
+    return result
+
+
+def _nodes_to_rst(nodes: Iterable[HtmlElement]) -> Generator[str, None, None]:
+    for node in nodes:
+        yield from _node_to_rst(node)
+
+
+def _node_to_rst(node: HtmlElement) -> str:
+    # TODO: Blockquote's
+    tag = node.tag
+    # print(f"\t:: {tag!r} {node.text!r} {node.tail!r} {node.attrib}")
+    tail = ''
+    if tag in {'p', 'td'}:
+        yield node.text or ''
+    elif tag == 'a':
+        href = node.attrib['href']
+        if node.text and href.startswith('#') and '-' not in href and f"#{node.text.lower()}" == href:
+            ref_name = node.text
+            ref_group = 'types' if ref_name[0].isupper() else 'methods'
+            yield f":class:`aiogram.{ref_group}.{pythonize_name(ref_name)}.{ref_name[0].upper()}{ref_name[1:]}`"
+        elif href in REF_LINKS:
+            yield f":ref:`{node.text or href} <{REF_LINKS[href]}>`"
+        else:
+            node.make_links_absolute()
+            href = node.attrib['href']
+            yield f"`{node.text or href} <{href}>`_"
+    elif tag in {'br', 'blockquote'}:
+        yield '\n'
+    elif tag == 'ul':
+        if node.text:
+            yield node.text
+    elif tag == 'li':
+        yield ' - '
+        if node.text:
+            yield node.text
+    elif tag == 'strong':
+        yield '**'
+        tail = '**'
+        yield node.text
+    elif tag == 'em':
+        yield '*'
+        tail = '*'
+        yield node.text
+    elif tag == 'code':
+        yield f':code:`{node.text_content()}`'
+
+    if tag == 'blockquote':
+        value = ''.join(_nodes_to_rst(node))
+        value.split('\n')
+        value = ' ' + '\n '.join(value.split('\n'))
+        yield value.rstrip() + '\n'
+    else:
+        yield from _nodes_to_rst(node)
+
+    if tail:
+        yield tail
+    if node.tail:
+        yield node.tail

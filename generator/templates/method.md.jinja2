@@ -2,14 +2,11 @@
 {{ entity.name }}
 {{ entity.name|header('#') }}
 
-{{ entity.description|md_line_breaks }}
-
 Returns: :obj:`{{ entity.python_returning_type }}`
 
-.. automodule:: aiogram.api.methods.{{ entity.pythonic_name }}
+.. automodule:: aiogram.methods.{{ entity.pythonic_name }}
     :members:
     :member-order: bysource
-    :special-members: __init__
     :undoc-members: True
 
 
@@ -29,21 +26,20 @@ Method as object
 
 Imports:
 
-- :code:`from aiogram.methods import {{ entity.name|class_name }}`
-- :code:`from aiogram.api.methods import {{ entity.name|class_name }}`
-- :code:`from aiogram.api.methods.{{ entity.pythonic_name }} import {{ entity.name|class_name }}`
+- :code:`from aiogram.methods.{{ entity.pythonic_name }} import {{ entity.name|class_name }}`
+- alias: :code:`from aiogram.methods import {{ entity.name|class_name }}`
 
 In handlers with current bot
 ----------------------------
 
-.. code-block::
+.. code-block:: python
 
     result: {{ entity.python_returning_type }} = await {{ entity.name|class_name }}(...)
 
 With specific bot
 ~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: python
 
     result: {{ entity.python_returning_type }} = await bot({{ entity.name|class_name }}(...))
 
@@ -51,7 +47,7 @@ With specific bot
 As reply into Webhook in handler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: python
 
     return {{ entity.name|class_name }}(...)
 {%- endif %}
