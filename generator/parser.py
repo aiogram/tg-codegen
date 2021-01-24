@@ -254,6 +254,8 @@ def _node_to_rst(node: HtmlElement) -> str:
             node.make_links_absolute()
             href = node.attrib['href']
             yield f"`{node.text or href} <{href}>`_"
+    elif tag == 'img':
+        yield node.attrib['alt']
     elif tag in {'br', 'blockquote'}:
         yield '\n'
     elif tag == 'ul':
