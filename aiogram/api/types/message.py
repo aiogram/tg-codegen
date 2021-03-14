@@ -18,6 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .inline_keyboard_markup import InlineKeyboardMarkup
     from .invoice import Invoice
     from .location import Location
+    from .message_auto_delete_timer_changed import MessageAutoDeleteTimerChanged
     from .message_entity import MessageEntity
     from .passport_data import PassportData
     from .photo_size import PhotoSize
@@ -30,6 +31,9 @@ if TYPE_CHECKING:  # pragma: no cover
     from .video import Video
     from .video_note import VideoNote
     from .voice import Voice
+    from .voice_chat_ended import VoiceChatEnded
+    from .voice_chat_participants_invited import VoiceChatParticipantsInvited
+    from .voice_chat_started import VoiceChatStarted
 
 
 class Message(TelegramObject):
@@ -123,10 +127,12 @@ class Message(TelegramObject):
     """*Optional*. Service message: the supergroup has been created. This field can't be received in a message coming through updates, because bot can't be a member of a supergroup when it is created. It can only be found in reply_to_message if someone replies to a very first message in a directly created supergroup."""
     channel_chat_created: Optional[bool] = None
     """*Optional*. Service message: the channel has been created. This field can't be received in a message coming through updates, because bot can't be a member of a channel when it is created. It can only be found in reply_to_message if someone replies to a very first message in a channel."""
+    message_auto_delete_timer_changed: Optional[MessageAutoDeleteTimerChanged] = None
+    """*Optional*. Service message: auto-delete timer settings changed in the chat"""
     migrate_to_chat_id: Optional[int] = None
-    """*Optional*. The group has been migrated to a supergroup with the specified identifier. This number may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier."""
+    """*Optional*. The group has been migrated to a supergroup with the specified identifier. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier."""
     migrate_from_chat_id: Optional[int] = None
-    """*Optional*. The supergroup has been migrated from a group with the specified identifier. This number may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier."""
+    """*Optional*. The supergroup has been migrated from a group with the specified identifier. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier."""
     pinned_message: Optional[Message] = None
     """*Optional*. Specified message was pinned. Note that the Message object in this field will not contain further *reply_to_message* fields even if it is itself a reply."""
     invoice: Optional[Invoice] = None
@@ -139,5 +145,11 @@ class Message(TelegramObject):
     """*Optional*. Telegram Passport data"""
     proximity_alert_triggered: Optional[ProximityAlertTriggered] = None
     """*Optional*. Service message. A user in the chat triggered another user's proximity alert while sharing Live Location."""
+    voice_chat_started: Optional[VoiceChatStarted] = None
+    """*Optional*. Service message: voice chat started"""
+    voice_chat_ended: Optional[VoiceChatEnded] = None
+    """*Optional*. Service message: voice chat ended"""
+    voice_chat_participants_invited: Optional[VoiceChatParticipantsInvited] = None
+    """*Optional*. Service message: new participants invited to a voice chat"""
     reply_markup: Optional[InlineKeyboardMarkup] = None
     """*Optional*. Inline keyboard attached to the message. :code:`login_url` buttons are represented as ordinary :code:`url` buttons."""

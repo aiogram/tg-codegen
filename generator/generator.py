@@ -106,6 +106,12 @@ class Generator:
                 print(code)
                 raise
 
+        def fix_line(line: str) -> str:
+            if not line.strip():
+                line = ''
+            return line
+
+        code = '\n'.join(map(fix_line, code.split('\n'))).strip() + '\n'
         return code
 
     def generate_method(self, entity: Entity, out_dir: pathlib.Path):

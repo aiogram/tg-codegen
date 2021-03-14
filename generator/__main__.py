@@ -1,6 +1,5 @@
 import logging
 
-import pypandoc
 import sys
 
 from generator.cli import main

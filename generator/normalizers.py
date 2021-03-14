@@ -75,6 +75,7 @@ def normalize_type(string):
 def get_returning(description):
     parts = list(filter(lambda item: "return" in item.lower(), description.split(".")))
     if not parts:
+        raise RuntimeError(f"Failed to parse returning type for {description!r}")
         return "Any", ""
     sentence = ". ".join(map(str.strip, parts))
     return_type = None
@@ -88,6 +89,8 @@ def get_returning(description):
                 return_type += f" or {otherwise}"
         if return_type:
             break
+    if not return_type:
+        raise RuntimeError(f"Failed to parse return type from {sentence!r}")
 
     return return_type, sentence + "."
 

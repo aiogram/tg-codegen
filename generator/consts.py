@@ -27,7 +27,9 @@ RETURN_PATTERNS = [
     re.compile(r"Returns (?P<type>[a-z]+) on success", flags=RE_FLAGS),
     re.compile(r"(?P<type>[a-z]+) on success", flags=RE_FLAGS),
     re.compile(r"(?P<type>[a-z]+) is returned", flags=RE_FLAGS),
+    re.compile(r"Returns the [a-z ]+ as (?P<type>[a-z]+) object", flags=RE_FLAGS),
     re.compile(r"Returns (?P<type>[a-z]+)", flags=RE_FLAGS),
+
 ]
 BUILTIN_TYPES = {
     "String": "str",

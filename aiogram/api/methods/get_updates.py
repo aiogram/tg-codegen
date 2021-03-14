@@ -14,9 +14,9 @@ class GetUpdates(TelegramMethod[List[Update]]):
     Use this method to receive incoming updates using long polling (`wiki <https://en.wikipedia.org/wiki/Push_technology#Long_polling>`_). An Array of :class:`aiogram.types.update.Update` objects is returned.
 
      **Notes**
-     
+
      **1.** This method will not work if an outgoing webhook is set up.
-     
+
      **2.** In order to avoid getting duplicate updates, recalculate *offset* after each server response.
 
     Source: https://core.telegram.org/bots/api#getupdates
@@ -31,7 +31,7 @@ class GetUpdates(TelegramMethod[List[Update]]):
     timeout: Optional[int] = None
     """Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling. Should be positive, short polling should be used for testing purposes only."""
     allowed_updates: Optional[List[str]] = None
-    """A JSON-serialized list of the update types you want your bot to receive. For example, specify ['message', 'edited_channel_post', 'callback_query'] to only receive updates of these types. See :class:`aiogram.types.update.Update` for a complete list of available update types. Specify an empty list to receive all updates regardless of type (default). If not specified, the previous setting will be used."""
+    """A JSON-serialized list of the update types you want your bot to receive. For example, specify ['message', 'edited_channel_post', 'callback_query'] to only receive updates of these types. See :class:`aiogram.types.update.Update` for a complete list of available update types. Specify an empty list to receive all update types except *chat_member* (default). If not specified, the previous setting will be used."""
 
     def build_request(self, bot: Bot) -> Request:
         data: Dict[str, Any] = self.dict()

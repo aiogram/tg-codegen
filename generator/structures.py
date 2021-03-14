@@ -54,7 +54,7 @@ class Annotation:
         elif self.name in {"parse_mode", "explanation_parse_mode"}:
             value = "UNSET"
         elif self.const:
-            value = f"Field({self.const!r}, const=True)"
+            value = f"Field({self.const}, const=True)"
         if value:
             result += f" = {value}"
         return result

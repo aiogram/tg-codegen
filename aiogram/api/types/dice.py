@@ -18,4 +18,4 @@ class Dice(TelegramObject):
     emoji: str
     """Emoji on which the dice throw animation is based"""
     value: int
-    """Value of the dice, 1-6 for '🎲' and '🎯' base emoji, 1-5 for '🏀' and '⚽' base emoji, 1-64 for '🎰' base emoji"""
+    """Value of the dice, 1-6 for '🎲', '🎯' and '🎳' base emoji, 1-5 for '🏀' and '⚽' base emoji, 1-64 for '🎰' base emoji"""

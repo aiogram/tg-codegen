@@ -174,15 +174,20 @@ class Parser:
             for annotation in entity.annotations:
                 if annotation.name != const_field:
                     continue
-                annotation.const = annotation.description.rsplit(maxsplit=1)[-1].strip(
+                annotation.const = repr(annotation.description.rsplit(maxsplit=1)[-1].strip(
                     "'"
-                )
+                ))
                 log.info(
                     "Setup constant field %r to %r", annotation.name, annotation.const
                 )
                 break
 
             break
+
+        if entity.name == 'ReplyKeyboardRemove':
+            for annotation in entity.annotations:
+                if annotation.name == 'remove_keyboard':
+                    annotation.const = 'True'
 
     def _set_specific_method_attributes(self, entity: Entity):
         pass
