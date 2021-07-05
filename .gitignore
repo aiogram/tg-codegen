@@ -8,3 +8,5 @@ __pycache__
 #aiogram/api/methods/*
 #!aiogram/api/methods/base.py
 #aiogram/api/client/bot.py
+
+*.log
