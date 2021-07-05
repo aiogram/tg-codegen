@@ -7,6 +7,7 @@ from ..methods import (
     AnswerInlineQuery,
     AnswerPreCheckoutQuery,
     AnswerShippingQuery,
+    BanChatMember,
     Close,
     CopyMessage,
     CreateChatInviteLink,
@@ -14,6 +15,7 @@ from ..methods import (
     DeleteChatPhoto,
     DeleteChatStickerSet,
     DeleteMessage,
+    DeleteMyCommands,
     DeleteStickerFromSet,
     DeleteWebhook,
     EditChatInviteLink,
@@ -27,6 +29,7 @@ from ..methods import (
     GetChat,
     GetChatAdministrators,
     GetChatMember,
+    GetChatMemberCount,
     GetChatMembersCount,
     GetFile,
     GetGameHighScores,
@@ -83,9 +86,15 @@ from ..methods import (
 from ..types import (
     UNSET,
     BotCommand,
+    BotCommandScope,
     Chat,
     ChatInviteLink,
-    ChatMember,
+    ChatMemberAdministrator,
+    ChatMemberBanned,
+    ChatMemberLeft,
+    ChatMemberMember,
+    ChatMemberOwner,
+    ChatMemberRestricted,
     ChatPermissions,
     File,
     ForceReply,
@@ -326,7 +335,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> Message:
         """
-        Use this method to forward messages of any kind. On success, the sent :class:`aiogram.types.message.Message` is returned.
+        Use this method to forward messages of any kind. Service messages can't be forwarded. On success, the sent :class:`aiogram.types.message.Message` is returned.
 
         Source: https://core.telegram.org/bots/api#forwardmessage
 
@@ -362,7 +371,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> MessageId:
         """
-        Use this method to copy messages of any kind. The method is analogous to the method :class:`aiogram.methods.forward_message.ForwardMessage`, but the copied message doesn't have a link to the original message. Returns the :class:`aiogram.types.message_id.MessageId` of the sent message on success.
+        Use this method to copy messages of any kind. Service messages and invoice messages can't be copied. The method is analogous to the method :class:`aiogram.methods.forward_message.ForwardMessage`, but the copied message doesn't have a link to the original message. Returns the :class:`aiogram.types.message_id.MessageId` of the sent message on success.
 
         Source: https://core.telegram.org/bots/api#copymessage
 
@@ -1174,6 +1183,35 @@ class Bot(BaseBot):
         call = GetFile(file_id=file_id,)
         return await self(call, request_timeout=request_timeout)
 
+    async def ban_chat_member(
+        self,
+        chat_id: Union[int, str],
+        user_id: int,
+        until_date: Optional[Union[datetime.datetime, datetime.timedelta, int]] = None,
+        revoke_messages: Optional[bool] = None,
+        request_timeout: Optional[int] = None,
+    ) -> bool:
+        """
+        Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless `unbanned <https://core.telegram.org/bots/api#unbanchatmember>`_ first. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+
+        Source: https://core.telegram.org/bots/api#banchatmember
+
+        :param chat_id: Unique identifier for the target group or username of the target supergroup or channel (in the format :code:`@channelusername`)
+        :param user_id: Unique identifier of the target user
+        :param until_date: Date when the user will be unbanned, unix time. If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever. Applied for supergroups and channels only.
+        :param revoke_messages: Pass :code:`True` to delete all messages from the chat for the user that is being removed. If :code:`False`, the user will be able to see messages in the group that were sent before the user was removed. Always :code:`True` for supergroups and channels.
+        :param request_timeout: Request timeout
+        :return: In the case of supergroups and channels, the user will not be able to return to
+            the chat on their own using invite links, etc. Returns True on success.
+        """
+        call = BanChatMember(
+            chat_id=chat_id,
+            user_id=user_id,
+            until_date=until_date,
+            revoke_messages=revoke_messages,
+        )
+        return await self(call, request_timeout=request_timeout)
+
     async def kick_chat_member(
         self,
         chat_id: Union[int, str],
@@ -1183,9 +1221,13 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to kick a user from a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless `unbanned <https://core.telegram.org/bots/api#unbanchatmember>`_ first. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+        .. warning:
 
-        Source: https://core.telegram.org/bots/api#kickchatmember
+            Renamed from :code:`kickChatMember` in 5.3 bot API version and can be removed in near future
+
+        Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless `unbanned <https://core.telegram.org/bots/api#unbanchatmember>`_ first. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+
+        Source: https://core.telegram.org/bots/api#banchatmember
 
         :param chat_id: Unique identifier for the target group or username of the target supergroup or channel (in the format :code:`@channelusername`)
         :param user_id: Unique identifier of the target user
@@ -1211,7 +1253,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to unban a previously kicked user in a supergroup or channel. The user will **not** return to the group or channel automatically, but will be able to join via link, etc. The bot must be an administrator for this to work. By default, this method guarantees that after the call the user is not a member of the chat, but will be able to join it. So if the user is a member of the chat they will also be **removed** from the chat. If you don't want this, use the parameter *only_if_banned*. Returns :code:`True` on success.
+        Use this method to unban a previously banned user in a supergroup or channel. The user will **not** return to the group or channel automatically, but will be able to join via link, etc. The bot must be an administrator for this to work. By default, this method guarantees that after the call the user is not a member of the chat, but will be able to join it. So if the user is a member of the chat they will also be **removed** from the chat. If you don't want this, use the parameter *only_if_banned*. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#unbanchatmember
 
@@ -1279,7 +1321,7 @@ class Bot(BaseBot):
         :param can_post_messages: Pass True, if the administrator can create channel posts, channels only
         :param can_edit_messages: Pass True, if the administrator can edit messages of other users and can pin messages, channels only
         :param can_delete_messages: Pass True, if the administrator can delete messages of other users
-        :param can_manage_voice_chats: Pass True, if the administrator can manage voice chats, supergroups only
+        :param can_manage_voice_chats: Pass True, if the administrator can manage voice chats
         :param can_restrict_members: Pass True, if the administrator can restrict, ban or unban chat members
         :param can_promote_members: Pass True, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by him)
         :param can_change_info: Pass True, if the administrator can change chat title, photo and other settings
@@ -1586,7 +1628,16 @@ class Bot(BaseBot):
 
     async def get_chat_administrators(
         self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
-    ) -> List[ChatMember]:
+    ) -> List[
+        Union[
+            ChatMemberOwner,
+            ChatMemberAdministrator,
+            ChatMemberMember,
+            ChatMemberRestricted,
+            ChatMemberLeft,
+            ChatMemberBanned,
+        ]
+    ]:
         """
         Use this method to get a list of administrators in a chat. On success, returns an Array of :class:`aiogram.types.chat_member.ChatMember` objects that contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
 
@@ -1602,13 +1653,32 @@ class Bot(BaseBot):
         call = GetChatAdministrators(chat_id=chat_id,)
         return await self(call, request_timeout=request_timeout)
 
-    async def get_chat_members_count(
+    async def get_chat_member_count(
         self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
     ) -> int:
         """
         Use this method to get the number of members in a chat. Returns *Int* on success.
 
-        Source: https://core.telegram.org/bots/api#getchatmemberscount
+        Source: https://core.telegram.org/bots/api#getchatmembercount
+
+        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format :code:`@channelusername`)
+        :param request_timeout: Request timeout
+        :return: Returns Int on success.
+        """
+        call = GetChatMemberCount(chat_id=chat_id,)
+        return await self(call, request_timeout=request_timeout)
+
+    async def get_chat_members_count(
+        self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
+    ) -> int:
+        """
+        .. warning:
+
+            Renamed from :code:`getChatMembersCount` in 5.3 bot API version and can be removed in near future
+
+        Use this method to get the number of members in a chat. Returns *Int* on success.
+
+        Source: https://core.telegram.org/bots/api#getchatmembercount
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format :code:`@channelusername`)
         :param request_timeout: Request timeout
@@ -1619,7 +1689,14 @@ class Bot(BaseBot):
 
     async def get_chat_member(
         self, chat_id: Union[int, str], user_id: int, request_timeout: Optional[int] = None,
-    ) -> ChatMember:
+    ) -> Union[
+        ChatMemberOwner,
+        ChatMemberAdministrator,
+        ChatMemberMember,
+        ChatMemberRestricted,
+        ChatMemberLeft,
+        ChatMemberBanned,
+    ]:
         """
         Use this method to get information about a member of a chat. Returns a :class:`aiogram.types.chat_member.ChatMember` object on success.
 
@@ -1703,30 +1780,63 @@ class Bot(BaseBot):
         return await self(call, request_timeout=request_timeout)
 
     async def set_my_commands(
-        self, commands: List[BotCommand], request_timeout: Optional[int] = None,
+        self,
+        commands: List[BotCommand],
+        scope: Optional[BotCommandScope] = None,
+        language_code: Optional[str] = None,
+        request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to change the list of the bot's commands. Returns :code:`True` on success.
+        Use this method to change the list of the bot's commands. See `https://core.telegram.org/bots#commands <https://core.telegram.org/bots#commands>`_`https://core.telegram.org/bots#commands <https://core.telegram.org/bots#commands>`_ for more details about bot commands. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#setmycommands
 
         :param commands: A JSON-serialized list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
+        :param scope: A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to :class:`aiogram.types.bot_command_scope_default.BotCommandScopeDefault`.
+        :param language_code: A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
-        call = SetMyCommands(commands=commands,)
+        call = SetMyCommands(commands=commands, scope=scope, language_code=language_code,)
         return await self(call, request_timeout=request_timeout)
 
-    async def get_my_commands(self, request_timeout: Optional[int] = None,) -> List[BotCommand]:
+    async def delete_my_commands(
+        self,
+        scope: Optional[BotCommandScope] = None,
+        language_code: Optional[str] = None,
+        request_timeout: Optional[int] = None,
+    ) -> bool:
         """
-        Use this method to get the current list of the bot's commands. Requires no parameters. Returns Array of :class:`aiogram.types.bot_command.BotCommand` on success.
+        Use this method to delete the list of the bot's commands for the given scope and user language. After deletion, `higher level commands <https://core.telegram.org/bots/api#determining-list-of-commands>`_ will be shown to affected users. Returns :code:`True` on success.
+
+        Source: https://core.telegram.org/bots/api#deletemycommands
+
+        :param scope: A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to :class:`aiogram.types.bot_command_scope_default.BotCommandScopeDefault`.
+        :param language_code: A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
+        :param request_timeout: Request timeout
+        :return: Returns True on success.
+        """
+        call = DeleteMyCommands(scope=scope, language_code=language_code,)
+        return await self(call, request_timeout=request_timeout)
+
+    async def get_my_commands(
+        self,
+        scope: Optional[BotCommandScope] = None,
+        language_code: Optional[str] = None,
+        request_timeout: Optional[int] = None,
+    ) -> List[BotCommand]:
+        """
+        Use this method to get the current list of the bot's commands for the given scope and user language. Returns Array of :class:`aiogram.types.bot_command.BotCommand` on success. If commands aren't set, an empty list is returned.
 
         Source: https://core.telegram.org/bots/api#getmycommands
 
+        :param scope: A JSON-serialized object, describing scope of users. Defaults to :class:`aiogram.types.bot_command_scope_default.BotCommandScopeDefault`.
+        :param language_code: A two-letter ISO 639-1 language code or an empty string
         :param request_timeout: Request timeout
-        :return: Returns Array of BotCommand on success.
+        :return: Returns Array of BotCommand on success. If commands aren't set, an empty list is
+            returned.
         """
-        call = GetMyCommands()
+        call = GetMyCommands(scope=scope, language_code=language_code,)
         return await self(call, request_timeout=request_timeout)
 
     # =============================================================================================
@@ -2176,14 +2286,16 @@ class Bot(BaseBot):
 
     async def send_invoice(
         self,
-        chat_id: int,
+        chat_id: Union[int, str],
         title: str,
         description: str,
         payload: str,
         provider_token: str,
-        start_parameter: str,
         currency: str,
         prices: List[LabeledPrice],
+        max_tip_amount: Optional[int] = None,
+        suggested_tip_amounts: Optional[List[int]] = None,
+        start_parameter: Optional[str] = None,
         provider_data: Optional[str] = None,
         photo_url: Optional[str] = None,
         photo_size: Optional[int] = None,
@@ -2207,14 +2319,16 @@ class Bot(BaseBot):
 
         Source: https://core.telegram.org/bots/api#sendinvoice
 
-        :param chat_id: Unique identifier for the target private chat
+        :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
         :param title: Product name, 1-32 characters
         :param description: Product description, 1-255 characters
         :param payload: Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
         :param provider_token: Payments provider token, obtained via `Botfather <https://t.me/botfather>`_
-        :param start_parameter: Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
         :param currency: Three-letter ISO 4217 currency code, see `more on currencies <https://core.telegram.org/bots/payments#supported-currencies>`_
         :param prices: Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+        :param max_tip_amount: The maximum accepted amount for tips in the *smallest units* of the currency (integer, **not** float/double). For example, for a maximum tip of :code:`US$ 1.45` pass :code:`max_tip_amount = 145`. See the *exp* parameter in `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0
+        :param suggested_tip_amounts: A JSON-serialized array of suggested amounts of tips in the *smallest units* of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed *max_tip_amount*.
+        :param start_parameter: Unique deep-linking parameter. If left empty, **forwarded copies** of the sent message will have a *Pay* button, allowing multiple users to pay directly from the forwarded message, using the same invoice. If non-empty, forwarded copies of the sent message will have a *URL* button with a deep link to the bot (instead of a *Pay* button), with the value used as the start parameter
         :param provider_data: A JSON-serialized data about the invoice, which will be shared with the payment provider. A detailed description of required fields should be provided by the payment provider.
         :param photo_url: URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
         :param photo_size: Photo size
@@ -2240,9 +2354,11 @@ class Bot(BaseBot):
             description=description,
             payload=payload,
             provider_token=provider_token,
-            start_parameter=start_parameter,
             currency=currency,
             prices=prices,
+            max_tip_amount=max_tip_amount,
+            suggested_tip_amounts=suggested_tip_amounts,
+            start_parameter=start_parameter,
             provider_data=provider_data,
             photo_url=photo_url,
             photo_size=photo_size,

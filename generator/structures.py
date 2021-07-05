@@ -3,7 +3,13 @@ from __future__ import annotations
 import typing
 from dataclasses import dataclass, field
 
-from generator.normalizers import get_returning, normalize_optional, normalize_type, pythonize_name
+from generator.normalizers import (
+    get_returning,
+    normalize_optional,
+    normalize_type,
+    pythonize_name,
+    replace_special_types,
+)
 
 
 @dataclass
@@ -33,7 +39,7 @@ class Annotation:
 
     @property
     def python_type(self) -> str:
-        result = normalize_type(self.type)
+        result = replace_special_types(normalize_type(self.type))
         if self.name == "date":
             return normalize_optional("datetime.datetime", required=self.required)
         if self.name == "media" and result == "str":
@@ -98,7 +104,6 @@ class Entity:
     def _get_returning(self):
         if self.is_type:
             return self.name, ""
-
         return get_returning(self.description)
 
     @property
@@ -111,7 +116,7 @@ class Entity:
 
     @property
     def python_returning_type(self):
-        return normalize_type(self.returning_type)
+        return replace_special_types(normalize_type(self.returning_type))
 
     @property
     def file_annotations(self):

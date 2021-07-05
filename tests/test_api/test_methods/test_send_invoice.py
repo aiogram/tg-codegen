@@ -15,7 +15,6 @@ class TestSendInvoice:
             description=...,
             payload=...,
             provider_token=...,
-            start_parameter=...,
             currency=...,
             prices=...,
         )
@@ -34,7 +33,6 @@ class TestSendInvoice:
             description=...,
             payload=...,
             provider_token=...,
-            start_parameter=...,
             currency=...,
             prices=...,
         )

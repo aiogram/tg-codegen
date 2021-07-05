@@ -36,7 +36,7 @@ class Generator:
                 "header": lambda value, symbol: symbol * len(value),
             }
         )
-        self.env.globals.update({"len": len, 'EXTRA': EXTRA})
+        self.env.globals.update({"len": len, "EXTRA": EXTRA})
 
         self.telegram_types = {
             entity.name for group in groups for entity in group.childs if entity.is_type
@@ -75,6 +75,33 @@ class Generator:
                 )
             )
 
+    def _code_autoflake(self, code: str) -> str:
+        return autoflake.fix_code(
+            code,
+            additional_imports=None,
+            expand_star_imports=True,
+            remove_all_unused_imports=True,
+            remove_duplicate_keys=True,
+            remove_unused_variables=False,
+            ignore_init_module_imports=False,
+        )
+
+    def _code_isort(self, code: str) -> str:
+        return isort.SortImports(file_contents=code).output
+
+    def _code_black(self, code: str) -> str:
+        try:
+            return black.format_file_contents(
+                code,
+                fast=True,
+                mode=black.FileMode(target_versions={black.TargetVersion.PY37}, line_length=99),
+            )
+        except black.NothingChanged:
+            return code
+        except black.InvalidInput:
+            print(code)
+            raise
+
     def render_template(
         self, template_name: str, context: Dict[str, Any], reformat_code: bool = True
     ):
@@ -82,36 +109,19 @@ class Generator:
         code = self.env.get_template(template_name).render(context)
 
         if reformat_code:
-            code = autoflake.fix_code(
-                code,
-                additional_imports=None,
-                expand_star_imports=True,
-                remove_all_unused_imports=True,
-                remove_duplicate_keys=True,
-                remove_unused_variables=False,
-                ignore_init_module_imports=False,
-            )
-            code = isort.SortImports(file_contents=code).output
-            try:
-                code = black.format_file_contents(
-                    code,
-                    fast=True,
-                    mode=black.FileMode(
-                        target_versions={black.TargetVersion.PY37}, line_length=99
-                    ),
-                )
-            except black.NothingChanged:
-                pass
-            except black.InvalidInput:
-                print(code)
-                raise
+            code = self._code_autoflake(code)
+            code = self._code_isort(code)
+            code = code.replace("if TYPE_CHECKING:  # pragma: no cover\n    pass\n", "")
+            code = self._code_autoflake(code)
+            code = self._code_isort(code)
+            code = self._code_black(code)
 
         def fix_line(line: str) -> str:
             if not line.strip():
-                line = ''
+                line = ""
             return line
 
-        code = '\n'.join(map(fix_line, code.split('\n'))).strip() + '\n'
+        code = "\n".join(map(fix_line, code.split("\n"))).strip() + "\n"
         return code
 
     def generate_method(self, entity: Entity, out_dir: pathlib.Path):
@@ -181,7 +191,7 @@ class Generator:
                     TELEGRAM_TYPE_PATTERN.format(type=telegram_type), entity.python_returning_type
                 ):
                     imports["telegram"].add(telegram_type)
-        imports['telegram'].add('InputFile')
+        imports["telegram"].add("InputFile")
         return imports
 
     @contextlib.contextmanager

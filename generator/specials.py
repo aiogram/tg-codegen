@@ -11,10 +11,13 @@ return Request(method="editMessageMedia", data=data, files=files)""",
 files: Dict[str, InputFile] = {}
 prepare_input_media(data, files)
 
-return Request(method="sendMediaGroup", data=data, files=files)"""
+return Request(method="sendMediaGroup", data=data, files=files)""",
 }
 
+EXTRA = {"methods": METHODS_EXTRA}
 
-EXTRA = {
-    'methods': METHODS_EXTRA
+# new name <- old name
+RENAMED_ENTITIES = {
+    "banChatMember": ("5.3", "kickChatMember"),
+    "getChatMemberCount": ("5.3", "getChatMembersCount"),
 }

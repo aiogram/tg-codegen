@@ -42,6 +42,7 @@ Available types
     venue
     proximity_alert_triggered
     message_auto_delete_timer_changed
+    voice_chat_scheduled
     voice_chat_started
     voice_chat_ended
     voice_chat_participants_invited
@@ -59,10 +60,24 @@ Available types
     chat_photo
     chat_invite_link
     chat_member
+    chat_member_owner
+    chat_member_administrator
+    chat_member_member
+    chat_member_restricted
+    chat_member_left
+    chat_member_banned
     chat_member_updated
     chat_permissions
     chat_location
     bot_command
+    bot_command_scope
+    bot_command_scope_default
+    bot_command_scope_all_private_chats
+    bot_command_scope_all_group_chats
+    bot_command_scope_all_chat_administrators
+    bot_command_scope_chat
+    bot_command_scope_chat_administrators
+    bot_command_scope_chat_member
     response_parameters
     input_media
     input_media_photo
@@ -117,6 +132,7 @@ Inline mode
     input_location_message_content
     input_venue_message_content
     input_contact_message_content
+    input_invoice_message_content
     chosen_inline_result
 
 Payments

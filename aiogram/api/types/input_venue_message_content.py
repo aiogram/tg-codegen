@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from .input_message_content import InputMessageContent
-
-if TYPE_CHECKING:  # pragma: no cover
-    pass
 
 
 class InputVenueMessageContent(InputMessageContent):

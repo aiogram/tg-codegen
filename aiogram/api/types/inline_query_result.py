@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from .base import TelegramObject
-
-if TYPE_CHECKING:  # pragma: no cover
-    pass
 
 
 class InlineQueryResult(TelegramObject):
@@ -33,7 +28,7 @@ class InlineQueryResult(TelegramObject):
      - :class:`aiogram.types.inline_query_result_video.InlineQueryResultVideo`
      - :class:`aiogram.types.inline_query_result_voice.InlineQueryResultVoice`
 
-    **Note:** All URLs passed in inline query results will be available to end users and therefore must be assumed to be public.
+    **Note:** All URLs passed in inline query results will be available to end users and therefore must be assumed to be **public**.
 
     Source: https://core.telegram.org/bots/api#inlinequeryresult
     """

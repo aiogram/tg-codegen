@@ -1,13 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pydantic import Field
 
 from .passport_element_error import PassportElementError
-
-if TYPE_CHECKING:  # pragma: no cover
-    pass
 
 
 class PassportElementErrorFrontSide(PassportElementError):

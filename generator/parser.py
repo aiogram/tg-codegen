@@ -1,4 +1,5 @@
 import logging
+from copy import copy
 from typing import Iterable, Generator
 
 import requests
@@ -9,13 +10,18 @@ from generator.consts import (
     ANCHOR_HEADER_PATTERN,
     DOCS_URL,
     SPECIAL_CLIENT_SUBTYPES,
-    SPECIAL_SERVER_SUBTYPES, SYMBOLS_MAP, REF_LINKS,
+    SPECIAL_SERVER_SUBTYPES,
+    SYMBOLS_MAP,
+    REF_LINKS,
+    SPECIAL_CLIENT_SUBTYPES_EXCLUDE,
 )
 from generator.normalizers import (
     normalize_description,
     normalize_method_annotation,
-    normalize_type_annotation, pythonize_name,
+    normalize_type_annotation,
+    pythonize_name,
 )
+from generator.specials import RENAMED_ENTITIES
 from generator.structures import Annotation, Entity, Group
 
 log = logging.getLogger(__name__)
@@ -54,9 +60,7 @@ class Parser:
             return
 
         if not group.childs[0].annotations:
-            log.warning(
-                "Update group %r description from first child element", group.title
-            )
+            log.warning("Update group %r description from first child element", group.title)
             group.description = group.childs[0].description
             group.childs.pop(0)
 
@@ -92,6 +96,21 @@ class Parser:
             ]:
                 child = self._parse_child(parent_tag, anchor_name)
                 group.childs.append(child)
+                if alias := RENAMED_ENTITIES.get(child.name):
+                    from_version, old_name = alias
+                    old_child = copy(child)
+                    old_child.name = old_name
+                    old_child.description = (
+                        f"Renamed from {old_name} in {from_version} Bot API version"
+                        f"\n{old_child.description}"
+                    )
+                    old_child.pretty_description = (
+                        f".. warning:\n\n"
+                        f"    Renamed from :code:`{old_name}` in {from_version} "
+                        f"bot API version and can be removed in near future\n\n"
+                        f"{old_child.pretty_description}"
+                    )
+                    group.childs.append(old_child)
 
         if group:  # Optimize last group
             self.optimize_group(group)
@@ -128,10 +147,13 @@ class Parser:
                 description.extend(self._parse_list(item))
 
         description = normalize_description("\n".join(description))
-        pretty_description = ''.join(pretty_description).strip()
+        pretty_description = "".join(pretty_description).strip()
         block = Entity(
-            anchor=anchor, name=name, description=description, pretty_description=pretty_description,
-            annotations=annotations
+            anchor=anchor,
+            name=name,
+            description=description,
+            pretty_description=pretty_description,
+            annotations=annotations,
         )
         self._set_specific_entity_attributes(block)
         block.fix_annotations_ordering()
@@ -146,13 +168,9 @@ class Parser:
         return self._set_specific_method_attributes(entity)
 
     def _set_specific_type_attributes(self, entity: Entity):
-        for (
-                (subtype_prefix, subtype_suffix),
-                base_type,
-        ) in SPECIAL_SERVER_SUBTYPES.items():
+        for ((subtype_prefix, subtype_suffix), base_type,) in SPECIAL_SERVER_SUBTYPES.items():
             if not (
-                    entity.name.startswith(subtype_prefix)
-                    and entity.name.endswith(subtype_suffix)
+                entity.name.startswith(subtype_prefix) and entity.name.endswith(subtype_suffix)
             ):
                 continue
             log.info("Handled specific type %r based on %r", entity.name, base_type)
@@ -160,34 +178,30 @@ class Parser:
             return
 
         for special_subtype_prefix, const_field in SPECIAL_CLIENT_SUBTYPES.items():
+            if entity.name in SPECIAL_CLIENT_SUBTYPES_EXCLUDE:
+                continue
             if (
-                    not entity.name.startswith(special_subtype_prefix)
-                    or entity.name == special_subtype_prefix
+                not entity.name.startswith(special_subtype_prefix)
+                or entity.name == special_subtype_prefix
             ):
                 continue
             log.info(
-                "Handled specific type %r based on %r",
-                entity.name,
-                special_subtype_prefix,
+                "Handled specific type %r based on %r", entity.name, special_subtype_prefix,
             )
             entity.extends = [special_subtype_prefix]
             for annotation in entity.annotations:
                 if annotation.name != const_field:
                     continue
-                annotation.const = repr(annotation.description.rsplit(maxsplit=1)[-1].strip(
-                    "'"
-                ))
-                log.info(
-                    "Setup constant field %r to %r", annotation.name, annotation.const
-                )
+                annotation.const = repr(annotation.description.rsplit(maxsplit=1)[-1].strip("'"))
+                log.info("Setup constant field %r to %r", annotation.name, annotation.const)
                 break
 
             break
 
-        if entity.name == 'ReplyKeyboardRemove':
+        if entity.name == "ReplyKeyboardRemove":
             for annotation in entity.annotations:
-                if annotation.name == 'remove_keyboard':
-                    annotation.const = 'True'
+                if annotation.name == "remove_keyboard":
+                    annotation.const = "True"
 
     def _set_specific_method_attributes(self, entity: Entity):
         pass
@@ -203,14 +217,13 @@ class Parser:
         header = [item.text_content() for item in head.getchildren()[0]]
 
         for body_item in body:
-            item = {
-                k: v
-                for k, v in zip(header, [item.text_content() for item in body_item])
-            }
-            item.update({
-                f"pretty_{k}": v
-                for k, v in zip(header, [node_to_rst(item) for item in body_item])
-            })
+            item = {k: v for k, v in zip(header, [item.text_content() for item in body_item])}
+            item.update(
+                {
+                    f"pretty_{k}": v
+                    for k, v in zip(header, [node_to_rst(item) for item in body_item])
+                }
+            )
             yield item
 
     def _parse_blockquote(self, blockquote: HtmlElement):
@@ -223,12 +236,12 @@ class Parser:
 
 
 def node_to_rst(node: HtmlElement) -> str:
-    result = ''.join(_node_to_rst(node))
+    result = "".join(_node_to_rst(node))
     for a, b in {
-        '*True*': ':code:`True`',
-        '*False*': ':code:`False`',
-        '_*': '_ *',
-        **SYMBOLS_MAP
+        "*True*": ":code:`True`",
+        "*False*": ":code:`False`",
+        "_*": "_ *",
+        **SYMBOLS_MAP,
     }.items():
         result = result.replace(a, b)
     # print(f'NODE {node.tag!r} ::{node.text_content()!r} -> {result!r}')
@@ -244,48 +257,53 @@ def _node_to_rst(node: HtmlElement) -> str:
     # TODO: Blockquote's
     tag = node.tag
     # print(f"\t:: {tag!r} {node.text!r} {node.tail!r} {node.attrib}")
-    tail = ''
-    if tag in {'p', 'td'}:
-        yield node.text or ''
-    elif tag == 'a':
-        href = node.attrib['href']
-        if node.text and href.startswith('#') and '-' not in href and f"#{node.text.lower()}" == href:
+    tail = ""
+    if tag in {"p", "td"}:
+        yield node.text or ""
+    elif tag == "a":
+        href = node.attrib["href"]
+        if (
+            node.text
+            and href.startswith("#")
+            and "-" not in href
+            and f"#{node.text.lower()}" == href
+        ):
             ref_name = node.text
-            ref_group = 'types' if ref_name[0].isupper() else 'methods'
+            ref_group = "types" if ref_name[0].isupper() else "methods"
             yield f":class:`aiogram.{ref_group}.{pythonize_name(ref_name)}.{ref_name[0].upper()}{ref_name[1:]}`"
         elif href in REF_LINKS:
             yield f":ref:`{node.text or href} <{REF_LINKS[href]}>`"
         else:
             node.make_links_absolute()
-            href = node.attrib['href']
+            href = node.attrib["href"]
             yield f"`{node.text or href} <{href}>`_"
-    elif tag == 'img':
-        yield node.attrib['alt']
-    elif tag in {'br', 'blockquote'}:
-        yield '\n'
-    elif tag == 'ul':
+    elif tag == "img":
+        yield node.attrib["alt"]
+    elif tag in {"br", "blockquote"}:
+        yield "\n"
+    elif tag == "ul":
         if node.text:
             yield node.text
-    elif tag == 'li':
-        yield ' - '
+    elif tag == "li":
+        yield " - "
         if node.text:
             yield node.text
-    elif tag == 'strong':
-        yield '**'
-        tail = '**'
+    elif tag == "strong":
+        yield "**"
+        tail = "**"
         yield node.text
-    elif tag == 'em':
-        yield '*'
-        tail = '*'
+    elif tag == "em":
+        yield "*"
+        tail = "*"
         yield node.text
-    elif tag == 'code':
-        yield f':code:`{node.text_content()}`'
+    elif tag == "code":
+        yield f":code:`{node.text_content()}`"
 
-    if tag == 'blockquote':
-        value = ''.join(_nodes_to_rst(node))
-        value.split('\n')
-        value = ' ' + '\n '.join(value.split('\n'))
-        yield value.rstrip() + '\n'
+    if tag == "blockquote":
+        value = "".join(_nodes_to_rst(node))
+        value.split("\n")
+        value = " " + "\n ".join(value.split("\n"))
+        yield value.rstrip() + "\n"
     else:
         yield from _nodes_to_rst(node)
 

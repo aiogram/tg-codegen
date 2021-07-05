@@ -2,12 +2,26 @@ from .animation import Animation
 from .audio import Audio
 from .base import UNSET, TelegramObject
 from .bot_command import BotCommand
+from .bot_command_scope import BotCommandScope
+from .bot_command_scope_all_chat_administrators import BotCommandScopeAllChatAdministrators
+from .bot_command_scope_all_group_chats import BotCommandScopeAllGroupChats
+from .bot_command_scope_all_private_chats import BotCommandScopeAllPrivateChats
+from .bot_command_scope_chat import BotCommandScopeChat
+from .bot_command_scope_chat_administrators import BotCommandScopeChatAdministrators
+from .bot_command_scope_chat_member import BotCommandScopeChatMember
+from .bot_command_scope_default import BotCommandScopeDefault
 from .callback_game import CallbackGame
 from .callback_query import CallbackQuery
 from .chat import Chat
 from .chat_invite_link import ChatInviteLink
 from .chat_location import ChatLocation
 from .chat_member import ChatMember
+from .chat_member_administrator import ChatMemberAdministrator
+from .chat_member_banned import ChatMemberBanned
+from .chat_member_left import ChatMemberLeft
+from .chat_member_member import ChatMemberMember
+from .chat_member_owner import ChatMemberOwner
+from .chat_member_restricted import ChatMemberRestricted
 from .chat_member_updated import ChatMemberUpdated
 from .chat_permissions import ChatPermissions
 from .chat_photo import ChatPhoto
@@ -47,6 +61,7 @@ from .inline_query_result_video import InlineQueryResultVideo
 from .inline_query_result_voice import InlineQueryResultVoice
 from .input_contact_message_content import InputContactMessageContent
 from .input_file import BufferedInputFile, FSInputFile, InputFile
+from .input_invoice_message_content import InputInvoiceMessageContent
 from .input_location_message_content import InputLocationMessageContent
 from .input_media import InputMedia
 from .input_media_animation import InputMediaAnimation
@@ -105,6 +120,7 @@ from .video_note import VideoNote
 from .voice import Voice
 from .voice_chat_ended import VoiceChatEnded
 from .voice_chat_participants_invited import VoiceChatParticipantsInvited
+from .voice_chat_scheduled import VoiceChatScheduled
 from .voice_chat_started import VoiceChatStarted
 from .webhook_info import WebhookInfo
 
@@ -136,6 +152,7 @@ __all__ = (
     "Venue",
     "ProximityAlertTriggered",
     "MessageAutoDeleteTimerChanged",
+    "VoiceChatScheduled",
     "VoiceChatStarted",
     "VoiceChatEnded",
     "VoiceChatParticipantsInvited",
@@ -153,10 +170,24 @@ __all__ = (
     "ChatPhoto",
     "ChatInviteLink",
     "ChatMember",
+    "ChatMemberOwner",
+    "ChatMemberAdministrator",
+    "ChatMemberMember",
+    "ChatMemberRestricted",
+    "ChatMemberLeft",
+    "ChatMemberBanned",
     "ChatMemberUpdated",
     "ChatPermissions",
     "ChatLocation",
     "BotCommand",
+    "BotCommandScope",
+    "BotCommandScopeDefault",
+    "BotCommandScopeAllPrivateChats",
+    "BotCommandScopeAllGroupChats",
+    "BotCommandScopeAllChatAdministrators",
+    "BotCommandScopeChat",
+    "BotCommandScopeChatAdministrators",
+    "BotCommandScopeChatMember",
     "ResponseParameters",
     "InputMedia",
     "InputMediaPhoto",
@@ -195,6 +226,7 @@ __all__ = (
     "InputLocationMessageContent",
     "InputVenueMessageContent",
     "InputContactMessageContent",
+    "InputInvoiceMessageContent",
     "ChosenInlineResult",
     "LabeledPrice",
     "Invoice",

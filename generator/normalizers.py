@@ -1,6 +1,12 @@
 import functools
 
-from generator.consts import BUILTIN_TYPES, READ_MORE_PATTERN, RETURN_PATTERNS, SYMBOLS_MAP
+from generator.consts import (
+    BUILTIN_TYPES,
+    READ_MORE_PATTERN,
+    RETURN_PATTERNS,
+    SYMBOLS_MAP,
+    ALIASED_TYPES_PATTERNS,
+)
 
 
 def normalize_description(text: str) -> str:
@@ -13,7 +19,7 @@ def normalize_description(text: str) -> str:
 
 def normalize_annotation(item: dict):
     for key in list(item.keys()):
-        if key.startswith('pretty_') and key != 'pretty_Description':
+        if key.startswith("pretty_") and key != "pretty_Description":
             item.pop(key)
             continue
         item[key.lower()] = item.pop(key)
@@ -30,13 +36,21 @@ def normalize_method_annotation(item: dict):
 def normalize_type_annotation(item: dict):
     normalize_annotation(item)
 
-    item["name"] = item.pop("field")
+    item["name"] = item.pop("field", item.pop("parameter", None))
 
     if item["description"].startswith("Optional"):
         item["required"] = False
         item["description"] = item["description"][10:]
     else:
         item["required"] = True
+
+
+@functools.lru_cache()
+def replace_special_types(string):
+    for pattern, new_value in ALIASED_TYPES_PATTERNS.items():
+        if pattern.search(string):
+            return pattern.sub(f"\\1{new_value}\\3", string)
+    return string
 
 
 @functools.lru_cache()
@@ -76,7 +90,6 @@ def get_returning(description):
     parts = list(filter(lambda item: "return" in item.lower(), description.split(".")))
     if not parts:
         raise RuntimeError(f"Failed to parse returning type for {description!r}")
-        return "Any", ""
     sentence = ". ".join(map(str.strip, parts))
     return_type = None
 
@@ -133,4 +146,4 @@ def first_line(text: str) -> str:
 
 
 def md_line_breaks(text: str):
-    return text.replace('\n', '\n\n')
+    return text.replace("\n", "\n\n")

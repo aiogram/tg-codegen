@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import List
 
 from pydantic import Field
 
 from .passport_element_error import PassportElementError
-
-if TYPE_CHECKING:  # pragma: no cover
-    pass
 
 
 class PassportElementErrorFiles(PassportElementError):

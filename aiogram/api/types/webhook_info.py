@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import List, Optional
 
 from .base import TelegramObject
-
-if TYPE_CHECKING:  # pragma: no cover
-    pass
 
 
 class WebhookInfo(TelegramObject):

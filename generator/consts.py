@@ -1,4 +1,5 @@
 import re
+from typing import List, Dict
 
 DOCS_URL = "https://core.telegram.org/bots/api"
 
@@ -29,8 +30,16 @@ RETURN_PATTERNS = [
     re.compile(r"(?P<type>[a-z]+) is returned", flags=RE_FLAGS),
     re.compile(r"Returns the [a-z ]+ as (?P<type>[a-z]+) object", flags=RE_FLAGS),
     re.compile(r"Returns (?P<type>[a-z]+)", flags=RE_FLAGS),
-
 ]
+ALIASED_TYPES = {
+    "ChatMember": "Union[ChatMemberOwner, ChatMemberAdministrator, ChatMemberMember,"
+    " ChatMemberRestricted, ChatMemberLeft, ChatMemberBanned]"
+}
+ALIASED_TYPES_PATTERNS: Dict[re.Pattern, str] = {
+    re.compile(f"(\\W|^)(ChatMember)(\\W|$)", flags=RE_FLAGS): value
+    for key, value in ALIASED_TYPES.items()
+}
+
 BUILTIN_TYPES = {
     "String": "str",
     "Integer": "int",
@@ -47,7 +56,10 @@ SPECIAL_CLIENT_SUBTYPES = {
     "InlineQueryResult": "type",
     "InputMedia": "type",
     "PassportElementError": "source",
+    "BotCommandScope": "type",
+    "ChatMember": "status",
 }
+SPECIAL_CLIENT_SUBTYPES_EXCLUDE = {"ChatMemberUpdated"}
 
 SPECIAL_SERVER_SUBTYPES = {("Input", "MessageContent"): "InputMessageContent"}
 
@@ -55,5 +67,5 @@ TELEGRAM_TYPE_PATTERN = r"(^|\[| ){type}(\]|$|,)"
 
 
 REF_LINKS = {
-    '#sending-files': "sending-files",
+    "#sending-files": "sending-files",
 }
