@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from ..types import UNSET, InlineKeyboardMarkup, Message, MessageEntity
 from .base import Request, TelegramMethod, prepare_parse_mode
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from ..client.bot import Bot
 
 
@@ -29,7 +29,7 @@ class EditMessageText(TelegramMethod[Union[Message, bool]]):
     parse_mode: Optional[str] = UNSET
     """Mode for parsing entities in the message text. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details."""
     entities: Optional[List[MessageEntity]] = None
-    """List of special entities that appear in message text, which can be specified instead of *parse_mode*"""
+    """A JSON-serialized list of special entities that appear in message text, which can be specified instead of *parse_mode*"""
     disable_web_page_preview: Optional[bool] = None
     """Disables link previews for links in this message"""
     reply_markup: Optional[InlineKeyboardMarkup] = None

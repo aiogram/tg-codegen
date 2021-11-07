@@ -7,11 +7,13 @@ from ..methods import (
     AnswerInlineQuery,
     AnswerPreCheckoutQuery,
     AnswerShippingQuery,
+    ApproveChatJoinRequest,
     BanChatMember,
     Close,
     CopyMessage,
     CreateChatInviteLink,
     CreateNewStickerSet,
+    DeclineChatJoinRequest,
     DeleteChatPhoto,
     DeleteChatStickerSet,
     DeleteMessage,
@@ -246,7 +248,7 @@ class Bot(BaseBot):
 
     async def get_me(self, request_timeout: Optional[int] = None,) -> User:
         """
-        A simple method for testing your bot's auth token. Requires no parameters. Returns basic information about the bot in form of a :class:`aiogram.types.user.User` object.
+        A simple method for testing your bot's authentication token. Requires no parameters. Returns basic information about the bot in form of a :class:`aiogram.types.user.User` object.
 
         Source: https://core.telegram.org/bots/api#getme
 
@@ -304,7 +306,7 @@ class Bot(BaseBot):
         :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
         :param text: Text of the message to be sent, 1-4096 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the message text. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param entities: List of special entities that appear in message text, which can be specified instead of *parse_mode*
+        :param entities: A JSON-serialized list of special entities that appear in message text, which can be specified instead of *parse_mode*
         :param disable_web_page_preview: Disables link previews for links in this message
         :param disable_notification: Sends the message `silently <https://telegram.org/blog/channels-2-0#silent-messages>`_. Users will receive a notification with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
@@ -380,7 +382,7 @@ class Bot(BaseBot):
         :param message_id: Message identifier in the chat specified in *from_chat_id*
         :param caption: New caption for media, 0-1024 characters after entities parsing. If not specified, the original caption is kept
         :param parse_mode: Mode for parsing entities in the new caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param caption_entities: List of special entities that appear in the new caption, which can be specified instead of *parse_mode*
+        :param caption_entities: A JSON-serialized list of special entities that appear in the new caption, which can be specified instead of *parse_mode*
         :param disable_notification: Sends the message `silently <https://telegram.org/blog/channels-2-0#silent-messages>`_. Users will receive a notification with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
         :param allow_sending_without_reply: Pass :code:`True`, if the message should be sent even if the specified replied-to message is not found
@@ -426,7 +428,7 @@ class Bot(BaseBot):
         :param photo: Photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new photo using multipart/form-data. The photo must be at most 10 MB in size. The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20. :ref:`More info on Sending Files » <sending-files>`
         :param caption: Photo caption (may also be used when resending photos by *file_id*), 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the photo caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param caption_entities: List of special entities that appear in the caption, which can be specified instead of *parse_mode*
+        :param caption_entities: A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*
         :param disable_notification: Sends the message `silently <https://telegram.org/blog/channels-2-0#silent-messages>`_. Users will receive a notification with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
         :param allow_sending_without_reply: Pass :code:`True`, if the message should be sent even if the specified replied-to message is not found
@@ -476,7 +478,7 @@ class Bot(BaseBot):
         :param audio: Audio file to send. Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an audio file from the Internet, or upload a new one using multipart/form-data. :ref:`More info on Sending Files » <sending-files>`
         :param caption: Audio caption, 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the audio caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param caption_entities: List of special entities that appear in the caption, which can be specified instead of *parse_mode*
+        :param caption_entities: A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*
         :param duration: Duration of the audio in seconds
         :param performer: Performer
         :param title: Track name
@@ -532,7 +534,7 @@ class Bot(BaseBot):
         :param thumb: Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can't be reused and can be only uploaded as a new file, so you can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using multipart/form-data under <file_attach_name>. :ref:`More info on Sending Files » <sending-files>`
         :param caption: Document caption (may also be used when resending documents by *file_id*), 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the document caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param caption_entities: List of special entities that appear in the caption, which can be specified instead of *parse_mode*
+        :param caption_entities: A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*
         :param disable_content_type_detection: Disables automatic server-side content type detection for files uploaded using multipart/form-data
         :param disable_notification: Sends the message `silently <https://telegram.org/blog/channels-2-0#silent-messages>`_. Users will receive a notification with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
@@ -589,7 +591,7 @@ class Bot(BaseBot):
         :param thumb: Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can't be reused and can be only uploaded as a new file, so you can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using multipart/form-data under <file_attach_name>. :ref:`More info on Sending Files » <sending-files>`
         :param caption: Video caption (may also be used when resending videos by *file_id*), 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the video caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param caption_entities: List of special entities that appear in the caption, which can be specified instead of *parse_mode*
+        :param caption_entities: A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*
         :param supports_streaming: Pass :code:`True`, if the uploaded video is suitable for streaming
         :param disable_notification: Sends the message `silently <https://telegram.org/blog/channels-2-0#silent-messages>`_. Users will receive a notification with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
@@ -648,7 +650,7 @@ class Bot(BaseBot):
         :param thumb: Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can't be reused and can be only uploaded as a new file, so you can pass 'attach://<file_attach_name>' if the thumbnail was uploaded using multipart/form-data under <file_attach_name>. :ref:`More info on Sending Files » <sending-files>`
         :param caption: Animation caption (may also be used when resending animation by *file_id*), 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the animation caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param caption_entities: List of special entities that appear in the caption, which can be specified instead of *parse_mode*
+        :param caption_entities: A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*
         :param disable_notification: Sends the message `silently <https://telegram.org/blog/channels-2-0#silent-messages>`_. Users will receive a notification with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
         :param allow_sending_without_reply: Pass :code:`True`, if the message should be sent even if the specified replied-to message is not found
@@ -698,7 +700,7 @@ class Bot(BaseBot):
         :param voice: Audio file to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. :ref:`More info on Sending Files » <sending-files>`
         :param caption: Voice message caption, 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the voice message caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param caption_entities: List of special entities that appear in the caption, which can be specified instead of *parse_mode*
+        :param caption_entities: A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*
         :param duration: Duration of the voice message in seconds
         :param disable_notification: Sends the message `silently <https://telegram.org/blog/channels-2-0#silent-messages>`_. Users will receive a notification with no sound.
         :param reply_to_message_id: If the message is a reply, ID of the original message
@@ -901,7 +903,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to stop updating a live location message before *live_period* expires. On success, if the message was sent by the bot, the sent :class:`aiogram.types.message.Message` is returned, otherwise :code:`True` is returned.
+        Use this method to stop updating a live location message before *live_period* expires. On success, if the message is not an inline message, the edited :class:`aiogram.types.message.Message` is returned, otherwise :code:`True` is returned.
 
         Source: https://core.telegram.org/bots/api#stopmessagelivelocation
 
@@ -910,8 +912,8 @@ class Bot(BaseBot):
         :param inline_message_id: Required if *chat_id* and *message_id* are not specified. Identifier of the inline message
         :param reply_markup: A JSON-serialized object for a new `inline keyboard <https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating>`_.
         :param request_timeout: Request timeout
-        :return: On success, if the message was sent by the bot, the sent Message is returned,
-            otherwise True is returned.
+        :return: On success, if the message is not an inline message, the edited Message is
+            returned, otherwise True is returned.
         """
         call = StopMessageLiveLocation(
             chat_id=chat_id,
@@ -1054,13 +1056,13 @@ class Bot(BaseBot):
         :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
         :param question: Poll question, 1-300 characters
         :param options: A JSON-serialized list of answer options, 2-10 strings 1-100 characters each
-        :param is_anonymous: True, if the poll needs to be anonymous, defaults to :code:`True`
+        :param is_anonymous: :code:`True`, if the poll needs to be anonymous, defaults to :code:`True`
         :param type: Poll type, 'quiz' or 'regular', defaults to 'regular'
-        :param allows_multiple_answers: True, if the poll allows multiple answers, ignored for polls in quiz mode, defaults to :code:`False`
+        :param allows_multiple_answers: :code:`True`, if the poll allows multiple answers, ignored for polls in quiz mode, defaults to :code:`False`
         :param correct_option_id: 0-based identifier of the correct answer option, required for polls in quiz mode
         :param explanation: Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most 2 line feeds after entities parsing
         :param explanation_parse_mode: Mode for parsing entities in the explanation. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param explanation_entities: List of special entities that appear in the poll explanation, which can be specified instead of *parse_mode*
+        :param explanation_entities: A JSON-serialized list of special entities that appear in the poll explanation, which can be specified instead of *parse_mode*
         :param open_period: Amount of time in seconds the poll will be active after creation, 5-600. Can't be used together with *close_date*.
         :param close_date: Point in time (Unix timestamp) when the poll will be automatically closed. Must be at least 5 and no more than 600 seconds in the future. Can't be used together with *open_period*.
         :param is_closed: Pass :code:`True`, if the poll needs to be immediately closed. This can be useful for poll preview.
@@ -1141,7 +1143,7 @@ class Bot(BaseBot):
         Source: https://core.telegram.org/bots/api#sendchataction
 
         :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
-        :param action: Type of action to broadcast. Choose one, depending on what the user is about to receive: *typing* for `text messages <https://core.telegram.org/bots/api#sendmessage>`_, *upload_photo* for `photos <https://core.telegram.org/bots/api#sendphoto>`_, *record_video* or *upload_video* for `videos <https://core.telegram.org/bots/api#sendvideo>`_, *record_voice* or *upload_voice* for `voice notes <https://core.telegram.org/bots/api#sendvoice>`_, *upload_document* for `general files <https://core.telegram.org/bots/api#senddocument>`_, *find_location* for `location data <https://core.telegram.org/bots/api#sendlocation>`_, *record_video_note* or *upload_video_note* for `video notes <https://core.telegram.org/bots/api#sendvideonote>`_.
+        :param action: Type of action to broadcast. Choose one, depending on what the user is about to receive: *typing* for `text messages <https://core.telegram.org/bots/api#sendmessage>`_, *upload_photo* for `photos <https://core.telegram.org/bots/api#sendphoto>`_, *record_video* or *upload_video* for `videos <https://core.telegram.org/bots/api#sendvideo>`_, *record_voice* or *upload_voice* for `voice notes <https://core.telegram.org/bots/api#sendvoice>`_, *upload_document* for `general files <https://core.telegram.org/bots/api#senddocument>`_, *choose_sticker* for `stickers <https://core.telegram.org/bots/api#sendsticker>`_, *find_location* for `location data <https://core.telegram.org/bots/api#sendlocation>`_, *record_video_note* or *upload_video_note* for `video notes <https://core.telegram.org/bots/api#sendvideonote>`_.
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1192,7 +1194,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless `unbanned <https://core.telegram.org/bots/api#unbanchatmember>`_ first. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+        Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless `unbanned <https://core.telegram.org/bots/api#unbanchatmember>`_ first. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#banchatmember
 
@@ -1225,7 +1227,7 @@ class Bot(BaseBot):
 
             Renamed from :code:`kickChatMember` in 5.3 bot API version and can be removed in near future
 
-        Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless `unbanned <https://core.telegram.org/bots/api#unbanchatmember>`_ first. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+        Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless `unbanned <https://core.telegram.org/bots/api#unbanchatmember>`_ first. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#banchatmember
 
@@ -1276,7 +1278,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for this to work and must have the appropriate admin rights. Pass :code:`True` for all permissions to lift restrictions from a user. Returns :code:`True` on success.
+        Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for this to work and must have the appropriate administrator rights. Pass :code:`True` for all permissions to lift restrictions from a user. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#restrictchatmember
 
@@ -1310,23 +1312,23 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to promote or demote a user in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Pass :code:`False` for all boolean parameters to demote a user. Returns :code:`True` on success.
+        Use this method to promote or demote a user in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Pass :code:`False` for all boolean parameters to demote a user. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#promotechatmember
 
         :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
         :param user_id: Unique identifier of the target user
         :param is_anonymous: Pass :code:`True`, if the administrator's presence in the chat is hidden
-        :param can_manage_chat: Pass True, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege
-        :param can_post_messages: Pass True, if the administrator can create channel posts, channels only
-        :param can_edit_messages: Pass True, if the administrator can edit messages of other users and can pin messages, channels only
-        :param can_delete_messages: Pass True, if the administrator can delete messages of other users
-        :param can_manage_voice_chats: Pass True, if the administrator can manage voice chats
-        :param can_restrict_members: Pass True, if the administrator can restrict, ban or unban chat members
-        :param can_promote_members: Pass True, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by him)
-        :param can_change_info: Pass True, if the administrator can change chat title, photo and other settings
-        :param can_invite_users: Pass True, if the administrator can invite new users to the chat
-        :param can_pin_messages: Pass True, if the administrator can pin messages, supergroups only
+        :param can_manage_chat: Pass :code:`True`, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege
+        :param can_post_messages: Pass :code:`True`, if the administrator can create channel posts, channels only
+        :param can_edit_messages: Pass :code:`True`, if the administrator can edit messages of other users and can pin messages, channels only
+        :param can_delete_messages: Pass :code:`True`, if the administrator can delete messages of other users
+        :param can_manage_voice_chats: Pass :code:`True`, if the administrator can manage voice chats
+        :param can_restrict_members: Pass :code:`True`, if the administrator can restrict, ban or unban chat members
+        :param can_promote_members: Pass :code:`True`, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by him)
+        :param can_change_info: Pass :code:`True`, if the administrator can change chat title, photo and other settings
+        :param can_invite_users: Pass :code:`True`, if the administrator can invite new users to the chat
+        :param can_pin_messages: Pass :code:`True`, if the administrator can pin messages, supergroups only
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1377,12 +1379,12 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to set default chat permissions for all members. The bot must be an administrator in the group or a supergroup for this to work and must have the *can_restrict_members* admin rights. Returns :code:`True` on success.
+        Use this method to set default chat permissions for all members. The bot must be an administrator in the group or a supergroup for this to work and must have the *can_restrict_members* administrator rights. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#setchatpermissions
 
         :param chat_id: Unique identifier for the target chat or username of the target supergroup (in the format :code:`@supergroupusername`)
-        :param permissions: New default chat permissions
+        :param permissions: A JSON-serialized object for new default chat permissions
         :param request_timeout: Request timeout
         :return: Returns True on success.
         """
@@ -1393,7 +1395,7 @@ class Bot(BaseBot):
         self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
     ) -> str:
         """
-        Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns the new invite link as *String* on success.
+        Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the new invite link as *String* on success.
 
          Note: Each administrator in a chat generates their own invite links. Bots can't use invite links generated by other administrators. If you want your bot to work with invite links, it will need to generate its own link using :class:`aiogram.methods.export_chat_invite_link.ExportChatInviteLink` or by calling the :class:`aiogram.methods.get_chat.GetChat` method. If your bot needs to generate a new primary invite link replacing its previous one, use :class:`aiogram.methods.export_chat_invite_link.ExportChatInviteLink` again.
 
@@ -1409,23 +1411,31 @@ class Bot(BaseBot):
     async def create_chat_invite_link(
         self,
         chat_id: Union[int, str],
+        name: Optional[str] = None,
         expire_date: Optional[int] = None,
         member_limit: Optional[int] = None,
+        creates_join_request: Optional[bool] = None,
         request_timeout: Optional[int] = None,
     ) -> ChatInviteLink:
         """
-        Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. The link can be revoked using the method :class:`aiogram.methods.revoke_chat_invite_link.RevokeChatInviteLink`. Returns the new invite link as :class:`aiogram.types.chat_invite_link.ChatInviteLink` object.
+        Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. The link can be revoked using the method :class:`aiogram.methods.revoke_chat_invite_link.RevokeChatInviteLink`. Returns the new invite link as :class:`aiogram.types.chat_invite_link.ChatInviteLink` object.
 
         Source: https://core.telegram.org/bots/api#createchatinvitelink
 
         :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
+        :param name: Invite link name; 0-32 characters
         :param expire_date: Point in time (Unix timestamp) when the link will expire
         :param member_limit: Maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999
+        :param creates_join_request: :code:`True`, if users joining the chat via the link need to be approved by chat administrators. If :code:`True`, *member_limit* can't be specified
         :param request_timeout: Request timeout
         :return: Returns the new invite link as ChatInviteLink object.
         """
         call = CreateChatInviteLink(
-            chat_id=chat_id, expire_date=expire_date, member_limit=member_limit,
+            chat_id=chat_id,
+            name=name,
+            expire_date=expire_date,
+            member_limit=member_limit,
+            creates_join_request=creates_join_request,
         )
         return await self(call, request_timeout=request_timeout)
 
@@ -1433,27 +1443,33 @@ class Bot(BaseBot):
         self,
         chat_id: Union[int, str],
         invite_link: str,
+        name: Optional[str] = None,
         expire_date: Optional[int] = None,
         member_limit: Optional[int] = None,
+        creates_join_request: Optional[bool] = None,
         request_timeout: Optional[int] = None,
     ) -> ChatInviteLink:
         """
-        Use this method to edit a non-primary invite link created by the bot. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns the edited invite link as a :class:`aiogram.types.chat_invite_link.ChatInviteLink` object.
+        Use this method to edit a non-primary invite link created by the bot. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the edited invite link as a :class:`aiogram.types.chat_invite_link.ChatInviteLink` object.
 
         Source: https://core.telegram.org/bots/api#editchatinvitelink
 
         :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
         :param invite_link: The invite link to edit
+        :param name: Invite link name; 0-32 characters
         :param expire_date: Point in time (Unix timestamp) when the link will expire
         :param member_limit: Maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999
+        :param creates_join_request: :code:`True`, if users joining the chat via the link need to be approved by chat administrators. If :code:`True`, *member_limit* can't be specified
         :param request_timeout: Request timeout
         :return: Returns the edited invite link as a ChatInviteLink object.
         """
         call = EditChatInviteLink(
             chat_id=chat_id,
             invite_link=invite_link,
+            name=name,
             expire_date=expire_date,
             member_limit=member_limit,
+            creates_join_request=creates_join_request,
         )
         return await self(call, request_timeout=request_timeout)
 
@@ -1461,7 +1477,7 @@ class Bot(BaseBot):
         self, chat_id: Union[int, str], invite_link: str, request_timeout: Optional[int] = None,
     ) -> ChatInviteLink:
         """
-        Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is automatically generated. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns the revoked invite link as :class:`aiogram.types.chat_invite_link.ChatInviteLink` object.
+        Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is automatically generated. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the revoked invite link as :class:`aiogram.types.chat_invite_link.ChatInviteLink` object.
 
         Source: https://core.telegram.org/bots/api#revokechatinvitelink
 
@@ -1473,11 +1489,43 @@ class Bot(BaseBot):
         call = RevokeChatInviteLink(chat_id=chat_id, invite_link=invite_link,)
         return await self(call, request_timeout=request_timeout)
 
+    async def approve_chat_join_request(
+        self, chat_id: Union[int, str], user_id: int, request_timeout: Optional[int] = None,
+    ) -> bool:
+        """
+        Use this method to approve a chat join request. The bot must be an administrator in the chat for this to work and must have the *can_invite_users* administrator right. Returns :code:`True` on success.
+
+        Source: https://core.telegram.org/bots/api#approvechatjoinrequest
+
+        :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
+        :param user_id: Unique identifier of the target user
+        :param request_timeout: Request timeout
+        :return: Returns True on success.
+        """
+        call = ApproveChatJoinRequest(chat_id=chat_id, user_id=user_id,)
+        return await self(call, request_timeout=request_timeout)
+
+    async def decline_chat_join_request(
+        self, chat_id: Union[int, str], user_id: int, request_timeout: Optional[int] = None,
+    ) -> bool:
+        """
+        Use this method to decline a chat join request. The bot must be an administrator in the chat for this to work and must have the *can_invite_users* administrator right. Returns :code:`True` on success.
+
+        Source: https://core.telegram.org/bots/api#declinechatjoinrequest
+
+        :param chat_id: Unique identifier for the target chat or username of the target channel (in the format :code:`@channelusername`)
+        :param user_id: Unique identifier of the target user
+        :param request_timeout: Request timeout
+        :return: Returns True on success.
+        """
+        call = DeclineChatJoinRequest(chat_id=chat_id, user_id=user_id,)
+        return await self(call, request_timeout=request_timeout)
+
     async def set_chat_photo(
         self, chat_id: Union[int, str], photo: InputFile, request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+        Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#setchatphoto
 
@@ -1493,7 +1541,7 @@ class Bot(BaseBot):
         self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+        Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#deletechatphoto
 
@@ -1508,7 +1556,7 @@ class Bot(BaseBot):
         self, chat_id: Union[int, str], title: str, request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to change the title of a chat. Titles can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+        Use this method to change the title of a chat. Titles can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#setchattitle
 
@@ -1527,7 +1575,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to change the description of a group, a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+        Use this method to change the description of a group, a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#setchatdescription
 
@@ -1547,7 +1595,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' admin right in a supergroup or 'can_edit_messages' admin right in a channel. Returns :code:`True` on success.
+        Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' administrator right in a supergroup or 'can_edit_messages' administrator right in a channel. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#pinchatmessage
 
@@ -1569,7 +1617,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' admin right in a supergroup or 'can_edit_messages' admin right in a channel. Returns :code:`True` on success.
+        Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' administrator right in a supergroup or 'can_edit_messages' administrator right in a channel. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#unpinchatmessage
 
@@ -1585,7 +1633,7 @@ class Bot(BaseBot):
         self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' admin right in a supergroup or 'can_edit_messages' admin right in a channel. Returns :code:`True` on success.
+        Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' administrator right in a supergroup or 'can_edit_messages' administrator right in a channel. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#unpinallchatmessages
 
@@ -1717,7 +1765,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Use the field *can_set_sticker_set* optionally returned in :class:`aiogram.methods.get_chat.GetChat` requests to check if the bot can use this method. Returns :code:`True` on success.
+        Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Use the field *can_set_sticker_set* optionally returned in :class:`aiogram.methods.get_chat.GetChat` requests to check if the bot can use this method. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#setchatstickerset
 
@@ -1734,7 +1782,7 @@ class Bot(BaseBot):
         self, chat_id: Union[int, str], request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Use this method to delete a group sticker set from a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Use the field *can_set_sticker_set* optionally returned in :class:`aiogram.methods.get_chat.GetChat` requests to check if the bot can use this method. Returns :code:`True` on success.
+        Use this method to delete a group sticker set from a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Use the field *can_set_sticker_set* optionally returned in :class:`aiogram.methods.get_chat.GetChat` requests to check if the bot can use this method. Returns :code:`True` on success.
 
         Source: https://core.telegram.org/bots/api#deletechatstickerset
 
@@ -1764,7 +1812,7 @@ class Bot(BaseBot):
 
         :param callback_query_id: Unique identifier for the query to be answered
         :param text: Text of the notification. If not specified, nothing will be shown to the user, 0-200 characters
-        :param show_alert: If *true*, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to *false*.
+        :param show_alert: If :code:`True`, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to *false*.
         :param url: URL that will be opened by the user's client. If you have created a :class:`aiogram.types.game.Game` and accepted the conditions via `@Botfather <https://t.me/botfather>`_, specify the URL that opens your game — note that this will only work if the query comes from a `https://core.telegram.org/bots/api#inlinekeyboardbutton <https://core.telegram.org/bots/api#inlinekeyboardbutton>`_ *callback_game* button.
         :param cache_time: The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram apps will support caching starting in version 3.14. Defaults to 0.
         :param request_timeout: Request timeout
@@ -1866,7 +1914,7 @@ class Bot(BaseBot):
         :param message_id: Required if *inline_message_id* is not specified. Identifier of the message to edit
         :param inline_message_id: Required if *chat_id* and *message_id* are not specified. Identifier of the inline message
         :param parse_mode: Mode for parsing entities in the message text. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param entities: List of special entities that appear in message text, which can be specified instead of *parse_mode*
+        :param entities: A JSON-serialized list of special entities that appear in message text, which can be specified instead of *parse_mode*
         :param disable_web_page_preview: Disables link previews for links in this message
         :param reply_markup: A JSON-serialized object for an `inline keyboard <https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating>`_.
         :param request_timeout: Request timeout
@@ -1906,7 +1954,7 @@ class Bot(BaseBot):
         :param inline_message_id: Required if *chat_id* and *message_id* are not specified. Identifier of the inline message
         :param caption: New caption of the message, 0-1024 characters after entities parsing
         :param parse_mode: Mode for parsing entities in the message caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details.
-        :param caption_entities: List of special entities that appear in the caption, which can be specified instead of *parse_mode*
+        :param caption_entities: A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*
         :param reply_markup: A JSON-serialized object for an `inline keyboard <https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating>`_.
         :param request_timeout: Request timeout
         :return: On success, if the edited message is not an inline message, the edited Message is
@@ -1933,7 +1981,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit animation, audio, document, photo, or video messages. If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo or a video otherwise. When an inline message is edited, a new file can't be uploaded. Use a previously uploaded file via its file_id or specify a URL. On success, if the edited message was sent by the bot, the edited :class:`aiogram.types.message.Message` is returned, otherwise :code:`True` is returned.
+        Use this method to edit animation, audio, document, photo, or video messages. If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo or a video otherwise. When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL. On success, if the edited message is not an inline message, the edited :class:`aiogram.types.message.Message` is returned, otherwise :code:`True` is returned.
 
         Source: https://core.telegram.org/bots/api#editmessagemedia
 
@@ -1943,7 +1991,7 @@ class Bot(BaseBot):
         :param inline_message_id: Required if *chat_id* and *message_id* are not specified. Identifier of the inline message
         :param reply_markup: A JSON-serialized object for a new `inline keyboard <https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating>`_.
         :param request_timeout: Request timeout
-        :return: On success, if the edited message was sent by the bot, the edited Message is
+        :return: On success, if the edited message is not an inline message, the edited Message is
             returned, otherwise True is returned.
         """
         call = EditMessageMedia(
@@ -1992,7 +2040,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> Poll:
         """
-        Use this method to stop a poll which was sent by the bot. On success, the stopped :class:`aiogram.types.poll.Poll` with the final results is returned.
+        Use this method to stop a poll which was sent by the bot. On success, the stopped :class:`aiogram.types.poll.Poll` is returned.
 
         Source: https://core.telegram.org/bots/api#stoppoll
 
@@ -2000,7 +2048,7 @@ class Bot(BaseBot):
         :param message_id: Identifier of the original message with the poll
         :param reply_markup: A JSON-serialized object for a new message `inline keyboard <https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating>`_.
         :param request_timeout: Request timeout
-        :return: On success, the stopped Poll with the final results is returned.
+        :return: On success, the stopped Poll is returned.
         """
         call = StopPoll(chat_id=chat_id, message_id=message_id, reply_markup=reply_markup,)
         return await self(call, request_timeout=request_timeout)
@@ -2387,13 +2435,13 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API will send an :class:`aiogram.types.update.Update` with a *shipping_query* field to the bot. Use this method to reply to shipping queries. On success, True is returned.
+        If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API will send an :class:`aiogram.types.update.Update` with a *shipping_query* field to the bot. Use this method to reply to shipping queries. On success, :code:`True` is returned.
 
         Source: https://core.telegram.org/bots/api#answershippingquery
 
         :param shipping_query_id: Unique identifier for the query to be answered
-        :param ok: Specify True if delivery to the specified address is possible and False if there are any problems (for example, if delivery to the specified address is not possible)
-        :param shipping_options: Required if *ok* is True. A JSON-serialized array of available shipping options.
+        :param ok: Specify :code:`True` if delivery to the specified address is possible and False if there are any problems (for example, if delivery to the specified address is not possible)
+        :param shipping_options: Required if *ok* is :code:`True`. A JSON-serialized array of available shipping options.
         :param error_message: Required if *ok* is False. Error message in human readable form that explains why it is impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable'). Telegram will display this message to the user.
         :param request_timeout: Request timeout
         :return: On success, True is returned.
@@ -2414,7 +2462,7 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> bool:
         """
-        Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of an :class:`aiogram.types.update.Update` with the field *pre_checkout_query*. Use this method to respond to such pre-checkout queries. On success, True is returned. **Note:** The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.
+        Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of an :class:`aiogram.types.update.Update` with the field *pre_checkout_query*. Use this method to respond to such pre-checkout queries. On success, :code:`True` is returned. **Note:** The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.
 
         Source: https://core.telegram.org/bots/api#answerprecheckoutquery
 
@@ -2507,21 +2555,21 @@ class Bot(BaseBot):
         request_timeout: Optional[int] = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to set the score of the specified user in a game. On success, if the message was sent by the bot, returns the edited :class:`aiogram.types.message.Message`, otherwise returns :code:`True`. Returns an error, if the new score is not greater than the user's current score in the chat and *force* is :code:`False`.
+        Use this method to set the score of the specified user in a game message. On success, if the message is not an inline message, the :class:`aiogram.types.message.Message` is returned, otherwise :code:`True` is returned. Returns an error, if the new score is not greater than the user's current score in the chat and *force* is :code:`False`.
 
         Source: https://core.telegram.org/bots/api#setgamescore
 
         :param user_id: User identifier
         :param score: New score, must be non-negative
-        :param force: Pass True, if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters
-        :param disable_edit_message: Pass True, if the game message should not be automatically edited to include the current scoreboard
+        :param force: Pass :code:`True`, if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters
+        :param disable_edit_message: Pass :code:`True`, if the game message should not be automatically edited to include the current scoreboard
         :param chat_id: Required if *inline_message_id* is not specified. Unique identifier for the target chat
         :param message_id: Required if *inline_message_id* is not specified. Identifier of the sent message
         :param inline_message_id: Required if *chat_id* and *message_id* are not specified. Identifier of the inline message
         :param request_timeout: Request timeout
-        :return: On success, if the message was sent by the bot, returns the edited Message,
-            otherwise returns True. Returns an error, if the new score is not greater than
-            the user's current score in the chat and force is False.
+        :return: On success, if the message is not an inline message, the Message is returned,
+            otherwise True is returned. Returns an error, if the new score is not greater
+            than the user's current score in the chat and force is False.
         """
         call = SetGameScore(
             user_id=user_id,

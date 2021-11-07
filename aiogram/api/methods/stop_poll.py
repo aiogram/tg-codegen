@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 from ..types import InlineKeyboardMarkup, Poll
 from .base import Request, TelegramMethod
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from ..client.bot import Bot
 
 
 class StopPoll(TelegramMethod[Poll]):
     """
-    Use this method to stop a poll which was sent by the bot. On success, the stopped :class:`aiogram.types.poll.Poll` with the final results is returned.
+    Use this method to stop a poll which was sent by the bot. On success, the stopped :class:`aiogram.types.poll.Poll` is returned.
 
     Source: https://core.telegram.org/bots/api#stoppoll
     """

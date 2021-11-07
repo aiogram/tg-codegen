@@ -4,10 +4,11 @@ from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .photo_size import PhotoSize
 
 
+# === Generated region: Animation ===
 class Animation(TelegramObject):
     """
     This object represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
@@ -32,4 +33,4 @@ class Animation(TelegramObject):
     mime_type: Optional[str] = None
     """*Optional*. MIME type of the file as defined by sender"""
     file_size: Optional[int] = None
-    """*Optional*. File size"""
+    """*Optional*. File size in bytes"""

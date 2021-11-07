@@ -7,7 +7,7 @@ from pydantic import Field
 from .base import UNSET
 from .inline_query_result import InlineQueryResult
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .inline_keyboard_markup import InlineKeyboardMarkup
     from .input_message_content import InputMessageContent
     from .message_entity import MessageEntity
@@ -25,7 +25,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
     id: str
     """Unique identifier for this result, 1-64 bytes"""
     photo_url: str
-    """A valid URL of the photo. Photo must be in **jpeg** format. Photo size must not exceed 5MB"""
+    """A valid URL of the photo. Photo must be in **JPEG** format. Photo size must not exceed 5MB"""
     thumb_url: str
     """URL of the thumbnail for the photo"""
     photo_width: Optional[int] = None

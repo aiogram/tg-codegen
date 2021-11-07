@@ -7,7 +7,7 @@ from pydantic import Field
 from .base import UNSET
 from .input_media import InputMedia
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .input_file import InputFile
     from .message_entity import MessageEntity
 
@@ -36,6 +36,6 @@ class InputMediaVideo(InputMedia):
     height: Optional[int] = None
     """*Optional*. Video height"""
     duration: Optional[int] = None
-    """*Optional*. Video duration"""
+    """*Optional*. Video duration in seconds"""
     supports_streaming: Optional[bool] = None
     """*Optional*. Pass :code:`True`, if the uploaded video is suitable for streaming"""

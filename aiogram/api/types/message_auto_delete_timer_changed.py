@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from .base import TelegramObject
+
+if TYPE_CHECKING:
+    pass
 
 
 class MessageAutoDeleteTimerChanged(TelegramObject):
@@ -11,4 +16,4 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
     """
 
     message_auto_delete_time: int
-    """New auto-delete time for messages in the chat"""
+    """New auto-delete time for messages in the chat; in seconds"""

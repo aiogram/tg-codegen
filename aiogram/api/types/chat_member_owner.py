@@ -6,7 +6,7 @@ from pydantic import Field
 
 from .chat_member import ChatMember
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .user import User
 
 
@@ -22,6 +22,6 @@ class ChatMemberOwner(ChatMember):
     user: User
     """Information about the user"""
     is_anonymous: bool
-    """True, if the user's presence in the chat is hidden"""
+    """:code:`True`, if the user's presence in the chat is hidden"""
     custom_title: Optional[str] = None
     """*Optional*. Custom title for this user"""

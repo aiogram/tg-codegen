@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 from ..types import InlineKeyboardMarkup, Message
 from .base import Request, TelegramMethod
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from ..client.bot import Bot
 
 
 class StopMessageLiveLocation(TelegramMethod[Union[Message, bool]]):
     """
-    Use this method to stop updating a live location message before *live_period* expires. On success, if the message was sent by the bot, the sent :class:`aiogram.types.message.Message` is returned, otherwise :code:`True` is returned.
+    Use this method to stop updating a live location message before *live_period* expires. On success, if the message is not an inline message, the edited :class:`aiogram.types.message.Message` is returned, otherwise :code:`True` is returned.
 
     Source: https://core.telegram.org/bots/api#stopmessagelivelocation
     """

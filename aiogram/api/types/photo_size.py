@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
+
+if TYPE_CHECKING:
+    pass
 
 
 class PhotoSize(TelegramObject):
@@ -21,4 +24,4 @@ class PhotoSize(TelegramObject):
     height: int
     """Photo height"""
     file_size: Optional[int] = None
-    """*Optional*. File size"""
+    """*Optional*. File size in bytes"""

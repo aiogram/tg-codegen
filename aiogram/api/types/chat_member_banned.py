@@ -7,7 +7,7 @@ from pydantic import Field
 
 from .chat_member import ChatMember
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .user import User
 
 
@@ -23,4 +23,4 @@ class ChatMemberBanned(ChatMember):
     user: User
     """Information about the user"""
     until_date: Union[datetime.datetime, datetime.timedelta, int]
-    """Date when restrictions will be lifted for this user; unix time"""
+    """Date when restrictions will be lifted for this user; unix time. If 0, then the user is banned forever"""

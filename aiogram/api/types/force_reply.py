@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
+
+if TYPE_CHECKING:
+    pass
 
 
 class ForceReply(TelegramObject):

@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 from ..types import ChatPermissions
 from .base import Request, TelegramMethod
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from ..client.bot import Bot
 
 
 class RestrictChatMember(TelegramMethod[bool]):
     """
-    Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for this to work and must have the appropriate admin rights. Pass :code:`True` for all permissions to lift restrictions from a user. Returns :code:`True` on success.
+    Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for this to work and must have the appropriate administrator rights. Pass :code:`True` for all permissions to lift restrictions from a user. Returns :code:`True` on success.
 
     Source: https://core.telegram.org/bots/api#restrictchatmember
     """

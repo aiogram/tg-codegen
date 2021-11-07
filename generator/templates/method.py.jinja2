@@ -12,7 +12,7 @@ from ..types import UNSET
 {% endfor %}
 {%- endif %}
 {%- endif %}
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from ..client.bot import Bot
 
 class {{ entity.name|class_name }}(TelegramMethod[{{ entity.python_returning_type }}]):

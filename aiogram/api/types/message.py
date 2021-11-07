@@ -7,7 +7,7 @@ from pydantic import Field
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .animation import Animation
     from .audio import Audio
     from .chat import Chat

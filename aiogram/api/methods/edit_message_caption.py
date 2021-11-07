@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from ..types import UNSET, InlineKeyboardMarkup, Message, MessageEntity
 from .base import Request, TelegramMethod, prepare_parse_mode
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from ..client.bot import Bot
 
 
@@ -29,7 +29,7 @@ class EditMessageCaption(TelegramMethod[Union[Message, bool]]):
     parse_mode: Optional[str] = UNSET
     """Mode for parsing entities in the message caption. See `formatting options <https://core.telegram.org/bots/api#formatting-options>`_ for more details."""
     caption_entities: Optional[List[MessageEntity]] = None
-    """List of special entities that appear in the caption, which can be specified instead of *parse_mode*"""
+    """A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*"""
     reply_markup: Optional[InlineKeyboardMarkup] = None
     """A JSON-serialized object for an `inline keyboard <https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating>`_."""
 

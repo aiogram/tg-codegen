@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from .base import TelegramObject
+
+if TYPE_CHECKING:
+    pass
 
 
 class VoiceChatEnded(TelegramObject):
@@ -11,4 +16,4 @@ class VoiceChatEnded(TelegramObject):
     """
 
     duration: int
-    """Voice chat duration; in seconds"""
+    """Voice chat duration in seconds"""

@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING, Any, Dict, Union
 from ..types import InputFile
 from .base import Request, TelegramMethod, prepare_file
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from ..client.bot import Bot
 
 
 class SetChatPhoto(TelegramMethod[bool]):
     """
-    Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns :code:`True` on success.
+    Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns :code:`True` on success.
 
     Source: https://core.telegram.org/bots/api#setchatphoto
     """

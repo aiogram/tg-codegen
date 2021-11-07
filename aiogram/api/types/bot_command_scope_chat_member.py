@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 from pydantic import Field
 
 from .bot_command_scope import BotCommandScope
+
+if TYPE_CHECKING:
+    pass
 
 
 class BotCommandScopeChatMember(BotCommandScope):

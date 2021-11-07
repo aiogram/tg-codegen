@@ -6,7 +6,7 @@ from pydantic import Field
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .order_info import OrderInfo
     from .user import User
 

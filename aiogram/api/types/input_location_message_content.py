@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .input_message_content import InputMessageContent
+
+if TYPE_CHECKING:
+    pass
 
 
 class InputLocationMessageContent(InputMessageContent):

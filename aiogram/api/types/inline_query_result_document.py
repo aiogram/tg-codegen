@@ -7,7 +7,7 @@ from pydantic import Field
 from .base import UNSET
 from .inline_query_result import InlineQueryResult
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .inline_keyboard_markup import InlineKeyboardMarkup
     from .input_message_content import InputMessageContent
     from .message_entity import MessageEntity
@@ -44,7 +44,7 @@ class InlineQueryResultDocument(InlineQueryResult):
     input_message_content: Optional[InputMessageContent] = None
     """*Optional*. Content of the message to be sent instead of the file"""
     thumb_url: Optional[str] = None
-    """*Optional*. URL of the thumbnail (jpeg only) for the file"""
+    """*Optional*. URL of the thumbnail (JPEG only) for the file"""
     thumb_width: Optional[int] = None
     """*Optional*. Thumbnail width"""
     thumb_height: Optional[int] = None

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
+
+if TYPE_CHECKING:
+    pass
 
 
 class User(TelegramObject):
@@ -15,7 +18,7 @@ class User(TelegramObject):
     id: int
     """Unique identifier for this user or bot. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier."""
     is_bot: bool
-    """True, if this user is a bot"""
+    """:code:`True`, if this user is a bot"""
     first_name: str
     """User's or bot's first name"""
     last_name: Optional[str] = None
@@ -25,8 +28,8 @@ class User(TelegramObject):
     language_code: Optional[str] = None
     """*Optional*. `IETF language tag <https://en.wikipedia.org/wiki/IETF_language_tag>`_ of the user's language"""
     can_join_groups: Optional[bool] = None
-    """*Optional*. True, if the bot can be invited to groups. Returned only in :class:`aiogram.methods.get_me.GetMe`."""
+    """*Optional*. :code:`True`, if the bot can be invited to groups. Returned only in :class:`aiogram.methods.get_me.GetMe`."""
     can_read_all_group_messages: Optional[bool] = None
-    """*Optional*. True, if `privacy mode <https://core.telegram.org/bots#privacy-mode>`_ is disabled for the bot. Returned only in :class:`aiogram.methods.get_me.GetMe`."""
+    """*Optional*. :code:`True`, if `privacy mode <https://core.telegram.org/bots#privacy-mode>`_ is disabled for the bot. Returned only in :class:`aiogram.methods.get_me.GetMe`."""
     supports_inline_queries: Optional[bool] = None
-    """*Optional*. True, if the bot supports inline queries. Returned only in :class:`aiogram.methods.get_me.GetMe`."""
+    """*Optional*. :code:`True`, if the bot supports inline queries. Returned only in :class:`aiogram.methods.get_me.GetMe`."""

@@ -7,7 +7,7 @@ from pydantic import Field
 from .base import UNSET
 from .inline_query_result import InlineQueryResult
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .inline_keyboard_markup import InlineKeyboardMarkup
     from .input_message_content import InputMessageContent
     from .message_entity import MessageEntity
@@ -31,7 +31,7 @@ class InlineQueryResultVideo(InlineQueryResult):
     mime_type: str
     """Mime type of the content of video url, 'text/html' or 'video/mp4'"""
     thumb_url: str
-    """URL of the thumbnail (jpeg only) for the video"""
+    """URL of the thumbnail (JPEG only) for the video"""
     title: str
     """Title for the result"""
     caption: Optional[str] = None

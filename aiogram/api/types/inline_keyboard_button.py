@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Optional
 
 from .base import TelegramObject
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .callback_game import CallbackGame
     from .login_url import LoginUrl
 
@@ -31,4 +31,4 @@ class InlineKeyboardButton(TelegramObject):
     callback_game: Optional[CallbackGame] = None
     """*Optional*. Description of the game that will be launched when the user presses the button."""
     pay: Optional[bool] = None
-    """*Optional*. Specify True, to send a `Pay button <https://core.telegram.org/bots/api#payments>`_."""
+    """*Optional*. Specify :code:`True`, to send a `Pay button <https://core.telegram.org/bots/api#payments>`_."""
